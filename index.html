@@ -133,7 +133,6 @@
             let isFound = false;
             keywords.forEach(kw => { if(str.includes(kw)) isFound = true; });
             if (!isFound) return 0;
-
             const match = str.match(/\d+[\d,.]*/);
             return match ? parseFloat(match[0].replace(/,/g, '')) : 0;
         }
@@ -145,15 +144,24 @@
                 let roomStr = row["เลขห้อง"];
                 let priceStr = row["ราคาขายจริง"];
                 let noteStr = row["หมายเหตุ"];
-                let monthStr = row["เดือน"];
 
-                if (!monthStr || !dateStr) return;
+                if (!dateStr) return;
 
+                // 🎯 ฟังก์ชันใหม่! สร้าง "เดือน" จาก "วันที่เข้าพัก" โดยอัตโนมัติ (ไม่ต้องง้อคอลัมน์ใน Sheets)
                 let formattedDate = dateStr;
-                if (dateStr.includes('/')) {
-                    let p = dateStr.split('/');
-                    formattedDate = `${p[2]}-${p[1].padStart(2, '0')}-${p[0].padStart(2, '0')}`;
+                let monthStr = "";
+                
+                if (dateStr.includes('/')) { // กรณีเป็น DD/MM/YYYY
+                    let parts = dateStr.split('/');
+                    if(parts.length === 3) {
+                        formattedDate = `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+                        monthStr = `${parts[2]}-${parts[1].padStart(2, '0')}`; // สร้าง YYYY-MM
+                    }
+                } else if (dateStr.includes('-')) { // กรณีเป็น YYYY-MM-DD
+                    monthStr = dateStr.substring(0, 7); // ตัดเอาแค่ 7 ตัวแรกเป็นเดือน
                 }
+
+                if(!monthStr) return; // ข้ามถ้าวันที่รูปแบบผิด
 
                 if (!allDataByMonth[monthStr]) {
                     allDataByMonth[monthStr] = { totalIncome: 0, totalElec: 0, totalExp: 0, dailyData: {} };
@@ -181,7 +189,10 @@
             const s = document.getElementById('month-selector');
             s.innerHTML = '';
             const sorted = Object.keys(allDataByMonth).sort();
-            if (sorted.length === 0) return;
+            if (sorted.length === 0) {
+                s.innerHTML = '<option>ไม่พบข้อมูล</option>';
+                return;
+            }
             sorted.forEach(m => {
                 let opt = document.createElement('option');
                 opt.value = m;
@@ -199,17 +210,12 @@
             const d = allDataByMonth[m];
             if(!d) return;
 
-            // 🎯 จุดที่แก้ไข: คำนวณรายได้สุทธิ (ลบค่าใช้จ่ายออกก่อน)
             let netIncome = d.totalIncome - d.totalElec - d.totalExp;
-            
-            // 🎯 คำนวณส่วนแบ่ง 30% จากรายได้สุทธิที่หักแล้ว
             let shareAmount = netIncome * 0.3;
 
             document.getElementById('total-income').innerText = d.totalIncome.toLocaleString() + " ฿";
             document.getElementById('total-electricity').innerText = "- " + d.totalElec.toLocaleString() + " ฿";
             document.getElementById('total-expenses').innerText = "- " + d.totalExp.toLocaleString() + " ฿";
-            
-            // โชว์ยอด 30% ที่ถูกต้อง
             document.getElementById('share-amount').innerText = shareAmount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + " ฿";
             document.getElementById('qr-amount').innerText = shareAmount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + " ฿";
             
