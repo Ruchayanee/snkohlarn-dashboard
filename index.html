@@ -26,107 +26,256 @@
         #room-10{ top: 4%;  left: 5%;  width: 44%; height: 13%; }
         .vacant { background-color: #10b981; } 
         .occupied { background-color: #f43f5e; box-shadow: inset 0 0 20px rgba(0,0,0,0.2); } 
+        .tab-btn { transition: all 0.3s ease; }
+        .tab-active { background-color: #1e293b; color: white; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
+        .tab-inactive { background-color: #e2e8f0; color: #64748b; }
     </style>
 </head>
 <body class="p-4 md:p-8">
     <div class="max-w-6xl mx-auto bg-white p-6 md:p-10 rounded-[2.5rem] shadow-2xl border border-slate-100">
         
-        <header class="text-center mb-10">
-            <h1 class="text-3xl font-bold text-slate-800">📊 ระบบบริหารจัดการ SN Kohlarn</h1>
-            <div class="mt-4 flex items-center justify-center gap-3">
-                <label class="font-bold text-slate-600">ดูข้อมูลเดือน:</label>
-                <select id="month-selector" onchange="changeMonth()" class="p-2 border-2 border-blue-200 rounded-xl font-bold text-blue-700 bg-blue-50 outline-none"></select>
-            </div>
+        <header class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-slate-800">📊 SN Kohlarn Super App</h1>
         </header>
 
-        <!-- สรุป 4 ช่องหลัก -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-            <div class="bg-blue-600 p-6 rounded-3xl text-white shadow-lg">
-                <p class="text-blue-100 text-xs font-bold uppercase">1. รายได้รวม (ก่อนหัก)</p>
-                <p id="total-income" class="text-3xl font-bold mt-1">0 ฿</p>
-            </div>
-            <div class="bg-amber-400 p-6 rounded-3xl text-white shadow-lg">
-                <p class="text-amber-100 text-xs font-bold uppercase">2. หักค่าไฟ</p>
-                <p id="total-electricity" class="text-3xl font-bold mt-1">0 ฿</p>
-            </div>
-            <div class="bg-rose-500 p-6 rounded-3xl text-white shadow-lg">
-                <p class="text-rose-100 text-xs font-bold uppercase">3. หักค่าคนงาน/ทิป</p>
-                <p id="total-expenses" class="text-3xl font-bold mt-1">0 ฿</p>
-            </div>
-            <div class="bg-emerald-600 p-6 rounded-3xl text-white shadow-lg border-b-8 border-emerald-800">
-                <p class="text-emerald-100 text-xs font-bold uppercase">4. ส่วนแบ่ง 30% (สุทธิ)</p>
-                <p id="share-amount" class="text-3xl font-bold mt-1">0 ฿</p>
-            </div>
+        <!-- แถบปุ่มเมนูสลับหน้า -->
+        <div class="flex justify-center gap-4 mb-8">
+            <button id="btn-finance" onclick="switchTab('finance')" class="tab-btn tab-active px-6 py-3 rounded-2xl font-bold flex items-center gap-2">
+                💰 ระบบรายได้
+            </button>
+            <button id="btn-stock" onclick="switchTab('stock')" class="tab-btn tab-inactive px-6 py-3 rounded-2xl font-bold flex items-center gap-2">
+                📦 เช็คสต๊อก
+            </button>
         </div>
 
-        <!-- กราฟรายวัน -->
-        <div class="mb-12 bg-slate-50 p-6 rounded-3xl border border-slate-200">
-            <h2 class="text-lg font-bold mb-4 text-slate-700">📈 ผลประกอบการรายวัน</h2>
-            <canvas id="monthlyChart" height="100"></canvas>
-        </div>
+        <!-- ==================== หน้าต่างที่ 1: ระบบรายได้ ==================== -->
+        <div id="view-finance">
+            <div class="text-center mb-10">
+                <div class="flex items-center justify-center gap-3">
+                    <label class="font-bold text-slate-600">ดูข้อมูลเดือน:</label>
+                    <select id="month-selector" onchange="changeMonth()" class="p-2 border-2 border-slate-200 rounded-xl font-bold text-slate-700 bg-slate-50 outline-none"></select>
+                </div>
+            </div>
 
-        <!-- แผนผังและรายละเอียดรายวัน -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start mb-10">
-            <div class="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
-                <h2 class="text-xl font-bold mb-6 text-slate-700">🔍 รายละเอียดรายวัน</h2>
-                <input type="date" id="date-select" class="w-full p-4 border-2 border-blue-100 rounded-2xl bg-blue-50 font-bold text-blue-800 outline-none mb-6" onchange="updateDailyView()">
-                <div class="space-y-4">
-                    <div class="flex justify-between items-center p-5 bg-slate-50 rounded-2xl">
-                        <span class="text-slate-500">สถานะ:</span>
-                        <span id="daily-status" class="px-4 py-1 rounded-full text-sm font-bold bg-slate-200 text-slate-600">ว่าง</span>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+                <div class="bg-blue-600 p-6 rounded-3xl text-white shadow-lg">
+                    <p class="text-blue-100 text-xs font-bold uppercase">1. รายได้รวม (ก่อนหัก)</p>
+                    <p id="total-income" class="text-3xl font-bold mt-1">0 ฿</p>
+                </div>
+                <div class="bg-amber-400 p-6 rounded-3xl text-white shadow-lg">
+                    <p class="text-amber-100 text-xs font-bold uppercase">2. หักค่าไฟ</p>
+                    <p id="total-electricity" class="text-3xl font-bold mt-1">0 ฿</p>
+                </div>
+                <div class="bg-rose-500 p-6 rounded-3xl text-white shadow-lg">
+                    <p class="text-rose-100 text-xs font-bold uppercase">3. หักค่าคนงาน/ทิป</p>
+                    <p id="total-expenses" class="text-3xl font-bold mt-1">0 ฿</p>
+                </div>
+                <div class="bg-emerald-600 p-6 rounded-3xl text-white shadow-lg border-b-8 border-emerald-800">
+                    <p class="text-emerald-100 text-xs font-bold uppercase">4. ส่วนแบ่ง 30% (สุทธิ)</p>
+                    <p id="share-amount" class="text-3xl font-bold mt-1">0 ฿</p>
+                </div>
+            </div>
+
+            <div class="mb-12 bg-slate-50 p-6 rounded-3xl border border-slate-200">
+                <h2 class="text-lg font-bold mb-4 text-slate-700">📈 ผลประกอบการรายวัน</h2>
+                <canvas id="monthlyChart" height="100"></canvas>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start mb-10">
+                <div class="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
+                    <h2 class="text-xl font-bold mb-6 text-slate-700">🔍 รายละเอียดรายวัน</h2>
+                    <input type="date" id="date-select" class="w-full p-4 border-2 border-blue-100 rounded-2xl bg-blue-50 font-bold text-blue-800 outline-none mb-6" onchange="updateDailyView()">
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center p-5 bg-slate-50 rounded-2xl">
+                            <span class="text-slate-500">สถานะ:</span>
+                            <span id="daily-status" class="px-4 py-1 rounded-full text-sm font-bold bg-slate-200 text-slate-600">ว่าง</span>
+                        </div>
+                        <div class="flex justify-between items-center p-5 bg-blue-600 rounded-2xl text-white">
+                            <span class="font-medium">รายได้วันนี้:</span>
+                            <span id="daily-total" class="text-2xl font-bold">0 ฿</span>
+                        </div>
                     </div>
-                    <div class="flex justify-between items-center p-5 bg-blue-600 rounded-2xl text-white">
-                        <span class="font-medium">รายได้วันนี้:</span>
-                        <span id="daily-total" class="text-2xl font-bold">0 ฿</span>
+                </div>
+                <div class="text-center">
+                    <h3 class="font-bold text-slate-400 mb-4 uppercase text-xs">แผนผังห้องพัก (เขียว=ว่าง / แดง=มีแขก)</h3>
+                    <div class="resort-map shadow-inner">
+                        <div id="room-1" class="room-overlay vacant"><span class="room-label">R</span><span class="room-number">1</span></div>
+                        <div id="room-2" class="room-overlay vacant"><span class="room-label">R</span><span class="room-number">2</span></div>
+                        <div id="room-3" class="room-overlay vacant"><span class="room-label">R</span><span class="room-number">3</span></div>
+                        <div id="room-4" class="room-overlay vacant"><span class="room-label">R</span><span class="room-number">4</span></div>
+                        <div id="room-5" class="room-overlay vacant"><span class="room-label">R</span><span class="room-number">5</span></div>
+                        <div id="room-6" class="room-overlay vacant"><span class="room-label">R</span><span class="room-number">6</span></div>
+                        <div id="room-7" class="room-overlay vacant"><span class="room-label">R</span><span class="room-number">7</span></div>
+                        <div id="room-8" class="room-overlay vacant"><span class="room-label">R</span><span class="room-number">8</span></div>
+                        <div id="room-9" class="room-overlay vacant"><span class="room-label">R</span><span class="room-number">9</span></div>
+                        <div id="room-10" class="room-overlay vacant"><span class="room-label">R</span><span class="room-number">10</span></div>
                     </div>
                 </div>
             </div>
-            <div class="text-center">
-                <h3 class="font-bold text-slate-400 mb-4 uppercase text-xs">แผนผังห้องพัก (เขียว=ว่าง / แดง=มีแขก)</h3>
-                <div class="resort-map shadow-inner">
-                    <!-- Rooms 1-10 -->
-                    <div id="room-1" class="room-overlay vacant"><span class="room-label">R</span><span class="room-number">1</span></div>
-                    <div id="room-2" class="room-overlay vacant"><span class="room-label">R</span><span class="room-number">2</span></div>
-                    <div id="room-3" class="room-overlay vacant"><span class="room-label">R</span><span class="room-number">3</span></div>
-                    <div id="room-4" class="room-overlay vacant"><span class="room-label">R</span><span class="room-number">4</span></div>
-                    <div id="room-5" class="room-overlay vacant"><span class="room-label">R</span><span class="room-number">5</span></div>
-                    <div id="room-6" class="room-overlay vacant"><span class="room-label">R</span><span class="room-number">6</span></div>
-                    <div id="room-7" class="room-overlay vacant"><span class="room-label">R</span><span class="room-number">7</span></div>
-                    <div id="room-8" class="room-overlay vacant"><span class="room-label">R</span><span class="room-number">8</span></div>
-                    <div id="room-9" class="room-overlay vacant"><span class="room-label">R</span><span class="room-number">9</span></div>
-                    <div id="room-10" class="room-overlay vacant"><span class="room-label">R</span><span class="room-number">10</span></div>
+
+            <div class="bg-slate-900 p-8 rounded-[2.5rem] text-center text-white max-w-sm mx-auto shadow-2xl">
+                <h2 class="text-lg font-bold mb-4 uppercase tracking-widest">ชำระยอดส่วนแบ่ง 30%</h2>
+                <div class="bg-white p-3 rounded-2xl inline-block mb-4">
+                    <img src="https://i.postimg.cc/QMvzFd8d/IMG-1752.jpg" alt="QR Code" class="w-48 h-48 object-contain">
+                </div>
+                <p class="text-slate-400 text-xs mb-1">ยอดที่ต้องโอน (หลังหักค่าใช้จ่าย):</p>
+                <p id="qr-amount" class="text-4xl font-bold text-emerald-400">0 ฿</p>
+            </div>
+        </div>
+
+        <!-- ==================== หน้าต่างที่ 2: ระบบจัดการสต๊อก (ของจริง) ==================== -->
+        <div id="view-stock" class="hidden">
+            <!-- กล่องแจ้งเตือน (ซ่อนไว้ก่อน ถ้ามีของใกล้หมดค่อยโชว์) -->
+            <div id="stock-alert-box" class="bg-rose-50 border-2 border-rose-200 p-6 rounded-3xl mb-8 flex items-start gap-4 hidden">
+                <div class="bg-rose-100 p-3 rounded-full text-rose-600 text-2xl">⚠️</div>
+                <div>
+                    <h3 class="text-lg font-bold text-rose-700">แจ้งเตือนด่วน! ของใกล้หมด/หมดแล้ว</h3>
+                    <p id="stock-alert-text" class="text-rose-600 text-sm mt-1 font-bold"></p>
+                </div>
+            </div>
+
+            <div class="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm">
+                <div class="bg-slate-50 p-4 border-b border-slate-200 flex justify-between items-center">
+                    <h2 class="font-bold text-slate-700">รายการของใช้สิ้นเปลือง</h2>
+                    <button onclick="refreshStock()" class="text-xs text-blue-600 bg-blue-50 px-3 py-1 rounded-full font-bold hover:bg-blue-100">🔄 โหลดข้อมูลล่าสุด</button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-100 text-slate-500 text-sm">
+                                <th class="p-4 font-bold">รายการสินค้า</th>
+                                <th class="p-4 font-bold text-center">ยอดคงเหลือ</th>
+                                <th class="p-4 font-bold text-center">จุดสั่งซื้อ</th>
+                                <th class="p-4 font-bold text-center">สถานะ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="stock-table-body" class="text-slate-700">
+                            <!-- ข้อมูลสต๊อกจะถูกดึงมาแทรกตรงนี้อัตโนมัติ -->
+                            <tr><td colspan="4" class="p-4 text-center text-slate-400">กำลังโหลดข้อมูล...</td></tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
 
-        <!-- ส่วนโอนเงิน -->
-        <div class="bg-slate-900 p-8 rounded-[2.5rem] text-center text-white max-w-sm mx-auto shadow-2xl">
-            <h2 class="text-lg font-bold mb-4 uppercase tracking-widest">ชำระยอดส่วนแบ่ง 30%</h2>
-            <div class="bg-white p-3 rounded-2xl inline-block mb-4">
-                <img src="https://i.postimg.cc/QMvzFd8d/IMG-1752.jpg" alt="QR Code" class="w-48 h-48 object-contain">
-            </div>
-            <p class="text-slate-400 text-xs mb-1">ยอดที่ต้องโอน (หลังหักค่าใช้จ่าย):</p>
-            <p id="qr-amount" class="text-4xl font-bold text-emerald-400">0 ฿</p>
-        </div>
     </div>
 
     <script>
-        const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSFeS1r3x0m5TlzHS8O19Qy0uuY9aGXJlEogF1lZkEdlgPewwdCLefvSNmch6MBm83CvUYTEOBMvK2T/pub?gid=109167594&single=true&output=csv';
+        // ฟังก์ชันสลับหน้าจอ (เงิน / สต๊อก)
+        function switchTab(tabName) {
+            const btnFinance = document.getElementById('btn-finance');
+            const btnStock = document.getElementById('btn-stock');
+            const viewFinance = document.getElementById('view-finance');
+            const viewStock = document.getElementById('view-stock');
+
+            if (tabName === 'finance') {
+                btnFinance.className = "tab-btn tab-active px-6 py-3 rounded-2xl font-bold flex items-center gap-2";
+                btnStock.className = "tab-btn tab-inactive px-6 py-3 rounded-2xl font-bold flex items-center gap-2";
+                viewFinance.classList.remove('hidden');
+                viewStock.classList.add('hidden');
+            } else {
+                btnStock.className = "tab-btn tab-active px-6 py-3 rounded-2xl font-bold flex items-center gap-2";
+                btnFinance.className = "tab-btn tab-inactive px-6 py-3 rounded-2xl font-bold flex items-center gap-2";
+                viewStock.classList.remove('hidden');
+                viewFinance.classList.add('hidden');
+            }
+        }
+
+        // ==================== URL ฐานข้อมูลทั้ง 2 ระบบ ====================
+        const FINANCE_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSFeS1r3x0m5TlzHS8O19Qy0uuY9aGXJlEogF1lZkEdlgPewwdCLefvSNmch6MBm83CvUYTEOBMvK2T/pub?gid=109167594&single=true&output=csv';
+        const STOCK_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQk1DLhmM8DEn1BEc8DWFUWjHAxYvGBXNKuEPZQKZw_pMBA3eQc_w1pS8QIea9fyOKGOCYUQygjyLzf/pub?gid=0&single=true&output=csv';
 
         let allDataByMonth = {}; 
         let currentChart = null;
 
         window.onload = () => {
-            Papa.parse(SHEET_CSV_URL, {
+            // โหลดข้อมูลบัญชีรายได้
+            Papa.parse(FINANCE_CSV_URL, {
                 download: true,
                 header: true,
                 skipEmptyLines: true,
-                complete: function(results) {
-                    processData(results.data);
-                }
+                complete: function(results) { processData(results.data); }
             });
+
+            // โหลดข้อมูลสต๊อก
+            loadStockData();
         };
 
+        // ==================== โค้ดส่วนระบบสต๊อกของ (ใหม่) ====================
+        function loadStockData() {
+            document.getElementById('stock-table-body').innerHTML = '<tr><td colspan="4" class="p-4 text-center text-slate-400">กำลังโหลดข้อมูล...</td></tr>';
+            Papa.parse(STOCK_CSV_URL, {
+                download: true,
+                header: true,
+                skipEmptyLines: true,
+                complete: function(results) { processStockData(results.data); }
+            });
+        }
+
+        function refreshStock() {
+            loadStockData(); // ปุ่มกดรีเฟรชข้อมูลสต๊อกใหม่
+        }
+
+        function processStockData(rows) {
+            const tbody = document.getElementById('stock-table-body');
+            tbody.innerHTML = '';
+            let alertItems = [];
+
+            if (rows.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-slate-400">ยังไม่มีข้อมูลสินค้า</td></tr>';
+                return;
+            }
+
+            rows.forEach(row => {
+                const itemName = row["รายการสินค้า"];
+                if (!itemName) return; // ข้ามบรรทัดที่ไม่ได้พิมพ์ชื่อสินค้า
+
+                const remaining = parseInt(row["ยอดคงเหลือ"]) || 0;
+                const reorderPoint = parseInt(row["จุดสั่งซื้อ (แจ้งเตือน)"]) || 0;
+                const unit = row["หน่วยนับ"] || "";
+
+                let statusHTML = '';
+                let rowClass = 'border-b border-slate-100 hover:bg-slate-50';
+                let remainingClass = 'font-bold p-4 text-center ';
+
+                // ระบบไฟจราจร
+                if (remaining <= 0) {
+                    statusHTML = '<span class="bg-rose-100 text-rose-600 px-3 py-1 rounded-full text-xs font-bold">หมดสต๊อก 🔴</span>';
+                    remainingClass += 'text-rose-600';
+                    alertItems.push(itemName);
+                } else if (remaining <= reorderPoint) {
+                    statusHTML = '<span class="bg-amber-100 text-amber-600 px-3 py-1 rounded-full text-xs font-bold">ใกล้หมด 🟡</span>';
+                    remainingClass += 'text-amber-500';
+                    alertItems.push(itemName);
+                } else {
+                    statusHTML = '<span class="bg-emerald-100 text-emerald-600 px-3 py-1 rounded-full text-xs font-bold">ปกติ 🟢</span>';
+                    remainingClass += 'text-emerald-600';
+                }
+
+                // สร้างบรรทัดในตาราง
+                const tr = document.createElement('tr');
+                tr.className = rowClass;
+                tr.innerHTML = `
+                    <td class="p-4 font-medium">${itemName} <span class="text-xs text-slate-400">(${unit})</span></td>
+                    <td class="${remainingClass}">${remaining}</td>
+                    <td class="p-4 text-center text-slate-400">${reorderPoint}</td>
+                    <td class="p-4 text-center">${statusHTML}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            // อัปเดตกล่องแจ้งเตือนด่วนด้านบน
+            const alertBox = document.getElementById('stock-alert-box');
+            const alertText = document.getElementById('stock-alert-text');
+            if (alertItems.length > 0) {
+                alertBox.classList.remove('hidden');
+                alertText.innerText = "กรุณาสั่งซื้อ: " + alertItems.join(', ');
+            } else {
+                alertBox.classList.add('hidden');
+            }
+        }
+
+        // ==================== โค้ดส่วนดึงข้อมูลรายได้ (ของเดิม) ====================
         function extractAmount(text, keywords) {
             if (!text) return 0;
             const str = text.toString();
@@ -147,21 +296,20 @@
 
                 if (!dateStr) return;
 
-                // 🎯 ฟังก์ชันใหม่! สร้าง "เดือน" จาก "วันที่เข้าพัก" โดยอัตโนมัติ (ไม่ต้องง้อคอลัมน์ใน Sheets)
                 let formattedDate = dateStr;
                 let monthStr = "";
                 
-                if (dateStr.includes('/')) { // กรณีเป็น DD/MM/YYYY
+                if (dateStr.includes('/')) {
                     let parts = dateStr.split('/');
                     if(parts.length === 3) {
                         formattedDate = `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
-                        monthStr = `${parts[2]}-${parts[1].padStart(2, '0')}`; // สร้าง YYYY-MM
+                        monthStr = `${parts[2]}-${parts[1].padStart(2, '0')}`;
                     }
-                } else if (dateStr.includes('-')) { // กรณีเป็น YYYY-MM-DD
-                    monthStr = dateStr.substring(0, 7); // ตัดเอาแค่ 7 ตัวแรกเป็นเดือน
+                } else if (dateStr.includes('-')) {
+                    monthStr = dateStr.substring(0, 7);
                 }
 
-                if(!monthStr) return; // ข้ามถ้าวันที่รูปแบบผิด
+                if(!monthStr) return; 
 
                 if (!allDataByMonth[monthStr]) {
                     allDataByMonth[monthStr] = { totalIncome: 0, totalElec: 0, totalExp: 0, dailyData: {} };
@@ -189,10 +337,7 @@
             const s = document.getElementById('month-selector');
             s.innerHTML = '';
             const sorted = Object.keys(allDataByMonth).sort();
-            if (sorted.length === 0) {
-                s.innerHTML = '<option>ไม่พบข้อมูล</option>';
-                return;
-            }
+            if (sorted.length === 0) { s.innerHTML = '<option>ไม่พบข้อมูล</option>'; return; }
             sorted.forEach(m => {
                 let opt = document.createElement('option');
                 opt.value = m;
