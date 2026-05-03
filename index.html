@@ -3,51 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SN Kohlarn - ระบบจัดการรีสอร์ต</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>SN Koh Larn - Super App</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;700&display=swap');
         body { 
-            font-family: 'Sarabun', sans-serif; 
-            background: linear-gradient(135deg, #f8f5f2 0%, #d7ccc8 100%); 
-            min-height: 100vh; 
+            font-family: 'Kanit', sans-serif; 
+            background-color: #f8f5f2; 
             display: flex; 
-            align-items: center; 
+            flex-direction: column; 
             justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+            margin: 0; 
+            text-align: center;
             padding: 20px;
         }
-        .menu-card {
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            border-top: 8px solid #a68b6d;
+        .title { color: #a68b6d; font-size: 36px; font-weight: bold; letter-spacing: 2px; margin-bottom: 5px; }
+        .subtitle { color: #888; font-size: 16px; margin-bottom: 40px; }
+        .btn-app {
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            width: 100%; max-width: 350px; padding: 25px; margin-bottom: 20px;
+            font-size: 20px; font-weight: bold; color: white; text-decoration: none;
+            border-radius: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            transition: 0.3s;
         }
+        .btn-app:active { transform: scale(0.95); }
+        .btn-book { background-color: #059669; }
+        .btn-dash { background-color: #1e293b; }
     </style>
 </head>
 <body>
 
-    <div class="menu-card p-8 max-w-sm w-full text-center">
-        <!-- 🌟 โลโก้ SN Kohlarn 🌟 -->
-        <img src="https://i.postimg.cc/zDw9HWXS/IMG-5036.jpg" alt="SN Kohlarn Logo" class="w-32 mx-auto mb-4 rounded-2xl shadow-sm border-2 border-slate-50">
-        
-        <h1 class="text-2xl font-bold text-[#a68b6d] mb-1 tracking-widest">SN KOH LARN</h1>
-        <p class="text-slate-500 mb-8 text-sm">ระบบจัดการรีสอร์ต (Super App)</p>
+    <img src="https://i.postimg.cc/zDw9HWXS/IMG-5036.jpg" alt="SN Kohlarn Logo" style="width: 130px; margin: 0 auto 20px auto; display: block; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+    <div class="title">SN KOH LARN</div>
+    <div class="subtitle">Super App Management System</div>
 
-        <!-- ปุ่มเมนู -->
-        <div class="space-y-4">
-            <a href="booking.html" class="block w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-4 rounded-xl transition-all shadow-md hover:shadow-lg hover:-translate-y-1 text-lg flex items-center justify-center gap-2">
-                📝 ระบบจองห้องพัก
-            </a>
-            
-            <a href="account.html" class="block w-full bg-slate-700 hover:bg-slate-800 text-white font-bold py-4 rounded-xl transition-all shadow-md hover:shadow-lg hover:-translate-y-1 text-lg flex items-center justify-center gap-2">
-                💰 จัดการบัญชี / บิล
-            </a>
-        </div>
-        
-        <div class="mt-8 text-xs text-slate-400">
-            Secure System &copy; 2026 SN Kohlarn
-        </div>
-    </div>
+    <a href="dashboard.html" class="btn-app btn-dash">📊 ระบบบัญชี และ สต๊อก</a>
+    <a href="booking.html" class="btn-app btn-book">📝 ระบบการจองห้องพัก</a>
 
 </body>
 </html>
