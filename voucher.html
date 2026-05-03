@@ -1,1 +1,137 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Voucher | SN Kohlarn</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;700&display=swap');
+        
+        /* 🌟 ธีมพื้นหลังแอป */
+        body { 
+            font-family: 'Sarabun', sans-serif; 
+            background: linear-gradient(135deg, #f8f5f2 0%, #d7ccc8 100%);
+            min-height: 100vh;
+            padding: 20px 10px;
+        }
 
+        /* 🌟 กระดาษ A4 */
+        .a4-paper { 
+            background: white; 
+            max-width: 210mm; 
+            margin: 0 auto; 
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            padding: 40px; 
+            border-radius: 15px;
+            border-top: 10px solid #a68b6d;
+        }
+
+        /* 🌟 การจัดการตอนพิมพ์ PDF */
+        @media print {
+            body { background: white; margin: 0; padding: 0; }
+            .no-print { display: none !important; }
+            .a4-paper { box-shadow: none; border-radius: 0; padding: 0; max-width: 100%; border-top: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ปุ่มดาวน์โหลด -->
+    <div class="max-w-xl mx-auto mb-6 flex justify-center no-print">
+        <button onclick="window.print()" class="bg-slate-800 text-white font-bold py-3 px-8 rounded-full shadow-xl hover:bg-slate-700 hover:scale-105 transition-all flex items-center gap-2">
+            ⬇️ บันทึกเป็น PDF (ดาวน์โหลด)
+        </button>
+    </div>
+
+    <!-- กระดาษใบจอง A4 -->
+    <div class="a4-paper relative">
+        
+        <!-- 🌟 หัวเอกสาร + โลโก้ (เอาเส้นกรอบออกแล้ว) 🌟 -->
+        <div class="text-center mb-8 border-b-2 border-slate-100 pb-6 flex flex-col items-center">
+            
+            <img src="https://i.postimg.cc/zDw9HWXS/IMG-5036.jpg" alt="SN Kohlarn Logo" class="h-28 w-auto mb-5">
+            
+            <h1 class="text-4xl font-bold text-[#a68b6d] tracking-widest mb-2">SN KOH LARN</h1>
+            <h2 class="text-xl text-slate-500 font-medium">ใบยืนยันการจองห้องพัก / Booking Confirmation</h2>
+        </div>
+
+        <!-- ข้อมูลลูกค้า -->
+        <div class="mb-8">
+            <h3 class="bg-slate-50 text-slate-700 font-bold p-2 rounded-lg mb-4 text-sm uppercase tracking-wide">👤 ข้อมูลผู้เข้าพัก (Guest Information)</h3>
+            <div class="grid grid-cols-2 gap-4 text-base">
+                <div><span class="text-slate-500">ชื่อ-สกุล / Name:</span> <br><strong id="v-name" class="text-lg">-</strong></div>
+                <div><span class="text-slate-500">เบอร์ติดต่อ / Contact:</span> <br><strong id="v-contact" class="text-lg">-</strong></div>
+            </div>
+        </div>
+
+        <!-- รายละเอียดการเข้าพัก -->
+        <div class="mb-8">
+            <h3 class="bg-slate-50 text-slate-700 font-bold p-2 rounded-lg mb-4 text-sm uppercase tracking-wide">📅 รายละเอียดการจอง (Booking Details)</h3>
+            <table class="w-full text-left text-base border-collapse">
+                <tbody>
+                    <tr class="border-b border-slate-100">
+                        <td class="py-3 text-slate-500 w-2/5">เช็คอิน / Check-in:</td>
+                        <td class="py-3 font-bold" id="v-cin">-</td>
+                    </tr>
+                    <tr class="border-b border-slate-100">
+                        <td class="py-3 text-slate-500">เช็คเอาท์ / Check-out:</td>
+                        <td class="py-3 font-bold" id="v-cout">-</td>
+                    </tr>
+                    <tr class="border-b border-slate-100">
+                        <td class="py-3 text-slate-500">จำนวนคืน / Nights:</td>
+                        <td class="py-3 font-bold"><span id="v-nights">-</span> คืน</td>
+                    </tr>
+                    <tr class="border-b border-slate-100">
+                        <td class="py-3 text-slate-500">ห้องพัก / Room(s):</td>
+                        <td class="py-3 font-bold text-[#e67e22]" id="v-rooms">-</td>
+                    </tr>
+                    <tr class="border-b border-slate-100">
+                        <td class="py-3 text-slate-500">บริการเสริม / Extras:</td>
+                        <td class="py-3 font-bold" id="v-extra">-</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- ยอดชำระ -->
+        <div class="mb-8">
+            <h3 class="bg-slate-50 text-slate-700 font-bold p-2 rounded-lg mb-4 text-sm uppercase tracking-wide">💳 รายละเอียดค่าใช้จ่าย (Payment)</h3>
+            <div class="flex justify-between items-center mb-2">
+                <span class="text-slate-500">มัดจำแล้ว / Deposit Paid:</span>
+                <span class="font-bold text-lg text-emerald-600" id="v-deposit">- บาท</span>
+            </div>
+            <div class="flex justify-between items-center bg-[#fff8e1] p-4 rounded-xl border border-[#ffe082] mt-4">
+                <span class="font-bold text-slate-700">ยอดชำระหน้างาน (Amount Due):</span>
+                <span class="font-bold text-2xl text-rose-600" id="v-net">- บาท</span>
+            </div>
+        </div>
+
+        <!-- ท้ายเอกสาร -->
+        <div class="text-center text-sm text-slate-400 mt-12 pt-6 border-t border-slate-100">
+            <p class="font-bold text-slate-500 mb-1">ขอขอบพระคุณที่ไว้วางใจเลือกพักกับ SN Kohlarn</p>
+            <p>กรุณาแสดงใบยืนยันการจองนี้แก่พนักงานในวันเข้าพัก</p>
+            <p class="mt-4">ติดต่อสอบถามโทร: 082-168-8808</p>
+        </div>
+
+    </div>
+
+    <!-- สคริปต์ดึงข้อมูล -->
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        
+        document.getElementById('v-name').innerText = params.get('name') || '-';
+        document.getElementById('v-contact').innerText = params.get('contact') || '-';
+        document.getElementById('v-cin').innerText = params.get('cin') || '-';
+        document.getElementById('v-cout').innerText = params.get('cout') || '-';
+        document.getElementById('v-nights').innerText = params.get('nights') || '-';
+        document.getElementById('v-rooms').innerText = params.get('rooms') || '-';
+        document.getElementById('v-extra').innerText = params.get('extra') || '-';
+        
+        const dep = parseInt(params.get('deposit')) || 0;
+        const net = parseInt(params.get('net')) || 0;
+        document.getElementById('v-deposit').innerText = dep.toLocaleString() + ' บาท';
+        document.getElementById('v-net').innerText = net.toLocaleString() + ' บาท';
+    </script>
+</body>
+</html>
