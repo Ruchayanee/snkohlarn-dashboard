@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบบัญชี SN Kohlarn</title>
+    <title>ระบบบริหารจัดการ SN Kohlarn</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
@@ -32,15 +32,10 @@
     </style>
 </head>
 <body class="p-4 md:p-8">
-    <div class="max-w-6xl mx-auto bg-white p-6 md:p-10 rounded-[2.5rem] shadow-2xl border border-slate-100 relative">
+    <div class="max-w-6xl mx-auto bg-white p-6 md:p-10 rounded-[2.5rem] shadow-2xl border border-slate-100">
         
-        <!-- 🌟 ปุ่มกลับหน้าแรก -->
-        <a href="index.html" class="inline-flex items-center gap-2 bg-slate-100 text-slate-700 px-4 py-2 rounded-xl font-bold hover:bg-slate-200 transition-all text-sm mb-6 md:absolute md:top-8 md:left-8 md:mb-0 decoration-none">
-            🔙 กลับหน้าแรก
-        </a>
-
-        <header class="text-center mb-8 mt-4 md:mt-0">
-            <h1 class="text-3xl font-bold text-slate-800">📊 SN Kohlarn Dashboard</h1>
+        <header class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-slate-800">📊 SN Kohlarn Super App</h1>
         </header>
 
         <!-- แถบปุ่มเมนูสลับหน้า -->
@@ -53,6 +48,7 @@
             </button>
         </div>
 
+        <!-- ==================== หน้าต่างที่ 1: ระบบรายได้ ==================== -->
         <div id="view-finance">
             <div class="text-center mb-10">
                 <div class="flex items-center justify-center gap-3">
@@ -127,7 +123,9 @@
             </div>
         </div>
 
+        <!-- ==================== หน้าต่างที่ 2: ระบบจัดการสต๊อก (ของจริง) ==================== -->
         <div id="view-stock" class="hidden">
+            <!-- กล่องแจ้งเตือน (ซ่อนไว้ก่อน ถ้ามีของใกล้หมดค่อยโชว์) -->
             <div id="stock-alert-box" class="bg-rose-50 border-2 border-rose-200 p-6 rounded-3xl mb-8 flex items-start gap-4 hidden">
                 <div class="bg-rose-100 p-3 rounded-full text-rose-600 text-2xl">⚠️</div>
                 <div>
@@ -152,15 +150,18 @@
                             </tr>
                         </thead>
                         <tbody id="stock-table-body" class="text-slate-700">
+                            <!-- ข้อมูลสต๊อกจะถูกดึงมาแทรกตรงนี้อัตโนมัติ -->
                             <tr><td colspan="4" class="p-4 text-center text-slate-400">กำลังโหลดข้อมูล...</td></tr>
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
+
     </div>
 
     <script>
+        // ฟังก์ชันสลับหน้าจอ (เงิน / สต๊อก)
         function switchTab(tabName) {
             const btnFinance = document.getElementById('btn-finance');
             const btnStock = document.getElementById('btn-stock');
@@ -180,6 +181,7 @@
             }
         }
 
+        // ==================== URL ฐานข้อมูลทั้ง 2 ระบบ ====================
         const FINANCE_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSFeS1r3x0m5TlzHS8O19Qy0uuY9aGXJlEogF1lZkEdlgPewwdCLefvSNmch6MBm83CvUYTEOBMvK2T/pub?gid=109167594&single=true&output=csv';
         const STOCK_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQk1DLhmM8DEn1BEc8DWFUWjHAxYvGBXNKuEPZQKZw_pMBA3eQc_w1pS8QIea9fyOKGOCYUQygjyLzf/pub?gid=0&single=true&output=csv';
 
@@ -187,22 +189,32 @@
         let currentChart = null;
 
         window.onload = () => {
+            // โหลดข้อมูลบัญชีรายได้
             Papa.parse(FINANCE_CSV_URL, {
-                download: true, header: true, skipEmptyLines: true,
+                download: true,
+                header: true,
+                skipEmptyLines: true,
                 complete: function(results) { processData(results.data); }
             });
+
+            // โหลดข้อมูลสต๊อก
             loadStockData();
         };
 
+        // ==================== โค้ดส่วนระบบสต๊อกของ (ใหม่) ====================
         function loadStockData() {
             document.getElementById('stock-table-body').innerHTML = '<tr><td colspan="4" class="p-4 text-center text-slate-400">กำลังโหลดข้อมูล...</td></tr>';
             Papa.parse(STOCK_CSV_URL, {
-                download: true, header: true, skipEmptyLines: true,
+                download: true,
+                header: true,
+                skipEmptyLines: true,
                 complete: function(results) { processStockData(results.data); }
             });
         }
 
-        function refreshStock() { loadStockData(); }
+        function refreshStock() {
+            loadStockData(); // ปุ่มกดรีเฟรชข้อมูลสต๊อกใหม่
+        }
 
         function processStockData(rows) {
             const tbody = document.getElementById('stock-table-body');
@@ -216,7 +228,7 @@
 
             rows.forEach(row => {
                 const itemName = row["รายการสินค้า"];
-                if (!itemName) return;
+                if (!itemName) return; // ข้ามบรรทัดที่ไม่ได้พิมพ์ชื่อสินค้า
 
                 const remaining = parseInt(row["ยอดคงเหลือ"]) || 0;
                 const reorderPoint = parseInt(row["จุดสั่งซื้อ (แจ้งเตือน)"]) || 0;
@@ -226,6 +238,7 @@
                 let rowClass = 'border-b border-slate-100 hover:bg-slate-50';
                 let remainingClass = 'font-bold p-4 text-center ';
 
+                // ระบบไฟจราจร
                 if (remaining <= 0) {
                     statusHTML = '<span class="bg-rose-100 text-rose-600 px-3 py-1 rounded-full text-xs font-bold">หมดสต๊อก 🔴</span>';
                     remainingClass += 'text-rose-600';
@@ -239,6 +252,7 @@
                     remainingClass += 'text-emerald-600';
                 }
 
+                // สร้างบรรทัดในตาราง
                 const tr = document.createElement('tr');
                 tr.className = rowClass;
                 tr.innerHTML = `
@@ -250,6 +264,7 @@
                 tbody.appendChild(tr);
             });
 
+            // อัปเดตกล่องแจ้งเตือนด่วนด้านบน
             const alertBox = document.getElementById('stock-alert-box');
             const alertText = document.getElementById('stock-alert-text');
             if (alertItems.length > 0) {
@@ -260,6 +275,7 @@
             }
         }
 
+        // ==================== โค้ดส่วนดึงข้อมูลรายได้ (ของเดิม) ====================
         function extractAmount(text, keywords) {
             if (!text) return 0;
             const str = text.toString();
