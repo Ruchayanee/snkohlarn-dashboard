@@ -3,148 +3,407 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบจองห้องพัก | SN Kohlarn</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>ระบบการจอง SN Koh Larn</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;700&display=swap');
-        body { 
-            font-family: 'Sarabun', sans-serif; 
-            background-color: #f8f5f2;
-            padding: 20px 10px;
-        }
-        .form-container {
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-            border-top: 6px solid #a68b6d;
-        }
+        :root { --primary-brown: #a68b6d; --light-brown: #d7ccc8; --bg-color: #f8f5f2; --text-dark: #4e443f; --white: #ffffff; --accent-green: #6d8a7a; --orange: #e67e22; }
+        body { font-family: 'Kanit', sans-serif; background-color: var(--bg-color); color: var(--text-dark); margin: 0; padding: 15px; }
+        .container { max-width: 650px; margin: 10px auto; background: var(--white); padding: 25px; border-radius: 20px; box-shadow: 0 10px 30px rgba(166, 139, 109, 0.15); }
+        .btn-back-home { display: block; text-align: center; background-color: #e74c3c; color: white; text-decoration: none; padding: 10px; border-radius: 10px; font-weight: bold; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .header { text-align: center; border-bottom: 2px solid var(--bg-color); padding-bottom: 15px; margin-bottom: 20px; }
+        .header h1 { margin: 0; color: var(--primary-brown); font-size: 26px; letter-spacing: 2px; }
+        .mode-selector { display: flex; flex-wrap: wrap; background: #eee; padding: 5px; border-radius: 12px; margin-bottom: 20px; gap: 5px; }
+        .mode-btn { flex: 1; min-width: 80px; padding: 10px 5px; border-radius: 8px; border: none; cursor: pointer; font-family: 'Kanit'; transition: 0.3s; font-size: 13px; font-weight: 500; }
+        .mode-btn.active { background: var(--primary-brown); color: white; }
+        .admin-section { background: #eef2f7; padding: 15px; border-radius: 12px; border: 1px solid #d1d9e6; margin-bottom: 20px; }
+        h3 { color: var(--primary-brown); font-size: 18px; border-left: 4px solid var(--primary-brown); padding-left: 10px; margin: 25px 0 10px; }
+        .form-group { margin-bottom: 12px; }
+        label { display: block; margin-bottom: 5px; font-size: 14px; font-weight: 500; }
+        .flex-row { display: flex; flex-direction: column; gap: 10px; }
+        @media (min-width: 480px) { .flex-row { flex-direction: row; } .flex-row div { flex: 1; } }
+        input, select { width: 100%; padding: 12px; border: 1px solid #e0d9d5; border-radius: 10px; font-family: 'Kanit'; box-sizing: border-box; }
+        .type-btn { flex: 1; padding: 10px; border: 1px solid var(--light-brown); border-radius: 10px; text-align: center; cursor: pointer; background: #fff; font-size: 14px; }
+        .type-btn.active { background: var(--primary-brown); color: #fff; }
+        .nightly-container { background: #faf8f6; padding: 15px; border-radius: 12px; border: 1px dashed var(--light-brown); }
+        .room-row { display: flex; gap: 10px; margin-bottom: 10px; align-items: flex-start; flex-wrap: wrap; background: #ffffff; padding: 15px; border-radius: 12px; border: 1px solid #e0d9d5; position: relative;}
+        .btn-add { background: var(--accent-green); color: white; border: none; padding: 5px 10px; border-radius: 8px; cursor: pointer; font-size: 12px; }
+        .btn-remove { position: absolute; top: 10px; right: 10px; background: #ffeaa7; color: #d63031; border: none; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 11px; font-weight: bold; }
+        .grid-3 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        @media (min-width: 480px) { .grid-3 { grid-template-columns: repeat(3, 1fr); } }
+        button.main-btn { background-color: var(--primary-brown); color: white; padding: 16px; border: none; border-radius: 12px; cursor: pointer; width: 100%; font-size: 16px; font-weight: 500; margin-top: 20px; }
+        button.action-btn { background-color: #27ae60; color: white; padding: 16px; border: none; border-radius: 12px; cursor: pointer; width: 100%; font-size: 16px; font-weight: 500; margin-top: 10px; }
+        button.action-btn:disabled { background-color: #95a5a6; cursor: not-allowed; }
+        #summaryResult { margin-top: 25px; padding: 20px; border: 1px solid var(--light-brown); background: #fffdfb; border-radius: 15px; display: none; white-space: pre-line; font-size: 14px; line-height: 1.8; }
+        .sub-panel { display: none; padding: 15px; background: #fdfaf5; border-radius: 15px; border: 1px solid var(--light-brown); }
+        .walkin-mode { background-color: #ffeaa7 !important; border-color: #fdcb6e !important; }
+        .room-cb-label { display: inline-block; padding: 6px 12px; background: #f1f3f5; border-radius: 20px; font-size: 13px; cursor: pointer; margin: 4px 4px 0 0; border: 1px solid #dee2e6; color: #495057; transition: all 0.2s; user-select: none; }
+        .room-cb-label input { display: none; }
+        .room-cb-label.checked { background: #1DB446; color: white; border-color: #1DB446; font-weight: bold; box-shadow: 0 2px 5px rgba(29, 180, 70, 0.3); }
+        .room-cb-label.locked { background: #ffdddd; color: #d63031; border-color: #ffcccc; cursor: not-allowed; text-decoration: line-through; opacity: 0.6; }
+        .checkbox-container { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 5px; }
+        #loadingRooms { color: #e67e22; font-size: 12px; display: none; font-weight:bold; }
+        .booking-card { background: #fff; border: 1px solid #e0d9d5; border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .booking-card h4 { margin: 0 0 10px 0; color: #2c3e50; font-size: 16px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
+        .booking-card p { margin: 5px 0; font-size: 13px; color: #555; }
+        .btn-delete-card { background: #e74c3c; color: white; border: none; padding: 10px; width: 100%; border-radius: 8px; cursor: pointer; font-family: 'Kanit'; transition: 0.3s;}
+        .btn-edit-card { background: #f39c12; color: white; border: none; padding: 10px; width: 100%; border-radius: 8px; cursor: pointer; font-family: 'Kanit'; transition: 0.3s;}
+        .btn-delete-card:disabled, .btn-edit-card:disabled { background: #e0d9d5; cursor: not-allowed; }
+        #loadingManage { text-align: center; color: #888; font-size: 14px; margin: 20px 0; display: none; }
     </style>
 </head>
 <body>
 
-    <!-- ปุ่มกลับหน้าแรก -->
-    <div class="max-w-lg mx-auto mb-4">
-        <a href="index.html" class="text-[#a68b6d] font-bold hover:text-slate-700 transition">⬅️ กลับหน้าเมนูหลัก</a>
+<div class="container">
+    <a href="index.html" class="btn-back-home">🔙 กลับหน้าแรก</a>
+
+    <div class="header">
+        <h1>SN KOH LARN</h1>
+        <p style="margin:0; font-size: 12px; color: #888;">ระบบจัดการการจองห้องพัก</p>
     </div>
 
-    <div class="max-w-lg mx-auto form-container p-6">
-        
-        <!-- 🌟 โลโก้ SN Kohlarn 🌟 -->
-        <div class="text-center mb-6 border-b-2 border-slate-100 pb-4">
-            <img src="https://i.postimg.cc/zDw9HWXS/IMG-5036.jpg" alt="SN Kohlarn Logo" class="w-24 mx-auto mb-3 rounded-xl shadow-sm">
-            <h2 class="text-xl font-bold text-slate-700">ระบบบันทึกการจองห้องพัก</h2>
+    <div class="mode-selector">
+        <button class="mode-btn active" id="modeBooking" onclick="switchMode('booking')">📝 ยืนยันจอง</button>
+        <button class="mode-btn" id="modeManage" onclick="switchMode('manage')">📋 จัดการบิล</button>
+    </div>
+
+    <div id="bookingFields">
+        <div class="admin-section" id="bookingChannelSection">
+            <h3 style="margin-top:0; color: #d35400; border-left-color: #d35400;">🏷️ ประเภทการจอง</h3>
+            <select id="bookingChannel" onchange="toggleWalkinMode()" style="font-size: 16px; font-weight: bold; color: #2c3e50;">
+                <option value="online">📱 จองออนไลน์ (ส่งข้อมูลเข้า LINE ลูกค้า)</option>
+                <option value="walkin">🚶‍♂️ ลูกค้า Walk-in หน้ารีสอร์ต (บันทึกบัญชีอย่างเดียว)</option>
+            </select>
         </div>
 
-        <!-- ฟอร์มกรอกข้อมูล -->
-        <form id="bookingForm" class="space-y-4">
-            
-            <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
-                <label class="block text-sm font-bold text-slate-700 mb-1">ประเภทการจอง</label>
-                <select id="channel" class="w-full p-2 border rounded-lg focus:outline-none focus:border-[#a68b6d]">
-                    <option value="online">📱 จองออนไลน์ (ส่งเข้า LINE)</option>
-                    <option value="walkin">🚶‍♂️ Walk-in (ไม่ส่ง LINE)</option>
-                </select>
+        <div id="customerInfoGroup">
+            <h3>👤 ข้อมูลลูกค้า</h3>
+            <div class="flex-row">
+                <div class="form-group"><label>ชื่อลูกค้า</label><input type="text" id="custName" placeholder="เช่น คุณสมชาย"></div>
+                <div class="form-group"><label>เบอร์โทรศัพท์</label><input type="text" id="contactSource" placeholder="เช่น 0812345678"></div>
             </div>
-
-            <div class="grid grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-sm font-bold text-slate-700 mb-1">ชื่อลูกค้า</label>
-                    <input type="text" id="custName" class="w-full p-2 border rounded-lg" placeholder="ชื่อ-สกุล">
-                </div>
-                <div>
-                    <label class="block text-sm font-bold text-slate-700 mb-1">เบอร์ติดต่อ</label>
-                    <input type="text" id="contact" class="w-full p-2 border rounded-lg" placeholder="08X-XXX-XXXX">
-                </div>
+            <div class="form-group" id="lineNameGroup">
+                <label style="color: #27ae60;">💬 ชื่อ LINE ลูกค้า</label>
+                <input type="text" id="lineName" placeholder="พิมพ์ชื่อให้ตรงกับในชีต LineUsers">
             </div>
+        </div>
 
-            <div>
-                <label class="block text-sm font-bold text-slate-700 mb-1">💬 ชื่อ LINE ลูกค้า (สำคัญ! ต้องพิมพ์ให้ตรง)</label>
-                <input type="text" id="lineName" class="w-full p-2 border rounded-lg" placeholder="ระบุชื่อ LINE เพื่อส่งใบจอง">
-            </div>
+        <div class="form-group">
+            <label>👥 จำนวนผู้เข้าพักทั้งหมด</label>
+            <input type="number" id="totalGuests" value="2" min="1">
+        </div>
 
-            <div class="grid grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-sm font-bold text-slate-700 mb-1">เช็คอิน</label>
-                    <input type="date" id="checkIn" class="w-full p-2 border rounded-lg">
-                </div>
-                <div>
-                    <label class="block text-sm font-bold text-slate-700 mb-1">เช็คเอาท์</label>
-                    <input type="date" id="checkOut" class="w-full p-2 border rounded-lg">
-                </div>
-            </div>
+        <h3>📅 วันที่เข้าพัก <span id="loadingRooms">⏳ กำลังเชื่อมต่อ...</span></h3>
+        <div class="flex-row">
+            <div class="form-group"><label>เช็คอิน</label><input type="date" id="checkIn" onchange="updateNightCount(); fetchBookedRooms();"></div>
+            <div class="form-group"><label>เช็คเอ้าท์</label><input type="date" id="checkOut" onchange="updateNightCount(); fetchBookedRooms();"></div>
+        </div>
 
-            <div>
-                <label class="block text-sm font-bold text-slate-700 mb-1">ห้องพักที่จอง (สรุป)</label>
-                <input type="text" id="cardRoomDisplay" class="w-full p-2 border rounded-lg" placeholder="เช่น Std (1), Fam (2)">
-            </div>
+        <h3>🏠 ห้องพัก</h3>
+        <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+            <div class="type-btn active" id="btnSingle" onclick="switchType('single')">ห้องประเภทเดิมตลอด</div>
+            <div class="type-btn" id="btnMixed" onclick="switchType('mixed')">ย้ายห้องรายคืน</div>
+        </div>
 
-            <div>
-                <label class="block text-sm font-bold text-slate-700 mb-1">บริการเสริม / หมายเหตุ</label>
-                <input type="text" id="extraText" class="w-full p-2 border rounded-lg" placeholder="เช่น ผู้ใหญ่เพิ่ม 1, มอไซค์ 1">
-            </div>
-
-            <div class="grid grid-cols-2 gap-4 bg-[#fff8e1] p-4 rounded-lg border border-[#ffe082]">
-                <div>
-                    <label class="block text-sm font-bold text-slate-700 mb-1">มัดจำแล้ว (บาท)</label>
-                    <input type="number" id="deposit" class="w-full p-2 border rounded-lg text-emerald-600 font-bold" value="0">
-                </div>
-                <div>
-                    <label class="block text-sm font-bold text-slate-700 mb-1">ยอดชำระหน้างาน</label>
-                    <input type="number" id="netPay" class="w-full p-2 border rounded-lg text-rose-600 font-bold" value="0">
+        <div id="singleRoomArea" class="nightly-container">
+            <div id="roomRowsContainer">
+                <div class="room-row">
+                    <div style="flex:1.5; min-width:120px;">
+                        <label style="font-size:12px; color:#666;">ประเภทห้อง</label>
+                        <select class="mainRoomType" onchange="handleRoomTypeChange(this)">
+                            <option value="std">Standard</option>
+                            <option value="fam">Family</option>
+                            <option value="sea">Seaview</option>
+                            <option value="jac">Jacuzzi</option>
+                        </select>
+                    </div>
+                    <div style="flex:1; min-width:80px;">
+                        <label style="font-size:12px; color:#e67e22;">ราคา/คืน</label>
+                        <input type="number" class="roomPriceInput" value="1900">
+                    </div>
+                    <div style="flex:1; min-width:60px;">
+                        <label style="font-size:12px; color:#666;">จำนวน</label>
+                        <input type="number" class="roomCount" value="0" readonly style="background:#f8f9fa; cursor:not-allowed;">
+                    </div>
+                    <div style="flex:100%; margin-top:8px;">
+                        <label style="font-size:12px; color:#1DB446; font-weight:bold;">👉 เลือกเบอร์ห้อง</label>
+                        <div class="checkbox-container"></div>
+                    </div>
+                    <button class="btn-remove" onclick="removeRoomRow(this)" style="display: none;">✕ ลบแถวนี้</button>
                 </div>
             </div>
+            <button class="btn-add" onclick="addRoomRow()" style="margin-top:10px;">+ เพิ่มห้องอื่น</button>
+        </div>
 
-            <button type="button" onclick="submitBooking()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-4 rounded-xl mt-4 transition shadow-md text-lg">
-                🚀 ยืนยันบันทึกการจอง
-            </button>
-            <div id="statusMsg" class="text-center font-bold mt-2"></div>
-        </form>
+        <div id="mixedRoomArea" class="nightly-container" style="display:none; background: transparent; border: none; padding: 0;">
+            <div id="mixedList">
+                <p style="text-align:center; color:#e74c3c; font-size:13px; margin:10px 0; background:#faf8f6; padding:15px; border-radius:12px;">⚠️ เลือกวันที่ก่อนครับ</p>
+            </div>
+        </div>
+
+        <div class="admin-section" style="margin-top:15px; background-color: #e8f5e9; border-color: #c8e6c9;">
+            <h4 style="margin:0 0 10px 0; color:#2e7d32; font-size:15px;">🎁 สิทธิประโยชน์ฟรี</h4>
+            <div class="flex-row">
+                <div class="form-group" style="flex:1;"><label>🛵 มอเตอร์ไซค์</label><select id="benefitMotor"><option value="free">✅ ฟรี (ห้องละ 1 คัน)</option><option value="none">❌ ไม่มี</option></select></div>
+                <div class="form-group" style="flex:1;"><label>🍳 อาหารเช้า</label><select id="benefitBreakfast"><option value="free">✅ ฟรีอาหารเช้า</option><option value="none" selected>❌ ไม่มี</option></select></div>
+            </div>
+        </div>
+
+        <h3>➕ บริการเสริม & ส่วนลดพิเศษ</h3>
+        <div class="grid-3">
+            <div class="form-group"><label>ผู้ใหญ่ (+700)</label><input type="number" id="addAdult" value="0"></div>
+            <div class="form-group"><label>เด็กโต (+600)</label><input type="number" id="addKidBig" value="0"></div>
+            <div class="form-group"><label>เด็กเล็ก (+400)</label><input type="number" id="addKidSmall" value="0"></div>
+            <div class="form-group"><label>สัตว์เลี้ยง (+500)</label><input type="number" id="addPet" value="0"></div>
+            <div class="form-group"><label>มอไซค์ (+300)</label><input type="number" id="addMotor" value="0"></div>
+            <div class="form-group"><label style="color:#e74c3c;">🎁 ส่วนลด</label><input type="number" id="discountVal" value="0"></div>
+        </div>
+
+        <div class="admin-section" style="margin-top:15px; background-color: #fff8e1; border-color: #ffe082;">
+            <h4 style="margin:0 0 10px 0; color:#f39c12; font-size:15px;">📝 รายการค่าใช้จ่ายอื่นๆ</h4>
+            <div class="flex-row">
+                <div class="form-group" style="flex:2;"><label>รายละเอียด</label><input type="text" id="customExtraName" placeholder="เช่น ค่าเรือ"></div>
+                <div class="form-group" style="flex:1;"><label>จำนวนเงิน (บาท)</label><input type="number" id="customExtraPrice" value="0"></div>
+            </div>
+        </div>
+        
+        <div class="admin-section" style="margin-top:15px;">
+            <div class="form-group"><label>💰 ค่ามัดจำประกัน</label><input type="number" id="manualDeposit" placeholder="ปกติคิด 1000/ห้อง อัตโนมัติ"></div>
+        </div>
+        
+        <button class="main-btn" onclick="generate()">🔖 1. ตรวจสอบข้อมูล</button>
+        <button id="sendLineBtn" class="action-btn" onclick="submitToBackend()" style="display:none;">🚀 2. ยืนยันบันทึกบัญชี</button>
     </div>
 
-    <script>
-        // 🌟 ใส่ลิงก์ Web App จริงของคุณทนายเรียบร้อย 🌟
-        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyR86HUB7hwVqJebZy9ckbcy-n0tITmzBJSP3cBT53Xiq4Wqf_h21Yp4kPctVfwvedk/exec"; 
+    <div id="manageSection" class="sub-panel">
+        <h3 style="margin-top:0; color: #2980b9; border-left-color: #2980b9;">📋 จัดการบิลปัจจุบัน & อนาคต</h3>
+        <button class="action-btn" onclick="loadBookings()" style="background-color: #3498db; margin-bottom: 15px;">🔄 ดึงข้อมูลล่าสุด</button>
+        <div id="loadingManage">⏳ กำลังเชื่อมต่อ...</div>
+        <div id="bookingListContainer"></div>
+    </div>
 
-        function submitBooking() {
-            document.getElementById("statusMsg").innerHTML = '<span class="text-blue-500">⏳ กำลังบันทึกข้อมูล...</span>';
-            
-            const data = {
-                action: "processBooking",
-                data: {
-                    channel: document.getElementById("channel").value,
-                    custName: document.getElementById("custName").value,
-                    contact: document.getElementById("contact").value,
-                    lineName: document.getElementById("lineName").value,
-                    checkInText: document.getElementById("checkIn").value,
-                    checkOutText: document.getElementById("checkOut").value,
-                    cardRoomDisplay: document.getElementById("cardRoomDisplay").value,
-                    extraText: document.getElementById("extraText").value,
-                    deposit: document.getElementById("deposit").value,
-                    netPay: document.getElementById("netPay").value,
-                    nights: 1, 
-                    dailyRooms: [ { date: document.getElementById("checkIn").value, room: document.getElementById("cardRoomDisplay").value } ],
-                    benefitMotor: "none",
-                    benefitBreakfast: "none"
-                }
-            };
+    <div id="summaryResult"></div>
+</div>
 
-            fetch(WEB_APP_URL, {
-                method: "POST",
-                body: JSON.stringify(data)
-            })
-            .then(res => res.json())
-            .then(res => {
-                if(res.status === "success" || res === "SUCCESS" || res === "WALKIN_SUCCESS") {
-                    document.getElementById("statusMsg").innerHTML = '<span class="text-green-600">✅ บันทึกสำเร็จ!</span>';
-                    setTimeout(() => window.location.reload(), 2000);
-                } else {
-                    document.getElementById("statusMsg").innerHTML = '<span class="text-orange-500">⚠️ บันทึกสำเร็จ แต่ไม่พบ LINE ลูกค้า</span>';
-                }
-            })
-            .catch(err => {
-                document.getElementById("statusMsg").innerHTML = '<span class="text-red-500">❌ เกิดข้อผิดพลาดในการเชื่อมต่อ</span>';
+<script>
+    // 🌟🌟 ลิงก์ API หลังบ้าน 🌟🌟
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyR86HUB7hwVqJebZy9ckbcy-n0tITmzBJSP3cBT53Xiq4Wqf_h21Yp4kPctVfwvedk/exec";
+
+    async function callAPI(action, payload = {}) {
+        try {
+            const response = await fetch(WEB_APP_URL, {
+                method: "POST", body: JSON.stringify({ action: action, data: payload }),
+                headers: { "Content-Type": "text/plain;charset=utf-8" } 
+            });
+            return await response.json();
+        } catch (error) { console.error("API Error:", error); throw error; }
+    }
+
+    const ROOM_NUMBERS = { 'std': ['1', '2', '3', '4', '5'], 'jac': ['6', '7'], 'fam': ['8', '9'], 'sea': ['10'] };
+    const ROOM_DATA = { 'std': { name: 'Standard', price: 1900, short: 'Std' }, 'fam': { name: 'Family', price: 2900, short: 'Fam' }, 'sea': { name: 'Seaview', price: 2900, short: 'Sea' }, 'jac': { name: 'Jacuzzi', price: 3500, short: 'Jac' } };
+
+    let currentMode = 'booking'; let roomMode = 'single'; let currentPayload = null; let globalBookedRooms = {}; 
+
+    window.onload = function() { document.querySelectorAll('.mainRoomType').forEach(sel => handleRoomTypeChange(sel)); };
+
+    function fetchBookedRooms() {
+        const cin = document.getElementById('checkIn').value; const cout = document.getElementById('checkOut').value;
+        if(!cin) return;
+        document.getElementById('loadingRooms').style.display = 'inline';
+        callAPI('getBookedRoomsDict', { cin: cin, cout: cout || cin }).then(res => {
+            globalBookedRooms = res; applyRoomLocks(); document.getElementById('loadingRooms').style.display = 'none';
+        }).catch(err => { document.getElementById('loadingRooms').style.display = 'none'; });
+    }
+
+    function applyRoomLocks() {
+        const cin = document.getElementById('checkIn').value; const cout = document.getElementById('checkOut').value;
+        if (!cin) return; let checkInDateObj = new Date(cin);
+
+        if (roomMode === 'single') {
+            let nights = 1; if (cout) nights = Math.max(1, Math.ceil((new Date(cout) - new Date(cin)) / 86400000));
+            let lockedRoomsForStay = new Set();
+            for(let n=0; n<nights; n++) {
+                let currentNight = new Date(checkInDateObj); currentNight.setDate(currentNight.getDate() + n);
+                let dateStr = currentNight.getFullYear() + "-" + String(currentNight.getMonth() + 1).padStart(2, '0') + "-" + String(currentNight.getDate()).padStart(2, '0');
+                if(globalBookedRooms[dateStr]) globalBookedRooms[dateStr].forEach(r => lockedRoomsForStay.add(r));
+            }
+            document.querySelectorAll('#singleRoomArea .room-cb').forEach(cb => {
+                const lbl = cb.parentElement;
+                if (lockedRoomsForStay.has(cb.value)) { cb.disabled = true; cb.checked = false; lbl.classList.add('locked'); lbl.title = "ไม่ว่าง"; } 
+                else { cb.disabled = false; lbl.classList.remove('locked'); lbl.title = ""; }
+            });
+        } else {
+            document.querySelectorAll('.night-block').forEach(block => {
+                const n = parseInt(block.getAttribute('data-night')); let currentNight = new Date(checkInDateObj); currentNight.setDate(currentNight.getDate() + (n - 1));
+                let dateStr = currentNight.getFullYear() + "-" + String(currentNight.getMonth() + 1).padStart(2, '0') + "-" + String(currentNight.getDate()).padStart(2, '0');
+                let lockedRoomsTonight = globalBookedRooms[dateStr] || [];
+                block.querySelectorAll('.room-cb').forEach(cb => {
+                    const lbl = cb.parentElement;
+                    if (lockedRoomsTonight.includes(cb.value)) { cb.disabled = true; cb.checked = false; lbl.classList.add('locked'); } 
+                    else { cb.disabled = false; lbl.classList.remove('locked'); }
+                });
             });
         }
-    </script>
+        document.querySelectorAll('.room-row').forEach(row => { const qtyInput = row.querySelector('.roomCount, .mixed-qty'); if(qtyInput) qtyInput.value = row.querySelectorAll('.room-cb:checked').length; });
+    }
+
+    function switchMode(m) {
+        currentMode = m;
+        ['modeBooking', 'modeManage'].forEach(id => {
+            const btn = document.getElementById(id);
+            if(btn) btn.classList.toggle('active', id === 'mode' + m.charAt(0).toUpperCase() + m.slice(1));
+        });
+        document.getElementById('bookingFields').style.display = (m === 'booking') ? 'block' : 'none';
+        document.getElementById('manageSection').style.display = (m === 'manage') ? 'block' : 'none';
+        document.getElementById('summaryResult').style.display = 'none';
+        document.getElementById('sendLineBtn').style.display = 'none';
+        if(m === 'manage') loadBookings();
+    }
+
+    function toggleWalkinMode() {
+        const channel = document.getElementById('bookingChannel').value; const lineGroup = document.getElementById('lineNameGroup'); const sendBtn = document.getElementById('sendLineBtn');
+        if (channel === 'walkin') { lineGroup.style.display = 'none'; document.getElementById('lineName').value = ""; if(sendBtn.style.display !== 'none') sendBtn.innerText = "💾 2. บันทึกลงระบบบัญชี"; } 
+        else { lineGroup.style.display = 'block'; if(sendBtn.style.display !== 'none') sendBtn.innerText = "🚀 2. บันทึกบัญชี & ส่งการ์ด LINE"; }
+    }
+
+    function switchType(t) {
+        roomMode = t; document.getElementById('btnSingle').classList.toggle('active', t === 'single'); document.getElementById('btnMixed').classList.toggle('active', t === 'mixed'); document.getElementById('singleRoomArea').style.display = (t === 'single') ? 'block' : 'none'; document.getElementById('mixedRoomArea').style.display = (t === 'mixed') ? 'block' : 'none'; updateNightCount();
+    }
+
+    function handleRoomTypeChange(selectElem) {
+        const priceInput = selectElem.closest('.room-row').querySelector('input[type="number"]');
+        if(priceInput) priceInput.value = ROOM_DATA[selectElem.value].price;
+        const row = selectElem.closest('.room-row'); const type = selectElem.value; const container = row.querySelector('.checkbox-container'); const qtyInput = row.querySelector('.roomCount, .mixed-qty');
+        container.innerHTML = ''; qtyInput.value = 0; 
+        ROOM_NUMBERS[type].forEach(num => {
+            const lbl = document.createElement('label'); lbl.className = 'room-cb-label'; const cb = document.createElement('input'); cb.type = 'checkbox'; cb.value = num; cb.className = 'room-cb';
+            cb.onchange = function() { if(this.checked) lbl.classList.add('checked'); else lbl.classList.remove('checked'); qtyInput.value = row.querySelectorAll('.room-cb:checked').length; };
+            lbl.appendChild(cb); lbl.appendChild(document.createTextNode(` ห้อง ${num}`)); container.appendChild(lbl);
+        });
+        applyRoomLocks();
+    }
+
+    function addRoomRow() { const container = document.getElementById('roomRowsContainer'); const newRow = container.firstElementChild.cloneNode(true); newRow.querySelector('.btn-remove').style.display = 'block'; container.appendChild(newRow); handleRoomTypeChange(newRow.querySelector('.mainRoomType')); }
+    
+    function addMixedRoomRow(btn) {
+        const container = btn.previousElementSibling; 
+        const rowHTML = `<div class="room-row mixed-room-row" style="align-items: flex-start; margin-top:8px; flex-wrap: wrap; background: #ffffff; padding: 15px; border-radius: 12px; border: 1px solid #e0d9d5; position: relative;"> <div style="flex:1.5; min-width:120px;"> <label style="font-size:11px; color:#666;">ประเภทห้อง</label> <select class="mixed-select" onchange="handleRoomTypeChange(this)"> <option value="std">Standard</option> <option value="fam">Family</option> <option value="sea">Seaview</option> <option value="jac">Jacuzzi</option> </select> </div> <div style="flex:1; min-width:80px;"> <label style="font-size:11px; color:#e67e22;">ราคา/คืน</label> <input type="number" class="mixed-price" value="1900"> </div> <div style="flex:1; min-width:60px;"> <label style="font-size:11px; color:#666;">จำนวน</label> <input type="number" class="mixed-qty" value="0" readonly style="background:#f8f9fa; cursor:not-allowed;"> </div> <div style="flex:100%; margin-top:8px;"> <label style="font-size:11px; color:#1DB446; font-weight:bold;">👉 เลือกเบอร์ห้อง (คลิกเพื่อเลือก)</label> <div class="checkbox-container"></div> </div> <button class="btn-remove" onclick="this.parentElement.remove()">✕ ลบ</button> </div>`;
+        container.insertAdjacentHTML('beforeend', rowHTML); handleRoomTypeChange(container.querySelectorAll('.mixed-select')[container.querySelectorAll('.mixed-select').length - 1]);
+    }
+
+    function removeRoomRow(btn) { btn.parentElement.remove(); }
+
+    function updateNightCount() {
+        const cin = document.getElementById('checkIn').value; const cout = document.getElementById('checkOut').value; const list = document.getElementById('mixedList');
+        if (cin && cout && roomMode === 'mixed') {
+            const nights = Math.max(1, Math.ceil((new Date(cout) - new Date(cin)) / 86400000)); list.innerHTML = ''; 
+            for (let i = 1; i <= nights; i++) {
+                list.innerHTML += `<div class="night-block" data-night="${i}" style="background: #faf8f6; padding: 15px; border-radius: 12px; border: 1px dashed var(--light-brown); margin-bottom: 15px;"> <h4 style="margin: 0 0 10px 0; color: #a68b6d; font-size: 15px; border-bottom: 1px solid #e0d9d5; padding-bottom:5px;">🌙 คืนที่ ${i}</h4> <div class="night-rows-container"> <div class="room-row mixed-room-row" style="align-items: flex-start; flex-wrap: wrap; background: #ffffff; padding: 15px; border-radius: 12px; border: 1px solid #e0d9d5; position: relative;"> <div style="flex:1.5; min-width:120px;"> <label style="font-size:11px; color:#666;">ประเภทห้อง</label> <select class="mixed-select" onchange="handleRoomTypeChange(this)"> <option value="std">Standard</option> <option value="fam">Family</option> <option value="sea">Seaview</option> <option value="jac">Jacuzzi</option> </select> </div> <div style="flex:1; min-width:80px;"> <label style="font-size:11px; color:#e67e22;">ราคา/คืน</label> <input type="number" class="mixed-price" value="1900"> </div> <div style="flex:1; min-width:60px;"> <label style="font-size:11px; color:#666;">จำนวน</label> <input type="number" class="mixed-qty" value="0" readonly style="background:#f8f9fa; cursor:not-allowed;"> </div> <div style="flex:100%; margin-top:8px;"> <label style="font-size:11px; color:#1DB446; font-weight:bold;">👉 เลือกเบอร์ห้อง</label> <div class="checkbox-container"></div> </div> <button class="btn-remove" onclick="this.parentElement.remove()" style="display:none;">✕ ลบ</button> </div> </div> <button class="btn-add" onclick="addMixedRoomRow(this)" style="margin-top:10px; background-color:#8ba597; width:100%; padding:8px;">+ เพิ่มห้องในคืนที่ ${i}</button> </div>`;
+            }
+            document.querySelectorAll('.mixed-select').forEach(sel => handleRoomTypeChange(sel));
+        } else if (roomMode === 'mixed') { list.innerHTML = `<p style="text-align:center; color:#e74c3c; font-size:13px; margin:10px 0;">⚠️ เลือกวันที่ก่อนครับ</p>`; }
+    }
+
+    function generate() {
+        const cin = document.getElementById('checkIn').value; const cout = document.getElementById('checkOut').value;
+        if (!cin || !cout) { alert("กรุณาระบุวันที่เข้าพัก"); return; }
+        const channel = document.getElementById('bookingChannel').value; const name = document.getElementById('custName').value || "-"; const source = document.getElementById('contactSource').value || "-"; const lineName = document.getElementById('lineName').value.trim(); const nights = Math.max(1, Math.ceil((new Date(cout) - new Date(cin)) / 86400000));
+        let roomText = ""; let totalRoomPrice = 0; let totalRoomsCount = 0; let cardRoomDisplay = []; let dashboardRooms = new Set(); let dailyRoomsArray = []; let checkInDateObj = new Date(cin);
+
+        if (roomMode === 'single') {
+            document.querySelectorAll('#roomRowsContainer .room-row').forEach(row => {
+                const t = row.querySelector('.mainRoomType').value; const customPrice = parseInt(row.querySelector('input[type="number"]').value) || ROOM_DATA[t].price; const checkedCbs = row.querySelectorAll('.room-cb:checked'); const count = checkedCbs.length;
+                if(count > 0) {
+                    totalRoomsCount += count; let rNos = Array.from(checkedCbs).map(cb => cb.value); let rNoStr = rNos.join(", ");
+                    cardRoomDisplay.push(`${ROOM_DATA[t].short} (${rNoStr})`); rNos.forEach(r => dashboardRooms.add(r)); 
+                    for(let n=0; n<nights; n++) {
+                        let currentNight = new Date(checkInDateObj); currentNight.setDate(currentNight.getDate() + n);
+                        let dateStr = currentNight.getFullYear() + "-" + String(currentNight.getMonth() + 1).padStart(2, '0') + "-" + String(currentNight.getDate()).padStart(2, '0');
+                        totalRoomPrice += (customPrice * count); roomText += `- คืน${n+1}: ${ROOM_DATA[t].name} (${rNoStr})\n`;
+                        rNos.forEach(r => { dailyRoomsArray.push({ date: dateStr, room: r }); });
+                    }
+                }
+            });
+        } else {
+            let maxRoomsInAnyNight = 0;
+            document.querySelectorAll('.night-block').forEach(block => {
+                const n = parseInt(block.getAttribute('data-night')); let currentNight = new Date(checkInDateObj); currentNight.setDate(currentNight.getDate() + (n - 1));
+                let dateStr = currentNight.getFullYear() + "-" + String(currentNight.getMonth() + 1).padStart(2, '0') + "-" + String(currentNight.getDate()).padStart(2, '0');
+                let roomsThisNight = 0;
+                block.querySelectorAll('.mixed-room-row').forEach(row => {
+                    const typeVal = row.querySelector('select').value; const customPrice = parseInt(row.querySelector('input[type="number"]').value) || 0; const checkedCbs = row.querySelectorAll('.room-cb:checked'); const qty = checkedCbs.length;
+                    if(qty > 0) {
+                        roomsThisNight += qty; let rNos = Array.from(checkedCbs).map(cb => cb.value); let rNoStr = rNos.join(", ");
+                        cardRoomDisplay.push(`คืน${n}:${ROOM_DATA[typeVal].short}(${rNoStr})`); rNos.forEach(r => dashboardRooms.add(r));
+                        totalRoomPrice += (customPrice * qty);
+                        rNos.forEach(r => { dailyRoomsArray.push({ date: dateStr, room: r }); });
+                    }
+                });
+                if(roomsThisNight > maxRoomsInAnyNight) maxRoomsInAnyNight = roomsThisNight;
+            });
+            totalRoomsCount = maxRoomsInAnyNight;
+        }
+
+        if(totalRoomsCount === 0) { alert("⚠️ ยังไม่ได้เลือกเบอร์ห้องครับ"); return; }
+
+        const adult = parseInt(document.getElementById('addAdult').value) || 0; const kBig = parseInt(document.getElementById('addKidBig').value) || 0; const kSmall = parseInt(document.getElementById('addKidSmall').value) || 0; const pet = parseInt(document.getElementById('addPet').value) || 0; const motor = parseInt(document.getElementById('addMotor').value) || 0; const discount = parseInt(document.getElementById('discountVal').value) || 0; const customExtraName = document.getElementById('customExtraName').value.trim(); const customExtraPrice = parseInt(document.getElementById('customExtraPrice').value) || 0;
+        let extraText = ""; let totalExtraPrice = (adult*700) + (kBig*600) + (kSmall*400) + (pet*500) + (motor*300) + customExtraPrice;
+        if(adult > 0) extraText += `ผู้ใหญ่(${adult}), `; if(pet > 0) extraText += `สัตว์เลี้ยง(${pet}), `; if(motor > 0) extraText += `เช่ามอไซค์(${motor}), `; if(customExtraPrice > 0) extraText += `${customExtraName}(${customExtraPrice}), `; if(discount > 0) extraText += `ส่วนลด(-${discount}), `;
+
+        let userDeposit = document.getElementById('manualDeposit').value; const deposit = userDeposit !== "" ? parseInt(userDeposit) : (totalRoomsCount * 1000); const netPay = totalRoomPrice + totalExtraPrice - discount;
+
+        currentPayload = {
+            channel: channel, custName: name, lineName: lineName, contact: source, checkInRaw: cin, checkOutRaw: cout, checkInText: cin, checkOutText: cout, nights: nights,
+            cardRoomDisplay: cardRoomDisplay.join(", "), sheetRoomDisplay: Array.from(dashboardRooms).join(", "), dailyRooms: dailyRoomsArray, roomText: roomText, totalRoomPrice: totalRoomPrice, extraText: extraText.replace(/, $/, ""), totalExtraPrice: totalExtraPrice, deposit: deposit, netPay: netPay, benefitMotor: document.getElementById('benefitMotor').value, benefitBreakfast: document.getElementById('benefitBreakfast').value     
+        };
+
+        let resMode = channel === 'walkin' ? "🚶‍♂️ [Walk-in]" : "📱 [Online : ส่ง LINE]";
+        document.getElementById('summaryResult').innerText = `ตรวจสอบ: คุณ ${name}\n${resMode}\nยอดรวม: ${netPay.toLocaleString()} บาท`; 
+        document.getElementById('summaryResult').style.display = 'block';
+        document.getElementById('sendLineBtn').style.display = 'block';
+        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    }
+
+    function submitToBackend() {
+        if(currentPayload.channel === 'online' && !currentPayload.lineName) { alert("⚠️ กรอกชื่อ LINE ด้วยครับ"); return; }
+        const btn = document.getElementById('sendLineBtn'); btn.disabled = true; btn.innerText = "⏳ กำลังบันทึก...";
+        
+        callAPI('processBooking', currentPayload).then(response => {
+            alert("✅ สำเร็จ!"); btn.innerText = "🚀 บันทึกแล้ว"; fetchBookedRooms();
+        }).catch(err => { alert("❌ พลาด! ลองใหม่ครับ"); btn.disabled = false; });
+    }
+
+    function loadBookings() {
+        document.getElementById('loadingManage').style.display = 'block'; document.getElementById('bookingListContainer').innerHTML = '';
+        callAPI('getActiveBookings').then(data => {
+            document.getElementById('loadingManage').style.display = 'none';
+            if(!data || data.length === 0) return document.getElementById('bookingListContainer').innerHTML = '<p class="text-center text-gray-500">ไม่มีบิล</p>';
+            let html = '';
+            data.forEach(b => {
+                html += `<div class="booking-card"><h4>👤 ${b.name} (${b.contact})</h4><p><b>ห้อง:</b> ${b.rooms.join(" | ")}</p><p><b>ยอดสุทธิ:</b> ฿${b.total}</p>
+                <div style="display:flex; gap:10px; margin-top:10px;">
+                    <button class="btn-edit-card" onclick="editBooking('${b.groupKey}', '${b.name}', '${b.contact}')">✏️ แก้ไข</button>
+                    <button class="btn-delete-card" onclick="cancelBooking('${b.groupKey}', '${b.name}')">🗑️ ลบ</button>
+                </div></div>`;
+            });
+            document.getElementById('bookingListContainer').innerHTML = html;
+        });
+    }
+
+    function editBooking(groupKey, custName, contact) {
+        if(confirm(`⚠️ แก้ไขข้อมูล ${custName}?`)) {
+            document.getElementById('custName').value = custName;
+            document.getElementById('bookingChannel').value = contact.includes("Walk-in:") ? 'walkin' : 'online';
+            document.getElementById('contactSource').value = contact.replace("Walk-in: ", "").trim();
+            toggleWalkinMode(); switchMode('booking');
+            callAPI('cancelBookingRecords', { groupKey: groupKey }).then(res => { alert(`เลืออกวันที่ใหม่ได้เลยครับ`); fetchBookedRooms(); });
+        }
+    }
+
+    function cancelBooking(groupKey, custName) {
+        if(confirm(`⚠️ ยืนยันลบบิล ${custName}?`)) {
+            callAPI('cancelBookingRecords', { groupKey: groupKey }).then(res => { alert(`✅ ลบสำเร็จ`); loadBookings(); });
+        }
+    }
+</script>
 </body>
 </html>
