@@ -228,11 +228,20 @@
         }
 
         // --- ส่วนตรวจสอบการโอน (ใหม่) ---
-        function loadPendingOrders() {
+        function loadPendingOrders(limit = 30) {
             const tbody = document.getElementById('verify-table-body');
+            const loadMoreBtn = document.getElementById('load-more-container');
+            
             tbody.innerHTML = '<tr><td colspan="5" class="p-8 text-center text-slate-400">กำลังดึงข้อมูล...</td></tr>';
 
-            fetch(`${BACKEND_URL}?action=getPending`)
+            // ซ่อนปุ่มโหลดทั้งหมดถ้ากดไปแล้ว
+            if (limit === 'all') {
+                loadMoreBtn.style.display = 'none';
+            } else {
+                loadMoreBtn.style.display = 'block';
+            }
+
+            fetch(`${BACKEND_URL}?action=getPending&limit=${limit}`)
                 .then(res => res.json())
                 .then(data => {
                     tbody.innerHTML = '';
@@ -241,7 +250,6 @@
                         return;
                     }
                     data.forEach(item => {
-                        // 🌟 เช็คสถานะเพื่อสร้างปุ่มที่เหมาะสม 🌟
                         let actionButton = '';
                         if (item.status === 'อนุมัติแล้ว') {
                             actionButton = `<button disabled class="bg-emerald-100 text-emerald-600 px-3 py-2 rounded-xl text-[11px] font-bold shadow-sm cursor-not-allowed w-full">✅ อนุมัติ</button>`;
