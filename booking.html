@@ -412,7 +412,16 @@
         const btn = document.getElementById('sendLineBtn'); btn.disabled = true; btn.innerText = "⏳ กำลังบันทึก...";
         
         callAPI('processBooking', currentPayload).then(response => {
-            alert("✅ สำเร็จ!"); 
+            alert("✅ สำเร็จ!");
+            // 🌟 เพิ่มบรรทัดนี้: เพื่อสั่งให้ GAS ไปเปลี่ยนสถานะสลิปเป็นอนุมัติทันที
+        if(currentPayload.rowId) {
+            fetch(`${BACKEND_URL}?action=approve&rowId=${currentPayload.rowId}&admin=SystemAuto`);
+        }
+
+        clearPendingData(); 
+        fetchBookedRooms();
+    });
+}
             btn.innerText = "🚀 บันทึกแล้ว"; 
             
             // ล้างข้อมูล Pending หลังบันทึกสำเร็จ
