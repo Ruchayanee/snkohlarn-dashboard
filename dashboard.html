@@ -223,7 +223,6 @@
             }
         }
 
-        // ระบบตรวจสอบการโอน
         function loadPendingOrders(limit = 30) {
             const tbody = document.getElementById('verify-table-body');
             const loadMoreBtn = document.getElementById('load-more-container');
@@ -258,7 +257,6 @@
                     return;
                 }
 
-                // เรียงเอาล่าสุดขึ้นก่อน
                 rawData.sort((a, b) => new Date(b[0]) - new Date(a[0]));
 
                 rawData.forEach((row, index) => {
@@ -274,25 +272,16 @@
 
                     let actionButton = '';
                     if (item.status === 'อนุมัติแล้ว') {
-                        actionButton = `<span class="text-emerald-600 font-bold text-xs">✅ อนุมัติแล้ว</span>`;
+                        actionButton = '<span class="text-emerald-600 font-bold text-xs">✅ อนุมัติแล้ว</span>';
                     } else if (item.status === 'ยกเลิก') {
-                        actionButton = `<span class="text-rose-500 font-bold text-xs">❌ ยกเลิกแล้ว</span>`;
+                        actionButton = '<span class="text-rose-500 font-bold text-xs">❌ ยกเลิกแล้ว</span>';
                     } else {
-                        actionButton = `<button onclick="goToBooking('${item.custName}', '${item.phone}', '${item.lineName}', '${item.slipUrl}', '${item.rowId}')" 
-                                        class="bg-blue-600 text-white px-3 py-2 rounded-xl text-[11px] font-bold hover:bg-blue-700 shadow-md w-full">
-                                        📝 จัดการการจอง
-                                    </button>`;
+                        actionButton = `<button onclick="goToBooking('${item.custName}', '${item.phone}', '${item.lineName}', '${item.slipUrl}', '${item.rowId}')" class="bg-blue-600 text-white px-3 py-2 rounded-xl text-[11px] font-bold hover:bg-blue-700 shadow-md w-full">📝 จัดการการจอง</button>`;
                     }
 
                     const tr = document.createElement('tr');
                     tr.className = "border-b border-slate-100 hover:bg-slate-50";
-                    tr.innerHTML = `
-                        <td class="p-4 text-xs text-slate-500">${new Date(item.date).toLocaleString('th-TH')}</td>
-                        <td class="p-4 font-bold text-sm text-slate-700">${item.custName}<br><span class="text-[10px] text-slate-400 font-normal">Line: ${item.lineName}</span></td>
-                        <td class="p-4 text-sm text-slate-600">${item.phone}</td>
-                        <td class="p-4 text-center"><a href="${item.slipUrl}" target="_blank" class="text-blue-500 underline text-xs font-bold">เปิดสลิป</a></td>
-                        <td class="p-4 text-center" style="width: 120px;">${actionButton}</td>
-                    `;
+                    tr.innerHTML = `<td class="p-4 text-xs text-slate-500">${new Date(item.date).toLocaleString('th-TH')}</td><td class="p-4 font-bold text-sm text-slate-700">${item.custName}<br><span class="text-[10px] text-slate-400 font-normal">Line: ${item.lineName}</span></td><td class="p-4 text-sm text-slate-600">${item.phone}</td><td class="p-4 text-center"><a href="${item.slipUrl}" target="_blank" class="text-blue-500 underline text-xs font-bold">เปิดสลิป</a></td><td class="p-4 text-center" style="width: 120px;">${actionButton}</td>`;
                     tbody.appendChild(tr);
                 });
             })
@@ -302,12 +291,11 @@
         }
 
         function goToBooking(name, phone, line, slip, rowId) {
-            const bookingPackage = { name, phone, line, slip, rowId };
+            const bookingPackage = { name: name, phone: phone, line: line, slip: slip, rowId: rowId };
             sessionStorage.setItem('pendingBooking', JSON.stringify(bookingPackage));
             window.location.href = 'booking.html'; 
         }
 
-        // ระบบเดิมของคุณทนาย
         const FINANCE_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSFeS1r3x0m5TlzHS8O19Qy0uuY9aGXJlEogF1lZkEdlgPewwdCLefvSNmch6MBm83CvUYTEOBMvK2T/pub?gid=109167594&single=true&output=csv';
         const STOCK_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQk1DLhmM8DEn1BEc8DWFUWjHAxYvGBXNKuEPZQKZw_pMBA3eQc_w1pS8QIea9fyOKGOCYUQygjyLzf/pub?gid=0&single=true&output=csv';
 
