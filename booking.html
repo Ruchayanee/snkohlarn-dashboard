@@ -209,39 +209,47 @@
 
     let currentMode = 'booking'; let roomMode = 'single'; let currentPayload = null; let globalBookedRooms = {}; 
 
-    // --- 🌟 แก้ไขฟังก์ชันโหลดหน้าจอ (ดึงข้อมูลรอการจอง) 🌟 ---
     window.onload = function() { 
-        // โหลดฟังก์ชันเดิม
-        document.querySelectorAll('.mainRoomType').forEach(sel => handleRoomTypeChange(sel)); 
+    // 1. รันฟังก์ชันเดิม (ดึงข้อมูลห้องพัก)
+    document.querySelectorAll('.mainRoomType').forEach(sel => handleRoomTypeChange(sel)); 
 
-        // 🟢 ส่วนดึงข้อมูลข้ามมาจาก Dashboard
-        const pendingBooking = sessionStorage.getItem('pendingBooking');
-        if (pendingBooking) {
-            const data = JSON.parse(pendingBooking);
-            
-            // กรอกข้อมูลพื้นฐานให้อัตโนมัติ
-            if(data.name) document.getElementById('custName').value = data.name;
-            if(data.phone) document.getElementById('contactSource').value = data.phone;
-            if(data.line) document.getElementById('lineName').value = data.line;
-            
-            // แสดงหน้าจอ Preview สลิป
+    // 2. ดึงข้อมูลจาก Dashboard
+    const pendingBooking = sessionStorage.getItem('pendingBooking');
+    console.log("ข้อมูลที่รับมา:", pendingBooking); // ตรวจสอบใน F12 ว่ามีข้อมูลไหม
+
+    if (pendingBooking) {
+        const data = JSON.parse(pendingBooking);
+        
+        // 🟢 ลองกรอกข้อมูล (ดักไว้หลายชื่อ เผื่อกุญแจไม่ตรง)
+        const name = data.name || data.custName;
+        const phone = data.phone || data.contactSource || data.contact;
+        const line = data.line || data.lineName;
+
+        if(name) document.getElementById('custName').value = name;
+        if(phone) document.getElementById('contactSource').value = phone;
+        if(line) document.getElementById('lineName').value = line;
+        
+        // 🟢 แสดงรูปสลิป
+        if (data.slip || data.slipUrl) {
+            const slipSrc = data.slip || data.slipUrl;
             const previewHTML = `
                 <div class="slip-preview-container" id="slipBox">
                     <div style="flex:1;">
                         <p style="margin:0; font-weight:bold; color:#d35400; font-size:14px;">📢 ข้อมูลรอการจอง (โอนสลิปแล้ว)</p>
-                        <p style="margin:5px 0; font-size:11px; color:#666;">ส่งมาจาก Line: <b>${data.line}</b></p>
+                        <p style="margin:5px 0; font-size:11px; color:#666;">ส่งมาจาก Line: <b>${line || 'ไม่ระบุ'}</b></p>
                         <button onclick="clearPendingData()" style="background:#e74c3c; color:white; border:none; padding:4px 8px; border-radius:5px; font-size:10px; cursor:pointer;">ล้างข้อมูลที่ค้างไว้</button>
                     </div>
                     <div class="slip-thumb">
-                        <a href="${data.slip}" target="_blank" title="คลิกดูภาพใหญ่">
-                            <img src="${data.slip}">
+                        <a href="${slipSrc}" target="_blank" title="คลิกดูภาพใหญ่">
+                            <img src="${slipSrc}">
                         </a>
                     </div>
                 </div>
             `;
             document.getElementById('pendingSlipArea').innerHTML = previewHTML;
         }
-    };
+    }
+};
 
     function clearPendingData() {
         sessionStorage.removeItem('pendingBooking');
