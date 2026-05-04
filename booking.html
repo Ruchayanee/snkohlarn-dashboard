@@ -208,7 +208,7 @@
 
     let currentMode = 'booking'; let roomMode = 'single'; let currentPayload = null; let globalBookedRooms = {}; 
 
-    // 🟢 ระบบ Auto-fill 
+    // 🟢 ระบบ Auto-fill (เพิ่มเข้ามาใหม่)
     window.onload = function() { 
         // โหลดฟังก์ชันเดิม
         document.querySelectorAll('.mainRoomType').forEach(sel => handleRoomTypeChange(sel)); 
@@ -223,7 +223,7 @@
             if(data.phone || data.contactSource) document.getElementById('contactSource').value = data.phone || data.contactSource;
             if(data.line || data.lineName) document.getElementById('lineName').value = data.line || data.lineName;
             
-            // 🎯 แก้ไข: แสดงหน้าจอ Preview สลิปแบบปุ่มกด แทนการใช้รูปภาพ
+            // แสดงหน้าจอ Preview สลิปแบบกล่องดูรูป
             const slipUrl = data.slip || data.slipUrl;
             if (slipUrl) {
                 const previewHTML = `
@@ -231,11 +231,11 @@
                         <div style="flex:1;">
                             <p style="margin:0; font-weight:bold; color:#d35400; font-size:14px;">📢 ข้อมูลรอการจอง (โอนสลิปแล้ว)</p>
                             <p style="margin:5px 0; font-size:11px; color:#666;">ส่งมาจาก Line: <b>${data.line || data.lineName || '-'}</b></p>
-                            <button onclick="clearPendingData()" style="background:#e74c3c; color:white; border:none; padding:4px 8px; border-radius:5px; font-size:10px; cursor:pointer; margin-top: 5px;">ล้างข้อมูลที่ค้างไว้</button>
+                            <button onclick="clearPendingData()" style="background:#e74c3c; color:white; border:none; padding:4px 8px; border-radius:5px; font-size:10px; cursor:pointer;">ล้างข้อมูลที่ค้างไว้</button>
                         </div>
-                        <div style="flex-shrink:0;">
-                            <a href="${slipUrl}" target="_blank" style="background-color: #ffffff; border: 2px solid #3498db; color: #3498db; padding: 10px 15px; border-radius: 12px; font-size: 13px; font-weight: bold; text-decoration: none; display: inline-flex; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
-                                🖼️ เปิดดูสลิป
+                        <div class="slip-thumb" style="width:80px; height:80px; border-radius:10px; overflow:hidden; border:1px solid #ccc; flex-shrink:0;">
+                            <a href="${slipUrl}" target="_blank" title="คลิกดูภาพใหญ่">
+                                <img src="${slipUrl}" style="width:100%; height:100%; object-fit:cover;">
                             </a>
                         </div>
                     </div>
@@ -412,7 +412,7 @@
         window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
     }
 
-    // 🟢 ระบบบันทึก + Auto Approve 
+    // 🟢 ระบบบันทึก + Auto Approve (เพิ่มของใหม่เข้าไปในของเดิม)
     function submitToBackend() {
         if(currentPayload.channel === 'online' && !currentPayload.lineName) { alert("⚠️ กรอกชื่อ LINE ด้วยครับ"); return; }
         const btn = document.getElementById('sendLineBtn'); btn.disabled = true; btn.innerText = "⏳ กำลังบันทึก...";
@@ -421,6 +421,7 @@
             alert("✅ สำเร็จ!"); 
             btn.innerText = "🚀 บันทึกแล้ว"; 
             
+            // 🌟 คำสั่งอนุมัติสลิปอัตโนมัติ (ทำงานคู่กับของใหม่) 🌟
             const pending = sessionStorage.getItem('pendingBooking');
             if (pending) {
                 const data = JSON.parse(pending);
@@ -434,7 +435,7 @@
         }).catch(err => { alert("❌ พลาด! ลองใหม่ครับ"); btn.disabled = false; btn.innerText = "🚀 ยืนยันบันทึกบัญชี"; });
     }
 
-    // 🟢 ระบบโหลดบิลและแก้ไข/ยกเลิก
+    // 🟢 ระบบโหลดบิลและแก้ไข/ยกเลิก (กู้คืนครบถ้วน)
     function loadBookings() {
         document.getElementById('loadingManage').style.display = 'block'; document.getElementById('bookingListContainer').innerHTML = '';
         callAPI('getActiveBookings').then(data => {
@@ -468,11 +469,15 @@
 
     function cancelBooking(groupKey, custName) {
         if(confirm(`⚠️ ยืนยันลบบิล ${custName}?`)) {
+            // 1. ยกเลิกในระบบจองหลัก
             callAPI('cancelBookingRecords', { groupKey: groupKey }).then(res => { 
                 alert(`✅ ลบสำเร็จ`); 
+                
+                // 2. 🌟 แจ้งเตือนไปยัง Dashboard ให้เปลี่ยนสถานะสลิปเป็น ❌ ยกเลิก 🌟
                 fetch(`${BACKEND_URL}?action=cancelByName&name=${encodeURIComponent(custName)}`)
                     .catch(e => console.log("แจ้ง Dashboard ขัดข้อง แต่ลบบิลแล้ว", e));
-                loadBookings(); 
+
+                loadBookings(); // รีเฟรชรายการ
             });
         }
     }
