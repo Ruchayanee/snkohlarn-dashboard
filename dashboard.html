@@ -34,28 +34,28 @@
 <body class="p-4 md:p-8">
     <div class="max-w-6xl mx-auto bg-white p-6 md:p-10 rounded-[2.5rem] shadow-2xl border border-slate-100 relative">
         
+        <!-- 🌟 ปุ่มกลับหน้าแรก (อยู่นี่ครับ!) 🌟 -->
         <a href="index.html" class="inline-flex items-center gap-2 bg-slate-100 text-slate-700 px-4 py-2 rounded-xl font-bold hover:bg-slate-200 transition-all text-sm mb-6 md:absolute md:top-8 md:left-8 md:mb-0 decoration-none">
             🔙 กลับหน้าแรก
         </a>
 
         <header class="text-center mb-8 mt-4 md:mt-0">
+            <!-- 🌟 โลโก้ที่เพิ่มเข้ามา 🌟 -->
             <img src="https://i.postimg.cc/zDw9HWXS/IMG-5036.jpg" alt="SN Kohlarn Logo" style="width: 120px; margin: 0 auto 15px auto; display: block; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
             <h1 class="text-3xl font-bold text-slate-800">📊 SN Kohlarn Dashboard</h1>
         </header>
 
-        <div class="flex flex-wrap justify-center gap-3 mb-8">
+        <!-- แถบปุ่มเมนูสลับหน้า (เงิน / สต๊อก) -->
+        <div class="flex justify-center gap-4 mb-8">
             <button id="btn-finance" onclick="switchTab('finance')" class="tab-btn tab-active px-6 py-3 rounded-2xl font-bold flex items-center gap-2">
                 💰 ระบบรายได้
             </button>
             <button id="btn-stock" onclick="switchTab('stock')" class="tab-btn tab-inactive px-6 py-3 rounded-2xl font-bold flex items-center gap-2">
                 📦 เช็คสต๊อก
             </button>
-            <button id="btn-verify" onclick="switchTab('verify')" class="tab-btn tab-inactive px-6 py-3 rounded-2xl font-bold flex items-center gap-2">
-                🔔 ตรวจสอบการโอน
-            </button>
         </div>
 
-        <!-- หน้าต่างที่ 1: ระบบรายได้ -->
+        <!-- ==================== หน้าต่างที่ 1: ระบบรายได้ ==================== -->
         <div id="view-finance">
             <div class="text-center mb-10">
                 <div class="flex items-center justify-center gap-3">
@@ -104,7 +104,7 @@
                     </div>
                 </div>
                 <div class="text-center">
-                    <h3 class="font-bold text-slate-400 mb-4 uppercase text-xs">แผนผังห้องพัก</h3>
+                    <h3 class="font-bold text-slate-400 mb-4 uppercase text-xs">แผนผังห้องพัก (เขียว=ว่าง / แดง=มีแขก)</h3>
                     <div class="resort-map shadow-inner">
                         <div id="room-1" class="room-overlay vacant"><span class="room-label">R</span><span class="room-number">1</span></div>
                         <div id="room-2" class="room-overlay vacant"><span class="room-label">R</span><span class="room-number">2</span></div>
@@ -130,7 +130,7 @@
             </div>
         </div>
 
-        <!-- หน้าต่างที่ 2: ระบบจัดการสต๊อก -->
+        <!-- ==================== หน้าต่างที่ 2: ระบบจัดการสต๊อก ==================== -->
         <div id="view-stock" class="hidden">
             <div id="stock-alert-box" class="bg-rose-50 border-2 border-rose-200 p-6 rounded-3xl mb-8 flex items-start gap-4 hidden">
                 <div class="bg-rose-100 p-3 rounded-full text-rose-600 text-2xl">⚠️</div>
@@ -163,145 +163,29 @@
             </div>
         </div>
 
-        <!-- หน้าต่างที่ 3: ระบบตรวจสอบการโอน -->
-        <div id="view-verify" class="hidden">
-            <div class="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm">
-                <div class="bg-slate-50 p-4 border-b border-slate-200 flex justify-between items-center">
-                    <h2 class="font-bold text-slate-700">รายการแจ้งโอน & ประวัติสลิป</h2>
-                    <button onclick="loadPendingOrders()" class="text-xs text-blue-600 bg-blue-50 px-3 py-1 rounded-full font-bold hover:bg-blue-100">🔄 ดึงข้อมูลล่าสุด</button>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse">
-                        <thead>
-                            <tr class="bg-slate-100 text-slate-500 text-sm">
-                                <th class="p-4 font-bold">วัน/เวลา</th>
-                                <th class="p-4 font-bold">ลูกค้า</th>
-                                <th class="p-4 font-bold">เบอร์โทร</th>
-                                <th class="p-4 font-bold text-center">สลิป</th>
-                                <th class="p-4 font-bold text-center">ดำเนินการ</th>
-                            </tr>
-                        </thead>
-                        <tbody id="verify-table-body" class="text-slate-700">
-                            <tr><td colspan="5" class="p-8 text-center text-slate-400">กำลังโหลดรายการ...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div id="load-more-container" class="bg-slate-50 p-4 text-center border-t border-slate-200">
-                    <button onclick="loadPendingOrders('all')" class="bg-white border border-slate-300 text-slate-600 px-6 py-2 rounded-xl text-sm font-bold hover:bg-slate-100 shadow-sm transition-all">
-                        📂 โหลดประวัติย้อนหลังทั้งหมด
-                    </button>
-                </div>
-            </div>
-        </div>
-
     </div>
 
+    <!-- 🌟 สคริปต์อยู่ด้านล่างนี้ครบทุกบรรทัดครับ! 🌟 -->
     <script>
-        const BACKEND_URL = "https://script.google.com/macros/s/AKfycbyLFO7dgjgdeDY5ETh7B_mV-bJG8T_tHnw-a41sOTfw9EKCoknUv2MJ2CP9yVJtL9CbfA/exec";
-
         function switchTab(tabName) {
             const btnFinance = document.getElementById('btn-finance');
             const btnStock = document.getElementById('btn-stock');
-            const btnVerify = document.getElementById('btn-verify');
             const viewFinance = document.getElementById('view-finance');
             const viewStock = document.getElementById('view-stock');
-            const viewVerify = document.getElementById('view-verify');
-
-            [btnFinance, btnStock, btnVerify].forEach(b => b.className = "tab-btn tab-inactive px-6 py-3 rounded-2xl font-bold flex items-center gap-2");
-            [viewFinance, viewStock, viewVerify].forEach(v => v.classList.add('hidden'));
 
             if (tabName === 'finance') {
                 btnFinance.className = "tab-btn tab-active px-6 py-3 rounded-2xl font-bold flex items-center gap-2";
+                btnStock.className = "tab-btn tab-inactive px-6 py-3 rounded-2xl font-bold flex items-center gap-2";
                 viewFinance.classList.remove('hidden');
-            } else if (tabName === 'stock') {
+                viewStock.classList.add('hidden');
+            } else {
                 btnStock.className = "tab-btn tab-active px-6 py-3 rounded-2xl font-bold flex items-center gap-2";
+                btnFinance.className = "tab-btn tab-inactive px-6 py-3 rounded-2xl font-bold flex items-center gap-2";
                 viewStock.classList.remove('hidden');
-            } else {
-                btnVerify.className = "tab-btn tab-active px-6 py-3 rounded-2xl font-bold flex items-center gap-2";
-                viewVerify.classList.remove('hidden');
-                loadPendingOrders();
+                viewFinance.classList.add('hidden');
             }
         }
 
-        // ระบบตรวจสอบการโอน (ปรับจูนการรับข้อมูล JSON)
-        function loadPendingOrders(limit = 30) {
-            const tbody = document.getElementById('verify-table-body');
-            const loadMoreBtn = document.getElementById('load-more-container');
-            
-            tbody.innerHTML = '<tr><td colspan="5" class="p-8 text-center text-slate-400">กำลังดึงข้อมูล...</td></tr>';
-
-            if (limit === 'all') {
-                loadMoreBtn.style.display = 'none';
-            } else {
-                loadMoreBtn.style.display = 'block';
-            }
-
-            fetch(`${BACKEND_URL}?action=getPending&limit=${limit}`)
-                .then(res => res.json())
-                .then(res => {
-                    if (res.status !== "success") {
-                        tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-rose-500">เกิดข้อผิดพลาด: ${res.message}</td></tr>`;
-                        return;
-                    }
-
-                    const rawData = res.data;
-                    tbody.innerHTML = '';
-
-                    if (!rawData || rawData.length === 0) {
-                        tbody.innerHTML = '<tr><td colspan="5" class="p-8 text-center text-slate-400">ไม่มีรายการแจ้งโอนใหม่ 🟢</td></tr>';
-                        return;
-                    }
-
-                    // เรียงเอาล่าสุดขึ้นก่อน
-                    rawData.sort((a, b) => new Date(b[0]) - new Date(a[0]));
-
-                    rawData.forEach((row, index) => {
-                        const item = {
-                            date: row[0],
-                            lineName: row[1],
-                            custName: row[2],
-                            phone: row[3].toString().replace(/'/g, ''), // ลบเครื่องหมาย ' ออก
-                            slipUrl: row[4],
-                            status: row[5],
-                            rowId: index + 2
-                        };
-
-                        let actionButton = '';
-                        if (item.status === 'อนุมัติแล้ว') {
-                            actionButton = `<span class="text-emerald-600 font-bold text-xs">✅ อนุมัติแล้ว</span>`;
-                        } else if (item.status === 'ยกเลิก') {
-                            actionButton = `<span class="text-rose-500 font-bold text-xs">❌ ยกเลิกแล้ว</span>`;
-                        } else {
-                            actionButton = `<button onclick="goToBooking('${item.custName}', '${item.phone}', '${item.lineName}', '${item.slipUrl}', '${item.rowId}')" 
-                                            class="bg-blue-600 text-white px-3 py-2 rounded-xl text-[11px] font-bold hover:bg-blue-700 shadow-md w-full">
-                                            📝 จัดการการจอง
-                                        </button>`;
-                        }
-
-                        const tr = document.createElement('tr');
-                        tr.className = "border-b border-slate-100 hover:bg-slate-50";
-                        tr.innerHTML = `
-                            <td class="p-4 text-xs text-slate-500">${new Date(item.date).toLocaleString('th-TH')}</td>
-                            <td class="p-4 font-bold text-sm text-slate-700">${item.custName}<br><span class="text-[10px] text-slate-400 font-normal">Line: ${item.lineName}</span></td>
-                            <td class="p-4 text-sm text-slate-600">${item.phone}</td>
-                            <td class="p-4 text-center"><a href="${item.slipUrl}" target="_blank" class="text-blue-500 underline text-xs font-bold">เปิดสลิป</a></td>
-                            <td class="p-4 text-center" style="width: 120px;">${actionButton}</td>
-                        `;
-                        tbody.appendChild(tr);
-                    });
-                })
-                .catch(err => {
-                    tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-rose-500">การเชื่อมต่อขัดข้อง: ${err}</td></tr>`;
-                });
-        }
-
-        function goToBooking(name, phone, line, slip, rowId) {
-            const bookingPackage = { name, phone, line, slip, rowId };
-            sessionStorage.setItem('pendingBooking', JSON.stringify(bookingPackage));
-            window.location.href = 'booking.html'; 
-        }
-
-        // ระบบเดิมของคุณทนาย
         const FINANCE_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSFeS1r3x0m5TlzHS8O19Qy0uuY9aGXJlEogF1lZkEdlgPewwdCLefvSNmch6MBm83CvUYTEOBMvK2T/pub?gid=109167594&single=true&output=csv';
         const STOCK_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQk1DLhmM8DEn1BEc8DWFUWjHAxYvGBXNKuEPZQKZw_pMBA3eQc_w1pS8QIea9fyOKGOCYUQygjyLzf/pub?gid=0&single=true&output=csv';
 
@@ -310,13 +194,16 @@
 
         window.onload = () => {
             Papa.parse(FINANCE_CSV_URL, {
-                download: true, header: true, skipEmptyLines: true,
+                download: true,
+                header: true,
+                skipEmptyLines: true,
                 complete: function(results) { processData(results.data); }
             });
             loadStockData();
         };
 
         function loadStockData() {
+            document.getElementById('stock-table-body').innerHTML = '<tr><td colspan="4" class="p-4 text-center text-slate-400">กำลังโหลดข้อมูล...</td></tr>';
             Papa.parse(STOCK_CSV_URL, {
                 download: true, header: true, skipEmptyLines: true,
                 complete: function(results) { processStockData(results.data); }
@@ -329,22 +216,56 @@
             const tbody = document.getElementById('stock-table-body');
             tbody.innerHTML = '';
             let alertItems = [];
+
+            if (rows.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-slate-400">ยังไม่มีข้อมูลสินค้า</td></tr>';
+                return;
+            }
+
             rows.forEach(row => {
                 const itemName = row["รายการสินค้า"];
                 if (!itemName) return;
+
                 const remaining = parseInt(row["ยอดคงเหลือ"]) || 0;
                 const reorderPoint = parseInt(row["จุดสั่งซื้อ (แจ้งเตือน)"]) || 0;
                 const unit = row["หน่วยนับ"] || "";
-                let statusHTML = remaining <= 0 ? '<span class="bg-rose-100 text-rose-600 px-3 py-1 rounded-full text-xs font-bold">หมด 🔴</span>' : remaining <= reorderPoint ? '<span class="bg-amber-100 text-amber-600 px-3 py-1 rounded-full text-xs font-bold">ใกล้หมด 🟡</span>' : '<span class="bg-emerald-100 text-emerald-600 px-3 py-1 rounded-full text-xs font-bold">ปกติ 🟢</span>';
+
+                let statusHTML = '';
+                let rowClass = 'border-b border-slate-100 hover:bg-slate-50';
+                let remainingClass = 'font-bold p-4 text-center ';
+
+                if (remaining <= 0) {
+                    statusHTML = '<span class="bg-rose-100 text-rose-600 px-3 py-1 rounded-full text-xs font-bold">หมดสต๊อก 🔴</span>';
+                    remainingClass += 'text-rose-600';
+                    alertItems.push(itemName);
+                } else if (remaining <= reorderPoint) {
+                    statusHTML = '<span class="bg-amber-100 text-amber-600 px-3 py-1 rounded-full text-xs font-bold">ใกล้หมด 🟡</span>';
+                    remainingClass += 'text-amber-500';
+                    alertItems.push(itemName);
+                } else {
+                    statusHTML = '<span class="bg-emerald-100 text-emerald-600 px-3 py-1 rounded-full text-xs font-bold">ปกติ 🟢</span>';
+                    remainingClass += 'text-emerald-600';
+                }
+
                 const tr = document.createElement('tr');
-                tr.className = 'border-b border-slate-100 hover:bg-slate-50';
-                tr.innerHTML = `<td class="p-4 font-medium text-sm">${itemName} <span class="text-[10px] text-slate-400">(${unit})</span></td><td class="p-4 text-center font-bold">${remaining}</td><td class="p-4 text-center text-slate-400 text-xs">${reorderPoint}</td><td class="p-4 text-center">${statusHTML}</td>`;
+                tr.className = rowClass;
+                tr.innerHTML = `
+                    <td class="p-4 font-medium">${itemName} <span class="text-xs text-slate-400">(${unit})</span></td>
+                    <td class="${remainingClass}">${remaining}</td>
+                    <td class="p-4 text-center text-slate-400">${reorderPoint}</td>
+                    <td class="p-4 text-center">${statusHTML}</td>
+                `;
                 tbody.appendChild(tr);
-                if (remaining <= reorderPoint) alertItems.push(itemName);
             });
+
             const alertBox = document.getElementById('stock-alert-box');
             const alertText = document.getElementById('stock-alert-text');
-            if (alertItems.length > 0) { alertBox.classList.remove('hidden'); alertText.innerText = "สั่งซื้อเพิ่ม: " + alertItems.join(', '); } else { alertBox.classList.add('hidden'); }
+            if (alertItems.length > 0) {
+                alertBox.classList.remove('hidden');
+                alertText.innerText = "กรุณาสั่งซื้อ: " + alertItems.join(', ');
+            } else {
+                alertBox.classList.add('hidden');
+            }
         }
 
         function extractAmount(text, keywords) {
@@ -364,23 +285,42 @@
                 let roomStr = row["เลขห้อง"];
                 let priceStr = row["ราคาขายจริง"];
                 let noteStr = row["หมายเหตุ"];
+
                 if (!dateStr) return;
+
                 let formattedDate = dateStr;
                 let monthStr = "";
+                
                 if (dateStr.includes('/')) {
                     let parts = dateStr.split('/');
-                    if(parts.length === 3) { formattedDate = `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`; monthStr = `${parts[2]}-${parts[1].padStart(2, '0')}`; }
-                } else if (dateStr.includes('-')) { monthStr = dateStr.substring(0, 7); }
+                    if(parts.length === 3) {
+                        formattedDate = `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+                        monthStr = `${parts[2]}-${parts[1].padStart(2, '0')}`;
+                    }
+                } else if (dateStr.includes('-')) {
+                    monthStr = dateStr.substring(0, 7);
+                }
+
                 if(!monthStr) return; 
-                if (!allDataByMonth[monthStr]) allDataByMonth[monthStr] = { totalIncome: 0, totalElec: 0, totalExp: 0, dailyData: {} };
-                if (!allDataByMonth[monthStr].dailyData[formattedDate]) allDataByMonth[monthStr].dailyData[formattedDate] = { income: 0, rooms: [] };
+
+                if (!allDataByMonth[monthStr]) {
+                    allDataByMonth[monthStr] = { totalIncome: 0, totalElec: 0, totalExp: 0, dailyData: {} };
+                }
+                if (!allDataByMonth[monthStr].dailyData[formattedDate]) {
+                    allDataByMonth[monthStr].dailyData[formattedDate] = { income: 0, rooms: [] };
+                }
+
                 let price = parseFloat(priceStr?.toString().replace(/,/g, '')) || 0;
                 allDataByMonth[monthStr].totalIncome += price;
                 allDataByMonth[monthStr].dailyData[formattedDate].income += price;
+
                 allDataByMonth[monthStr].totalElec += extractAmount(noteStr, ["ค่าไฟ"]);
                 allDataByMonth[monthStr].totalExp += extractAmount(noteStr, ["คนงาน", "ทิป"]);
+
                 let room = parseInt(roomStr);
-                if (!isNaN(room) && !allDataByMonth[monthStr].dailyData[formattedDate].rooms.includes(room)) allDataByMonth[monthStr].dailyData[formattedDate].rooms.push(room);
+                if (!isNaN(room) && !allDataByMonth[monthStr].dailyData[formattedDate].rooms.includes(room)) {
+                    allDataByMonth[monthStr].dailyData[formattedDate].rooms.push(room);
+                }
             });
             setupMonthSelector();
         }
@@ -389,6 +329,7 @@
             const s = document.getElementById('month-selector');
             s.innerHTML = '';
             const sorted = Object.keys(allDataByMonth).sort();
+            if (sorted.length === 0) { s.innerHTML = '<option>ไม่พบข้อมูล</option>'; return; }
             sorted.forEach(m => {
                 let opt = document.createElement('option');
                 opt.value = m;
@@ -397,22 +338,24 @@
                 opt.text = `${mNames[parseInt(p[1])]} ${p[0]}`;
                 s.appendChild(opt);
             });
-            if(sorted.length > 0) {
-                s.value = sorted[sorted.length - 1];
-                changeMonth();
-            }
+            s.value = sorted[sorted.length - 1];
+            changeMonth();
         }
 
         function changeMonth() {
             const m = document.getElementById('month-selector').value;
             const d = allDataByMonth[m];
             if(!d) return;
-            let shareAmount = (d.totalIncome - d.totalElec - d.totalExp) * 0.3;
+
+            let netIncome = d.totalIncome - d.totalElec - d.totalExp;
+            let shareAmount = netIncome * 0.3;
+
             document.getElementById('total-income').innerText = d.totalIncome.toLocaleString() + " ฿";
             document.getElementById('total-electricity').innerText = "- " + d.totalElec.toLocaleString() + " ฿";
             document.getElementById('total-expenses').innerText = "- " + d.totalExp.toLocaleString() + " ฿";
             document.getElementById('share-amount').innerText = shareAmount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + " ฿";
             document.getElementById('qr-amount').innerText = shareAmount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + " ฿";
+            
             const sortedDates = Object.keys(d.dailyData).sort();
             document.getElementById('date-select').value = sortedDates[sortedDates.length - 1] || "";
             updateDailyView();
@@ -423,10 +366,15 @@
             const m = document.getElementById('month-selector').value;
             const ds = document.getElementById('date-select').value;
             let data = (allDataByMonth[m] && allDataByMonth[m].dailyData[ds]) ? allDataByMonth[m].dailyData[ds] : { income: 0, rooms: [] };
+            
             document.getElementById('daily-total').innerText = data.income.toLocaleString() + " ฿";
             const elStatus = document.getElementById('daily-status');
-            elStatus.innerText = data.rooms.length === 10 ? "เต็ม" : `พัก ${data.rooms.length} ห้อง`;
-            for(let i=1; i<=10; i++) { document.getElementById(`room-${i}`).className = `room-overlay ${data.rooms.includes(i) ? 'occupied' : 'vacant'}`; }
+            elStatus.innerText = data.rooms.length === 10 ? "เต็ม" : `เข้าพัก ${data.rooms.length} ห้อง`;
+            elStatus.className = `px-4 py-1 rounded-full text-sm font-bold ${data.rooms.length === 10 ? 'bg-rose-100 text-rose-600' : 'bg-emerald-100 text-emerald-600'}`;
+
+            for(let i=1; i<=10; i++) {
+                document.getElementById(`room-${i}`).className = `room-overlay ${data.rooms.includes(i) ? 'occupied' : 'vacant'}`;
+            }
         }
 
         function renderChart(m, dailyData) {
@@ -435,8 +383,15 @@
             if(currentChart) currentChart.destroy();
             currentChart = new Chart(ctx, {
                 type: 'bar',
-                data: { labels: sorted.map(d => parseInt(d.split('-')[2])), datasets: [{ label: 'รายได้', data: sorted.map(d => dailyData[d].income), backgroundColor: '#3b82f6', borderRadius: 8 }] },
-                options: { responsive: true, plugins: { legend: { display: false } } }
+                data: {
+                    labels: sorted.map(d => parseInt(d.split('-')[2])),
+                    datasets: [{ label: 'รายได้รวม (฿)', data: sorted.map(d => dailyData[d].income), backgroundColor: '#3b82f6', borderRadius: 8 }]
+                },
+                options: { 
+                    responsive: true, 
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true, grid: { color: '#f1f5f9' } }, x: { grid: { display: false } } }
+                }
             });
         }
     </script>
