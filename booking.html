@@ -210,46 +210,63 @@
     let currentMode = 'booking'; let roomMode = 'single'; let currentPayload = null; let globalBookedRooms = {}; 
 
     window.onload = function() { 
-    // 1. รันฟังก์ชันเดิม (ดึงข้อมูลห้องพัก)
-    document.querySelectorAll('.mainRoomType').forEach(sel => handleRoomTypeChange(sel)); 
-
-    // 2. ดึงข้อมูลจาก Dashboard
+    function checkPendingBooking() {
     const pendingBooking = sessionStorage.getItem('pendingBooking');
-    console.log("ข้อมูลที่รับมา:", pendingBooking); // ตรวจสอบใน F12 ว่ามีข้อมูลไหม
+    console.log("Checking session storage...", pendingBooking);
 
     if (pendingBooking) {
         const data = JSON.parse(pendingBooking);
         
-        // 🟢 ลองกรอกข้อมูล (ดักไว้หลายชื่อ เผื่อกุญแจไม่ตรง)
-        const name = data.name || data.custName;
-        const phone = data.phone || data.contactSource || data.contact;
-        const line = data.line || data.lineName;
+        // 1. กรอกข้อมูล (ใช้ ID ที่ถูกต้องของคุณทนาย)
+        const fields = {
+            'custName': data.name || data.custName,
+            'contactSource': data.phone || data.contactSource,
+            'lineName': data.line || data.lineName
+        };
 
-        if(name) document.getElementById('custName').value = name;
-        if(phone) document.getElementById('contactSource').value = phone;
-        if(line) document.getElementById('lineName').value = line;
-        
-        // 🟢 แสดงรูปสลิป
-        if (data.slip || data.slipUrl) {
-            const slipSrc = data.slip || data.slipUrl;
-            const previewHTML = `
-                <div class="slip-preview-container" id="slipBox">
+        for (let id in fields) {
+            const input = document.getElementById(id);
+            if (input && fields[id]) {
+                input.value = fields[id];
+                console.log(`Filled ${id} with ${fields[id]}`);
+            }
+        }
+
+        // 2. แสดงกล่องสลิป (ถ้ายังไม่มีที่วาง ให้สร้างเอง)
+        let previewArea = document.getElementById('pendingSlipArea');
+        if (!previewArea) {
+            previewArea = document.createElement('div');
+            previewArea.id = 'pendingSlipArea';
+            const target = document.querySelector('.mode-selector');
+            if (target) target.parentNode.insertBefore(previewArea, target);
+        }
+
+        const slipUrl = data.slip || data.slipUrl;
+        if (slipUrl) {
+            previewArea.innerHTML = `
+                <div class="slip-preview-container" style="background:#fff8e1; border:2px solid #f39c12; padding:15px; border-radius:15px; margin-bottom:20px; display:flex; gap:15px; align-items:center;">
                     <div style="flex:1;">
-                        <p style="margin:0; font-weight:bold; color:#d35400; font-size:14px;">📢 ข้อมูลรอการจอง (โอนสลิปแล้ว)</p>
-                        <p style="margin:5px 0; font-size:11px; color:#666;">ส่งมาจาก Line: <b>${line || 'ไม่ระบุ'}</b></p>
-                        <button onclick="clearPendingData()" style="background:#e74c3c; color:white; border:none; padding:4px 8px; border-radius:5px; font-size:10px; cursor:pointer;">ล้างข้อมูลที่ค้างไว้</button>
+                        <p style="margin:0; font-weight:bold; color:#d35400; font-size:14px;">📢 ข้อมูลรอการจอง (ตรวจสลิปตรงนี้)</p>
+                        <p style="margin:5px 0; font-size:11px; color:#666;">ลูกค้า: <b>${data.line || '-'}</b></p>
+                        <button onclick="sessionStorage.removeItem('pendingBooking'); location.reload();" style="background:#e74c3c; color:white; border:none; padding:4px 8px; border-radius:5px; font-size:10px; cursor:pointer;">ล้างข้อมูล</button>
                     </div>
-                    <div class="slip-thumb">
-                        <a href="${slipSrc}" target="_blank" title="คลิกดูภาพใหญ่">
-                            <img src="${slipSrc}">
-                        </a>
+                    <div style="width:80px; height:80px; border-radius:10px; overflow:hidden; border:1px solid #ccc;">
+                        <a href="${slipUrl}" target="_blank"><img src="${slipUrl}" style="width:100%; height:100%; object-fit:cover;"></a>
                     </div>
                 </div>
             `;
-            document.getElementById('pendingSlipArea').innerHTML = previewHTML;
         }
     }
-};
+}
+
+// ใช้ตัวนี้ดักแทน window.onload ปกติ เพื่อป้องกันการชนกันของ Script
+if (document.readyState === 'complete') {
+    setTimeout(checkPendingBooking, 500); // รอ 0.5 วินาทีเพื่อให้ชัวร์
+} else {
+    window.addEventListener('load', () => {
+        setTimeout(checkPendingBooking, 500);
+    });
+}
 
     function clearPendingData() {
         sessionStorage.removeItem('pendingBooking');
