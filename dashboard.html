@@ -197,7 +197,7 @@
     </div>
 
     <script>
-        const BACKEND_URL = "https://script.google.com/macros/s/AKfycbyR86HUB7hwVqJebZy9ckbcy-n0tITmzBJSP3cBT53Xiq4Wqf_h21Yp4kPctVfwvedk/exec";
+        const BACKEND_URL = "https://script.google.com/macros/s/AKfycbyLFO7dgjgdeDY5ETh7B_mV-bJG8T_tHnw-a41sOTfw9EKCoknUv2MJ2CP9yVJtL9CbfA/exec";
 
         function switchTab(tabName) {
             const btnFinance = document.getElementById('btn-finance');
@@ -223,7 +223,7 @@
             }
         }
 
-        // ระบบตรวจสอบการโอน (ปรับจูนการรับข้อมูล JSON)
+        // ระบบตรวจสอบการโอน
         function loadPendingOrders(limit = 30) {
             const tbody = document.getElementById('verify-table-body');
             const loadMoreBtn = document.getElementById('load-more-container');
@@ -236,26 +236,11 @@
                 loadMoreBtn.style.display = 'block';
             }
 
-           function loadPendingOrders(limit = 30) {
-            const tbody = document.getElementById('verify-table-body');
-            const loadMoreBtn = document.getElementById('load-more-container');
-            
-            tbody.innerHTML = '<tr><td colspan="5" class="p-8 text-center text-slate-400">กำลังดึงข้อมูล...</td></tr>';
-
-            // ซ่อนปุ่มโหลดทั้งหมดถ้ากดไปแล้ว
-            if (limit === 'all') {
-                loadMoreBtn.style.display = 'none';
-            } else {
-                loadMoreBtn.style.display = 'block';
-            }
-
-            // 🚨 จุดที่แก้ไข: เพิ่มการตั้งค่า { redirect: 'follow' } เพื่อแก้ปัญหา CORS (Failed to fetch)
             fetch(`${BACKEND_URL}?action=getPending&limit=${limit}`, {
                 method: 'GET',
                 redirect: 'follow' 
             })
             .then(res => {
-                // เช็คให้ชัวร์ว่าการเชื่อมต่อไม่มีปัญหา
                 if (!res.ok) throw new Error('Network response was not ok');
                 return res.json();
             })
@@ -281,7 +266,7 @@
                         date: row[0],
                         lineName: row[1],
                         custName: row[2],
-                        phone: row[3] ? row[3].toString().replace(/'/g, '') : '', // ลบเครื่องหมาย ' ออก (กันเหนียวถ้าบางแถวไม่มีเบอร์)
+                        phone: row[3] ? row[3].toString().replace(/'/g, '') : '', 
                         slipUrl: row[4],
                         status: row[5],
                         rowId: index + 2
@@ -312,10 +297,10 @@
                 });
             })
             .catch(err => {
-                // แจ้งเตือนให้ชัดเจนขึ้นเมื่อเกิด Error
-                tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-rose-500">การเชื่อมต่อขัดข้อง (Failed to fetch): กรุณาลองรีเฟรชหน้าเว็บอีกครั้ง<br><span class="text-xs text-slate-400">${err}</span></td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-rose-500">การเชื่อมต่อขัดข้อง: ตรวจสอบ URL หรือลองล้างแคชเบราว์เซอร์<br><span class="text-xs text-slate-400">${err}</span></td></tr>`;
             });
         }
+
         function goToBooking(name, phone, line, slip, rowId) {
             const bookingPackage = { name, phone, line, slip, rowId };
             sessionStorage.setItem('pendingBooking', JSON.stringify(bookingPackage));
