@@ -469,7 +469,16 @@
 
     function cancelBooking(groupKey, custName) {
         if(confirm(`⚠️ ยืนยันลบบิล ${custName}?`)) {
-            callAPI('cancelBookingRecords', { groupKey: groupKey }).then(res => { alert(`✅ ลบสำเร็จ`); loadBookings(); });
+            // 1. ยกเลิกในระบบจองหลัก
+            callAPI('cancelBookingRecords', { groupKey: groupKey }).then(res => { 
+                alert(`✅ ลบสำเร็จ`); 
+                
+                // 2. 🌟 แจ้งเตือนไปยัง Dashboard ให้เปลี่ยนสถานะสลิปเป็น ❌ ยกเลิก 🌟
+                fetch(`${BACKEND_URL}?action=cancelByName&name=${encodeURIComponent(custName)}`)
+                    .catch(e => console.log("แจ้ง Dashboard ขัดข้อง แต่ลบบิลแล้ว", e));
+
+                loadBookings(); // รีเฟรชรายการ
+            });
         }
     }
 </script>
