@@ -231,10 +231,23 @@
                 .then(data => {
                     tbody.innerHTML = '';
                     if (data.length === 0) {
-                        tbody.innerHTML = '<tr><td colspan="5" class="p-8 text-center text-slate-400">ไม่มีรายการค้างตรวจสอบ 🟢</td></tr>';
+                        tbody.innerHTML = '<tr><td colspan="5" class="p-8 text-center text-slate-400">ไม่มีรายการ 🟢</td></tr>';
                         return;
                     }
                     data.forEach(item => {
+                        // 🌟 เช็คสถานะเพื่อสร้างปุ่มที่เหมาะสม 🌟
+                        let actionButton = '';
+                        if (item.status === 'อนุมัติแล้ว') {
+                            actionButton = `<button disabled class="bg-emerald-100 text-emerald-600 px-3 py-2 rounded-xl text-[11px] font-bold shadow-sm cursor-not-allowed w-full">✅ อนุมัติ</button>`;
+                        } else if (item.status === 'ยกเลิกการจอง') {
+                            actionButton = `<button disabled class="bg-rose-100 text-rose-600 px-3 py-2 rounded-xl text-[11px] font-bold shadow-sm cursor-not-allowed w-full">❌ ยกเลิก</button>`;
+                        } else {
+                            actionButton = `<button onclick="goToBooking('${item.custName}', '${item.phone}', '${item.lineName}', '${item.slipUrl}', '${item.rowId}')" 
+                                        class="bg-blue-600 text-white px-3 py-2 rounded-xl text-[11px] font-bold hover:bg-blue-700 shadow-md w-full">
+                                    📝 จัดการการจอง
+                                </button>`;
+                        }
+
                         const tr = document.createElement('tr');
                         tr.className = "border-b border-slate-100 hover:bg-slate-50";
                         tr.innerHTML = `
@@ -242,11 +255,8 @@
                             <td class="p-4 font-bold text-sm">${item.custName}<br><span class="text-[10px] text-slate-400 font-normal">Line: ${item.lineName}</span></td>
                             <td class="p-4 text-sm">${item.phone}</td>
                             <td class="p-4 text-center"><a href="${item.slipUrl}" target="_blank" class="text-blue-500 underline text-xs font-bold">เปิดดู</a></td>
-                            <td class="p-4 text-center">
-                                <button onclick="goToBooking('${item.custName}', '${item.phone}', '${item.lineName}', '${item.slipUrl}', '${item.rowId}')" 
-                                        class="bg-blue-600 text-white px-3 py-2 rounded-xl text-[10px] font-bold hover:bg-blue-700 shadow-md">
-                                    📝 จัดการการจอง
-                                </button>
+                            <td class="p-4 text-center" style="width: 120px;">
+                                ${actionButton}
                             </td>
                         `;
                         tbody.appendChild(tr);
