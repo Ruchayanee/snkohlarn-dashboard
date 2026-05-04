@@ -236,65 +236,86 @@
                 loadMoreBtn.style.display = 'block';
             }
 
-            fetch(`${BACKEND_URL}?action=getPending&limit=${limit}`)
-                .then(res => res.json())
-                .then(res => {
-                    if (res.status !== "success") {
-                        tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-rose-500">เกิดข้อผิดพลาด: ${res.message}</td></tr>`;
-                        return;
+           function loadPendingOrders(limit = 30) {
+            const tbody = document.getElementById('verify-table-body');
+            const loadMoreBtn = document.getElementById('load-more-container');
+            
+            tbody.innerHTML = '<tr><td colspan="5" class="p-8 text-center text-slate-400">กำลังดึงข้อมูล...</td></tr>';
+
+            // ซ่อนปุ่มโหลดทั้งหมดถ้ากดไปแล้ว
+            if (limit === 'all') {
+                loadMoreBtn.style.display = 'none';
+            } else {
+                loadMoreBtn.style.display = 'block';
+            }
+
+            // 🚨 จุดที่แก้ไข: เพิ่มการตั้งค่า { redirect: 'follow' } เพื่อแก้ปัญหา CORS (Failed to fetch)
+            fetch(`${BACKEND_URL}?action=getPending&limit=${limit}`, {
+                method: 'GET',
+                redirect: 'follow' 
+            })
+            .then(res => {
+                // เช็คให้ชัวร์ว่าการเชื่อมต่อไม่มีปัญหา
+                if (!res.ok) throw new Error('Network response was not ok');
+                return res.json();
+            })
+            .then(res => {
+                if (res.status !== "success") {
+                    tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-rose-500">เกิดข้อผิดพลาด: ${res.message}</td></tr>`;
+                    return;
+                }
+
+                const rawData = res.data;
+                tbody.innerHTML = '';
+
+                if (!rawData || rawData.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" class="p-8 text-center text-slate-400">ไม่มีรายการแจ้งโอนใหม่ 🟢</td></tr>';
+                    return;
+                }
+
+                // เรียงเอาล่าสุดขึ้นก่อน
+                rawData.sort((a, b) => new Date(b[0]) - new Date(a[0]));
+
+                rawData.forEach((row, index) => {
+                    const item = {
+                        date: row[0],
+                        lineName: row[1],
+                        custName: row[2],
+                        phone: row[3] ? row[3].toString().replace(/'/g, '') : '', // ลบเครื่องหมาย ' ออก (กันเหนียวถ้าบางแถวไม่มีเบอร์)
+                        slipUrl: row[4],
+                        status: row[5],
+                        rowId: index + 2
+                    };
+
+                    let actionButton = '';
+                    if (item.status === 'อนุมัติแล้ว') {
+                        actionButton = `<span class="text-emerald-600 font-bold text-xs">✅ อนุมัติแล้ว</span>`;
+                    } else if (item.status === 'ยกเลิก') {
+                        actionButton = `<span class="text-rose-500 font-bold text-xs">❌ ยกเลิกแล้ว</span>`;
+                    } else {
+                        actionButton = `<button onclick="goToBooking('${item.custName}', '${item.phone}', '${item.lineName}', '${item.slipUrl}', '${item.rowId}')" 
+                                        class="bg-blue-600 text-white px-3 py-2 rounded-xl text-[11px] font-bold hover:bg-blue-700 shadow-md w-full">
+                                        📝 จัดการการจอง
+                                    </button>`;
                     }
 
-                    const rawData = res.data;
-                    tbody.innerHTML = '';
-
-                    if (!rawData || rawData.length === 0) {
-                        tbody.innerHTML = '<tr><td colspan="5" class="p-8 text-center text-slate-400">ไม่มีรายการแจ้งโอนใหม่ 🟢</td></tr>';
-                        return;
-                    }
-
-                    // เรียงเอาล่าสุดขึ้นก่อน
-                    rawData.sort((a, b) => new Date(b[0]) - new Date(a[0]));
-
-                    rawData.forEach((row, index) => {
-                        const item = {
-                            date: row[0],
-                            lineName: row[1],
-                            custName: row[2],
-                            phone: row[3].toString().replace(/'/g, ''), // ลบเครื่องหมาย ' ออก
-                            slipUrl: row[4],
-                            status: row[5],
-                            rowId: index + 2
-                        };
-
-                        let actionButton = '';
-                        if (item.status === 'อนุมัติแล้ว') {
-                            actionButton = `<span class="text-emerald-600 font-bold text-xs">✅ อนุมัติแล้ว</span>`;
-                        } else if (item.status === 'ยกเลิก') {
-                            actionButton = `<span class="text-rose-500 font-bold text-xs">❌ ยกเลิกแล้ว</span>`;
-                        } else {
-                            actionButton = `<button onclick="goToBooking('${item.custName}', '${item.phone}', '${item.lineName}', '${item.slipUrl}', '${item.rowId}')" 
-                                            class="bg-blue-600 text-white px-3 py-2 rounded-xl text-[11px] font-bold hover:bg-blue-700 shadow-md w-full">
-                                            📝 จัดการการจอง
-                                        </button>`;
-                        }
-
-                        const tr = document.createElement('tr');
-                        tr.className = "border-b border-slate-100 hover:bg-slate-50";
-                        tr.innerHTML = `
-                            <td class="p-4 text-xs text-slate-500">${new Date(item.date).toLocaleString('th-TH')}</td>
-                            <td class="p-4 font-bold text-sm text-slate-700">${item.custName}<br><span class="text-[10px] text-slate-400 font-normal">Line: ${item.lineName}</span></td>
-                            <td class="p-4 text-sm text-slate-600">${item.phone}</td>
-                            <td class="p-4 text-center"><a href="${item.slipUrl}" target="_blank" class="text-blue-500 underline text-xs font-bold">เปิดสลิป</a></td>
-                            <td class="p-4 text-center" style="width: 120px;">${actionButton}</td>
-                        `;
-                        tbody.appendChild(tr);
-                    });
-                })
-                .catch(err => {
-                    tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-rose-500">การเชื่อมต่อขัดข้อง: ${err}</td></tr>`;
+                    const tr = document.createElement('tr');
+                    tr.className = "border-b border-slate-100 hover:bg-slate-50";
+                    tr.innerHTML = `
+                        <td class="p-4 text-xs text-slate-500">${new Date(item.date).toLocaleString('th-TH')}</td>
+                        <td class="p-4 font-bold text-sm text-slate-700">${item.custName}<br><span class="text-[10px] text-slate-400 font-normal">Line: ${item.lineName}</span></td>
+                        <td class="p-4 text-sm text-slate-600">${item.phone}</td>
+                        <td class="p-4 text-center"><a href="${item.slipUrl}" target="_blank" class="text-blue-500 underline text-xs font-bold">เปิดสลิป</a></td>
+                        <td class="p-4 text-center" style="width: 120px;">${actionButton}</td>
+                    `;
+                    tbody.appendChild(tr);
                 });
+            })
+            .catch(err => {
+                // แจ้งเตือนให้ชัดเจนขึ้นเมื่อเกิด Error
+                tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-rose-500">การเชื่อมต่อขัดข้อง (Failed to fetch): กรุณาลองรีเฟรชหน้าเว็บอีกครั้ง<br><span class="text-xs text-slate-400">${err}</span></td></tr>`;
+            });
         }
-
         function goToBooking(name, phone, line, slip, rowId) {
             const bookingPackage = { name, phone, line, slip, rowId };
             sessionStorage.setItem('pendingBooking', JSON.stringify(bookingPackage));
