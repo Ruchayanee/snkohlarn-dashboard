@@ -43,7 +43,6 @@
             <h1 class="text-3xl font-bold text-slate-800">📊 SN Kohlarn Dashboard</h1>
         </header>
 
-        <!-- 🌟 เพิ่มปุ่มที่ 3: ตรวจสอบการโอน เข้าไปในแถบเมนู 🌟 -->
         <div class="flex flex-wrap justify-center gap-3 mb-8">
             <button id="btn-finance" onclick="switchTab('finance')" class="tab-btn tab-active px-6 py-3 rounded-2xl font-bold flex items-center gap-2">
                 💰 ระบบรายได้
@@ -56,7 +55,7 @@
             </button>
         </div>
 
-        <!-- ==================== หน้าต่างที่ 1: ระบบรายได้ (คงเดิม) ==================== -->
+        <!-- หน้าต่างที่ 1: ระบบรายได้ -->
         <div id="view-finance">
             <div class="text-center mb-10">
                 <div class="flex items-center justify-center gap-3">
@@ -131,7 +130,7 @@
             </div>
         </div>
 
-        <!-- ==================== หน้าต่างที่ 2: ระบบจัดการสต๊อก (คงเดิม) ==================== -->
+        <!-- หน้าต่างที่ 2: ระบบจัดการสต๊อก -->
         <div id="view-stock" class="hidden">
             <div id="stock-alert-box" class="bg-rose-50 border-2 border-rose-200 p-6 rounded-3xl mb-8 flex items-start gap-4 hidden">
                 <div class="bg-rose-100 p-3 rounded-full text-rose-600 text-2xl">⚠️</div>
@@ -164,7 +163,7 @@
             </div>
         </div>
 
-        <!-- ==================== หน้าต่างที่ 3: ระบบตรวจสอบการโอน ==================== -->
+        <!-- หน้าต่างที่ 3: ระบบตรวจสอบการโอน -->
         <div id="view-verify" class="hidden">
             <div class="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm">
                 <div class="bg-slate-50 p-4 border-b border-slate-200 flex justify-between items-center">
@@ -187,7 +186,6 @@
                         </tbody>
                     </table>
                 </div>
-                <!-- 🌟 ปุ่มโหลดประวัติทั้งหมด 🌟 -->
                 <div id="load-more-container" class="bg-slate-50 p-4 text-center border-t border-slate-200">
                     <button onclick="loadPendingOrders('all')" class="bg-white border border-slate-300 text-slate-600 px-6 py-2 rounded-xl text-sm font-bold hover:bg-slate-100 shadow-sm transition-all">
                         📂 โหลดประวัติย้อนหลังทั้งหมด
@@ -199,7 +197,6 @@
     </div>
 
     <script>
-        // 🚨 แก้ไขลิงก์ GAS ของคุณทนายตรงนี้ครับ 🚨
         const BACKEND_URL = "https://script.google.com/macros/s/AKfycbyLFO7dgjgdeDY5ETh7B_mV-bJG8T_tHnw-a41sOTfw9EKCoknUv2MJ2CP9yVJtL9CbfA/exec";
 
         function switchTab(tabName) {
@@ -210,7 +207,6 @@
             const viewStock = document.getElementById('view-stock');
             const viewVerify = document.getElementById('view-verify');
 
-            // รีเซ็ตสถานะปุ่มและหน้าต่าง
             [btnFinance, btnStock, btnVerify].forEach(b => b.className = "tab-btn tab-inactive px-6 py-3 rounded-2xl font-bold flex items-center gap-2");
             [viewFinance, viewStock, viewVerify].forEach(v => v.classList.add('hidden'));
 
@@ -227,14 +223,13 @@
             }
         }
 
-        // --- ส่วนตรวจสอบการโอน (ใหม่) ---
+        // ระบบตรวจสอบการโอน (ปรับจูนการรับข้อมูล JSON)
         function loadPendingOrders(limit = 30) {
             const tbody = document.getElementById('verify-table-body');
             const loadMoreBtn = document.getElementById('load-more-container');
             
             tbody.innerHTML = '<tr><td colspan="5" class="p-8 text-center text-slate-400">กำลังดึงข้อมูล...</td></tr>';
 
-            // ซ่อนปุ่มโหลดทั้งหมดถ้ากดไปแล้ว
             if (limit === 'all') {
                 loadMoreBtn.style.display = 'none';
             } else {
@@ -243,49 +238,70 @@
 
             fetch(`${BACKEND_URL}?action=getPending&limit=${limit}`)
                 .then(res => res.json())
-                .then(data => {
-                    tbody.innerHTML = '';
-                    if (data.length === 0) {
-                        tbody.innerHTML = '<tr><td colspan="5" class="p-8 text-center text-slate-400">ไม่มีรายการ 🟢</td></tr>';
+                .then(res => {
+                    if (res.status !== "success") {
+                        tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-rose-500">เกิดข้อผิดพลาด: ${res.message}</td></tr>`;
                         return;
                     }
-                    data.forEach(item => {
+
+                    const rawData = res.data;
+                    tbody.innerHTML = '';
+
+                    if (!rawData || rawData.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="5" class="p-8 text-center text-slate-400">ไม่มีรายการแจ้งโอนใหม่ 🟢</td></tr>';
+                        return;
+                    }
+
+                    // เรียงเอาล่าสุดขึ้นก่อน
+                    rawData.sort((a, b) => new Date(b[0]) - new Date(a[0]));
+
+                    rawData.forEach((row, index) => {
+                        const item = {
+                            date: row[0],
+                            lineName: row[1],
+                            custName: row[2],
+                            phone: row[3].toString().replace(/'/g, ''), // ลบเครื่องหมาย ' ออก
+                            slipUrl: row[4],
+                            status: row[5],
+                            rowId: index + 2
+                        };
+
                         let actionButton = '';
                         if (item.status === 'อนุมัติแล้ว') {
-                            actionButton = `<button disabled class="bg-emerald-100 text-emerald-600 px-3 py-2 rounded-xl text-[11px] font-bold shadow-sm cursor-not-allowed w-full">✅ อนุมัติ</button>`;
-                        } else if (item.status === 'ยกเลิกการจอง') {
-                            actionButton = `<button disabled class="bg-rose-100 text-rose-600 px-3 py-2 rounded-xl text-[11px] font-bold shadow-sm cursor-not-allowed w-full">❌ ยกเลิก</button>`;
+                            actionButton = `<span class="text-emerald-600 font-bold text-xs">✅ อนุมัติแล้ว</span>`;
+                        } else if (item.status === 'ยกเลิก') {
+                            actionButton = `<span class="text-rose-500 font-bold text-xs">❌ ยกเลิกแล้ว</span>`;
                         } else {
                             actionButton = `<button onclick="goToBooking('${item.custName}', '${item.phone}', '${item.lineName}', '${item.slipUrl}', '${item.rowId}')" 
-                                        class="bg-blue-600 text-white px-3 py-2 rounded-xl text-[11px] font-bold hover:bg-blue-700 shadow-md w-full">
-                                    📝 จัดการการจอง
-                                </button>`;
+                                            class="bg-blue-600 text-white px-3 py-2 rounded-xl text-[11px] font-bold hover:bg-blue-700 shadow-md w-full">
+                                            📝 จัดการการจอง
+                                        </button>`;
                         }
 
                         const tr = document.createElement('tr');
                         tr.className = "border-b border-slate-100 hover:bg-slate-50";
                         tr.innerHTML = `
-                            <td class="p-4 text-xs">${new Date(item.date).toLocaleString('th-TH')}</td>
-                            <td class="p-4 font-bold text-sm">${item.custName}<br><span class="text-[10px] text-slate-400 font-normal">Line: ${item.lineName}</span></td>
-                            <td class="p-4 text-sm">${item.phone}</td>
-                            <td class="p-4 text-center"><a href="${item.slipUrl}" target="_blank" class="text-blue-500 underline text-xs font-bold">เปิดดู</a></td>
-                            <td class="p-4 text-center" style="width: 120px;">
-                                ${actionButton}
-                            </td>
+                            <td class="p-4 text-xs text-slate-500">${new Date(item.date).toLocaleString('th-TH')}</td>
+                            <td class="p-4 font-bold text-sm text-slate-700">${item.custName}<br><span class="text-[10px] text-slate-400 font-normal">Line: ${item.lineName}</span></td>
+                            <td class="p-4 text-sm text-slate-600">${item.phone}</td>
+                            <td class="p-4 text-center"><a href="${item.slipUrl}" target="_blank" class="text-blue-500 underline text-xs font-bold">เปิดสลิป</a></td>
+                            <td class="p-4 text-center" style="width: 120px;">${actionButton}</td>
                         `;
                         tbody.appendChild(tr);
                     });
+                })
+                .catch(err => {
+                    tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-rose-500">การเชื่อมต่อขัดข้อง: ${err}</td></tr>`;
                 });
         }
 
-        // ฟังก์ชันวาร์ปไปหน้า Booking พร้อมส่งข้อมูล
         function goToBooking(name, phone, line, slip, rowId) {
             const bookingPackage = { name, phone, line, slip, rowId };
             sessionStorage.setItem('pendingBooking', JSON.stringify(bookingPackage));
-            window.location.href = 'booking.html'; // วาร์ปไปเลย!
+            window.location.href = 'booking.html'; 
         }
 
-        // --- ระบบเดิมของคุณทนาย (ห้ามลบเด็ดขาด) ---
+        // ระบบเดิมของคุณทนาย
         const FINANCE_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSFeS1r3x0m5TlzHS8O19Qy0uuY9aGXJlEogF1lZkEdlgPewwdCLefvSNmch6MBm83CvUYTEOBMvK2T/pub?gid=109167594&single=true&output=csv';
         const STOCK_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQk1DLhmM8DEn1BEc8DWFUWjHAxYvGBXNKuEPZQKZw_pMBA3eQc_w1pS8QIea9fyOKGOCYUQygjyLzf/pub?gid=0&single=true&output=csv';
 
@@ -381,8 +397,10 @@
                 opt.text = `${mNames[parseInt(p[1])]} ${p[0]}`;
                 s.appendChild(opt);
             });
-            s.value = sorted[sorted.length - 1];
-            changeMonth();
+            if(sorted.length > 0) {
+                s.value = sorted[sorted.length - 1];
+                changeMonth();
+            }
         }
 
         function changeMonth() {
