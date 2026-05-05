@@ -405,23 +405,42 @@
 
     function submitToBackend() {
         if(currentPayload.channel === 'online' && !currentPayload.lineName) { alert("⚠️ กรอกชื่อ LINE ด้วยครับ"); return; }
-        const btn = document.getElementById('sendLineBtn'); btn.disabled = true; btn.innerText = "⏳ กำลังบันทึก...";
+        const btn = document.getElementById('sendLineBtn'); 
+        btn.disabled = true; 
+        btn.innerText = "⏳ กำลังบันทึก...";
         
         callAPI('processBooking', currentPayload).then(response => {
-            alert("✅ สำเร็จ!"); 
-            btn.innerText = "🚀 บันทึกแล้ว"; 
-            
-            const pending = sessionStorage.getItem('pendingBooking');
-            if (pending) {
-                const data = JSON.parse(pending);
-                if (data.rowId) {
-                    fetch(`${BACKEND_URL}?action=approve&rowId=${data.rowId}&admin=System_Auto`).catch(e => console.log(e));
+            // 🚨 เพิ่มบรรทัดนี้เพื่อแอบดูว่า Google ตอบอะไรกลับมา
+            console.log("ข้อความตอบกลับจาก Google:", response); 
+
+            // เช็คว่า Google บอกว่า "สำเร็จ" จริงๆ ใช่ไหม (ดักได้ทั้ง status และ result)
+            if (response.status === "success" || response.result === "success") {
+                alert("✅ บันทึกข้อมูลสำเร็จ!"); 
+                btn.innerText = "🚀 บันทึกแล้ว"; 
+                
+                const pending = sessionStorage.getItem('pendingBooking');
+                if (pending) {
+                    const data = JSON.parse(pending);
+                    if (data.rowId) {
+                        fetch(`${BACKEND_URL}?action=approve&rowId=${data.rowId}&admin=System_Auto`).catch(e => console.log(e));
+                    }
                 }
+
+                clearPendingData(); 
+                fetchBookedRooms();
+            } else {
+                // 🛑 ถ้า Google ตอบกลับมาว่ามี Error (เช่น หาชีทไม่เจอ, บรรทัดพัง)
+                let errorMsg = response.message || response.error || JSON.stringify(response);
+                alert("❌ หลังบ้านฟ้องว่า: " + errorMsg);
+                btn.disabled = false; 
+                btn.innerText = "🚀 ยืนยันบันทึกบัญชี อีกครั้ง"; 
             }
 
-            clearPendingData(); 
-            fetchBookedRooms();
-        }).catch(err => { alert("❌ พลาด! ลองใหม่ครับ"); btn.disabled = false; btn.innerText = "🚀 ยืนยันบันทึกบัญชี"; });
+        }).catch(err => { 
+            alert("❌ การเชื่อมต่อขัดข้อง: " + err.message); 
+            btn.disabled = false; 
+            btn.innerText = "🚀 ยืนยันบันทึกบัญชี"; 
+        });
     }
 
     function loadBookings() {
