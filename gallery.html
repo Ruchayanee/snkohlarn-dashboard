@@ -15,11 +15,11 @@
 
         /* --- 1. ENGLISH COTTAGE BRANDING --- */
         :root {
-            --sage-green: #556b2f;         /* Vintage Sage */
-            --warm-cream: #fdfaf1;         /* Old Parchment */
-            --classic-oak: #7c5c42;        /* Antique Wood */
-            --heritage-slate: #2d3436;     /* Deep Shadow */
-            --security-alert: #991b1b;     /* Warning Crimson */
+            --sage-green: #556b2f;
+            --warm-cream: #fdfaf1;
+            --classic-oak: #7c5c42;
+            --heritage-slate: #2d3436;
+            --security-alert: #991b1b;
         }
 
         * {
@@ -37,6 +37,7 @@
         }
 
         .serif-text { font-family: 'Playfair Display', serif; }
+        .phone-nowrap { white-space: nowrap !important; }
 
         /* --- 2. SECURITY PROTOCOL LAYERS --- */
         .invisible-shield {
@@ -55,11 +56,10 @@
             border: 25px solid var(--security-alert);
         }
 
-        /* --- 3. ARCHITECTURAL UI --- */
+        /* --- 3. UI COMPONENTS --- */
         .cottage-navbar {
             background: rgba(253, 250, 241, 0.9);
             backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
             border-bottom: 1.5px solid rgba(85, 107, 47, 0.1);
         }
 
@@ -71,10 +71,7 @@
             border: 1px solid rgba(124, 92, 66, 0.05);
         }
 
-        .room-card:hover {
-            transform: translateY(-15px) scale(1.02);
-            box-shadow: 0 30px 60px rgba(85, 107, 47, 0.15);
-        }
+        .room-card:hover { transform: translateY(-15px) scale(1.02); }
 
         .filter-tab {
             transition: all 0.4s ease;
@@ -88,11 +85,10 @@
             box-shadow: 0 10px 25px rgba(85, 107, 47, 0.3);
         }
 
-        /* --- 4. VIDEO LIGHTBOX SYSTEM --- */
+        /* --- 4. VIDEO & MEDIA SYSTEM --- */
         .modal-background {
             background: rgba(10, 15, 5, 0.98);
             backdrop-filter: blur(40px);
-            -webkit-backdrop-filter: blur(40px);
         }
 
         .dynamic-mark {
@@ -104,45 +100,34 @@
             text-transform: uppercase; letter-spacing: 0.6em;
         }
 
-        /* --- 5. ENHANCED ANIMATIONS --- */
-        @keyframes subtleFloat {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-
-        .floating-icon { animation: subtleFloat 3s ease-in-out infinite; }
-
     </style>
 </head>
-<body class="selection:bg-sage-green selection:text-white">
+<body>
 
     <!-- The Vault Shield -->
     <div class="alert-curtain"></div>
     <div id="vault-message" class="fixed inset-0 z-[10001] hidden flex items-center justify-center p-10">
-        <div class="bg-white max-w-md w-full p-16 rounded-[4rem] shadow-[0_40px_100px_rgba(0,0,0,0.2)] border-t-[10px] border-red-700 text-center">
-            <div class="floating-icon w-24 h-24 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-8">
-                <i class="fas fa-fingerprint text-5xl text-red-700"></i>
-            </div>
+        <div class="bg-white max-w-md w-full p-16 rounded-[4rem] shadow-2xl border-t-[10px] border-red-700 text-center">
+            <i class="fas fa-fingerprint text-5xl text-red-700 mb-8"></i>
             <h2 class="text-3xl font-bold text-slate-800 mb-4 serif-text italic">Protocol Warning</h2>
             <p class="text-slate-500 text-sm mb-10 italic">Our visual assets are protected by high-level encryption to ensure resort authenticity.</p>
-            <button onclick="location.reload()" class="bg-slate-900 text-white px-12 py-4 rounded-full font-bold tracking-widest text-xs uppercase transition-all hover:bg-sage-green">Refresh Access</button>
+            <button onclick="location.reload()" class="bg-slate-900 text-white px-12 py-4 rounded-full font-bold text-xs uppercase transition-all hover:bg-sage-green">Refresh Access</button>
         </div>
     </div>
 
-    <!-- Navigation Menu -->
+    <!-- Navigation -->
     <nav class="cottage-navbar sticky top-0 z-[60] px-10 py-6">
         <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
             <div class="flex items-center gap-6">
-                <div class="w-16 h-16 bg-[#556b2f] rounded-[1.5rem] flex items-center justify-center shadow-xl border-2 border-white/30">
+                <div class="w-16 h-16 bg-[#556b2f] rounded-[1.5rem] flex items-center justify-center shadow-xl">
                     <i class="fas fa-feather-pointed text-white text-2xl"></i>
                 </div>
                 <div>
-                    <h1 class="text-3xl font-bold text-[#556b2f] tracking-tighter serif-text italic">SN KOH LARN</h1>
+                    <h1 class="text-3xl font-bold text-[#556b2f] serif-text italic">SN KOH LARN</h1>
                     <p class="text-[10px] text-[#7c5c42] uppercase tracking-[0.5em] font-bold">Heritage Cottage Resort</p>
                 </div>
             </div>
-            
-            <div class="flex flex-wrap justify-center gap-4" id="room-filters">
+            <div class="flex flex-wrap justify-center gap-4">
                 <button onclick="vault.filter('all')" class="filter-tab active px-8 py-2.5 rounded-full text-xs font-bold uppercase italic serif-text">All Tastes</button>
                 <button onclick="vault.filter('standard')" class="filter-tab px-8 py-2.5 rounded-full text-xs font-bold uppercase italic serif-text">Standard</button>
                 <button onclick="vault.filter('family')" class="filter-tab px-8 py-2.5 rounded-full text-xs font-bold uppercase italic serif-text">Family</button>
@@ -152,10 +137,10 @@
         </div>
     </nav>
 
-    <!-- Main Header (English Style) -->
+    <!-- Header Section -->
     <header class="max-w-5xl mx-auto text-center pt-28 pb-20 px-10">
         <h2 class="text-6xl md:text-8xl serif-text text-[#7c5c42] mb-10 leading-[1.1] italic">
-            Discover the <span class="text-[#556b2f]">Quintessential</span> Charm
+            Experience the <span class="text-[#556b2f]">Quintessential</span> Charm
         </h2>
         <div class="w-40 h-[1.5px] bg-[#556b2f] mx-auto mb-10 opacity-30"></div>
         <p class="text-slate-500 max-w-4xl mx-auto text-xl leading-[1.8] font-light italic">
@@ -163,50 +148,38 @@
             provides a tranquil escape, blending classic elegance with the serene spirit of island life.
         </p>
         
-        <!-- Thai Warning Overlay (Subtle but Clear) -->
         <div class="mt-16 group">
-            <div class="inline-flex items-center gap-4 bg-white border-2 border-red-50 px-8 py-4 rounded-[2rem] text-[#991b1b] shadow-sm transition-all group-hover:border-red-100">
+            <div class="inline-flex items-center gap-4 bg-white border-2 border-red-50 px-8 py-4 rounded-[2rem] text-[#991b1b] shadow-sm transition-all">
                 <i class="fas fa-user-shield text-lg animate-pulse"></i>
                 <span class="text-xs font-bold tracking-wider italic">
-                    ⚠️ โปรดระวังมิจฉาชีพแอบอ้าง! จองตรงผ่าน LINE Official หรือติดต่อรีสอร์ตโดยตรงที่ 082-168-8808 เท่านั้น
+                    ⚠️ โปรดระวังมิจฉาชีพแอบอ้าง! จองตรงผ่าน LINE Official หรือติดต่อรีสอร์ตโดยตรงที่ <span class="phone-nowrap">082-168-8808</span> เท่านั้น
                 </span>
             </div>
         </div>
     </header>
 
-    <!-- Gallery Engine Grid -->
+    <!-- Gallery Grid -->
     <main class="max-w-7xl mx-auto px-10 pb-40">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-16 lg:gap-20" id="main-canvas">
-            <!-- JavaScript Injected Here -->
+            <!-- JavaScript Injection -->
         </div>
     </main>
 
-    <!-- Professional Video & Image Portal -->
+    <!-- Media Portal -->
     <div id="media-portal" class="fixed inset-0 z-[100] hidden modal-background flex flex-col">
         <div class="absolute top-12 right-12 z-[110]">
-            <button onclick="vault.closePortal()" class="w-20 h-20 bg-white/5 hover:bg-white/15 text-white rounded-full flex items-center justify-center transition-all border border-white/20 backdrop-blur-md">
+            <button onclick="vault.closePortal()" class="w-20 h-20 bg-white/5 hover:bg-white/15 text-white rounded-full flex items-center justify-center border border-white/20 backdrop-blur-md">
                 <i class="fas fa-times text-3xl"></i>
             </button>
         </div>
-
         <div class="flex-1 flex items-center justify-center relative p-12">
             <div class="invisible-shield"></div>
             <div class="dynamic-mark">OFFICIAL SN KOHLARN</div>
-            
-            <button onclick="vault.prev()" class="absolute left-10 text-white/20 hover:text-white transition-all text-6xl p-10 z-[120] hidden xl:block">
-                <i class="fas fa-chevron-left"></i>
-            </button>
-
             <div class="w-full h-full flex items-center justify-center">
-                <img id="portal-image" src="" class="max-w-full max-h-full object-contain rounded-[3rem] shadow-[0_50px_100px_rgba(0,0,0,0.6)] border border-white/10" alt="Protected Heritage Content">
-                <video id="portal-video" class="hidden max-w-full max-h-full rounded-[3rem] shadow-2xl" controls controlsList="nodownload"></video>
+                <img id="portal-image" src="" class="max-w-full max-h-full object-contain rounded-[3rem] shadow-2xl border border-white/10">
+                <video id="portal-video" class="hidden max-w-full max-h-full rounded-[3rem]" controls controlsList="nodownload"></video>
             </div>
-
-            <button onclick="vault.next()" class="absolute right-10 text-white/20 hover:text-white transition-all text-6xl p-10 z-[120] hidden xl:block">
-                <i class="fas fa-chevron-right"></i>
-            </button>
         </div>
-
         <div class="bg-black/10 backdrop-blur-3xl px-12 py-16 text-center text-white border-t border-white/5">
             <h3 id="portal-name" class="text-4xl font-bold serif-text mb-6 italic text-[#fdfaf1]"></h3>
             <p id="portal-details" class="text-white/40 text-base max-w-4xl mx-auto leading-loose italic font-light"></p>
@@ -220,37 +193,36 @@
                 <h4 class="font-bold text-[#556b2f] mb-10 tracking-[0.5em] text-[10px] uppercase serif-text">Our Philosophy</h4>
                 <p class="text-slate-400 text-sm leading-[2.2] italic font-light">
                     At SN KOH LARN, we believe in preserving the gentle art of hospitality. 
-                    Our cottages serve as a bridge between tradition and island peace, 
-                    curated for the discerning traveler.
+                    Our cottages serve as a bridge between tradition and island peace.
                 </p>
             </div>
             
             <div class="text-center bg-[#fdfaf1] p-16 rounded-[4rem] border border-[#556b2f]/5 shadow-sm">
                 <h4 class="font-bold text-[#556b2f] mb-8 tracking-[0.5em] text-[10px] uppercase serif-text">Direct Inquiries</h4>
-                <p class="text-[#7c5c42] font-bold text-4xl mb-6 serif-text italic tracking-tighter">082-168-8808</p>
-                <p class="text-slate-400 text-xs italic mb-10 font-bold uppercase tracking-widest">Connect via Line: @snkohlarn</p>
+                <p class="text-[#7c5c42] font-bold text-4xl mb-6 serif-text italic tracking-tighter phone-nowrap">082-168-8808</p>
+                <p class="text-slate-400 text-xs italic mb-10 font-bold uppercase tracking-widest">Official Contact Admin Only</p>
                 <div class="flex justify-center gap-10 text-[#556b2f]">
                     <a href="#" class="hover:scale-125 transition-all"><i class="fab fa-line text-4xl"></i></a>
-                    <a href="#" class="hover:scale-125 transition-all"><i class="fab fa-instagram text-4xl"></i></a>
+                    <a href="#" class="hover:scale-125 transition-all"><i class="fab fa-facebook text-4xl"></i></a>
                     <a href="#" class="hover:scale-125 transition-all"><i class="fas fa-paper-plane text-4xl"></i></a>
                 </div>
             </div>
 
             <div class="text-center lg:text-right">
                 <h4 class="font-bold text-[#556b2f] mb-10 tracking-[0.5em] text-[10px] uppercase serif-text">Legal Notice</h4>
-                <p class="text-slate-400 text-[11px] leading-[2.5] italic font-medium">
-                    All digital media on this platform is the exclusive property of SN KOH LARN. 
-                    Redistribution, reproduction, or commercial use is strictly prohibited. <br>
+                <!-- Thai Legal Notice (As Requested) -->
+                <p class="text-slate-400 text-[10px] leading-[2.5] italic font-medium">
+                    <span class="text-slate-800 font-bold">ข้อกำหนดทางกฎหมาย:</span> เนื้อหาและภาพถ่ายทั้งหมดถือเป็นทรัพย์สินทางปัญญาของ <span class="text-[#556b2f] font-bold">เอสเอ็น เกาะล้าน</span> 
+                    ห้ามมิให้ผู้ใดคัดลอก ดัดแปลง หรือนำไปเผยแพร่ในเชิงพาณิชย์โดยไม่ได้รับอนุญาต มิฉะนั้นจะถูกดำเนินคดีตามกฎหมายถึงที่สุดโดยทีมกฎหมายของรีสอร์ต 
+                    <br>
                     <span class="mt-8 block font-black text-[#556b2f] tracking-widest uppercase">© 2026 OFFICIAL RESORT ADMIN</span>
                 </p>
             </div>
         </div>
     </footer>
 
-    <!-- Logic Controller: Heritage Edition 5.0 -->
     <script>
         const vault = (() => {
-            // 1. DATA INFRASTRUCTURE (4 Key Room Types)
             const URL_BASE = "images/images/";
             const ROOM_COLLECTION = [
                 { id: "STD", cat: "standard", name: "English Standard Cottage", file: "IMG_0844.HEIC", desc: "Our hallmark standard retreat, meticulously crafted with floral heritage accents and a serene village vibe.", isVideo: false },
@@ -260,50 +232,26 @@
                 { id: "VID", cat: "all", name: "Official Walkthrough", file: "preview_video.mp4", desc: "Take a step into the timeless world of SN Koh Larn Heritage Resort.", isVideo: true }
             ];
 
-            let state = { currentFilter: 'all', activeIdx: 0, currentList: [...ROOM_COLLECTION], modalActive: false };
+            let state = { filter: 'all', idx: 0, items: [...ROOM_COLLECTION], active: false };
 
-            // 2. SYSTEM BOOT
             const boot = () => {
                 refreshUI();
                 initShield();
                 initGestures();
-                console.log("%cSN KOHLARN FINAL: SYSTEM SECURED", "color: #fdfaf1; background: #556b2f; padding: 12px; font-weight: 900; font-family: serif;");
             };
 
-            // 3. SECURITY ENGINE (Lawyer Grade Logic)
             const initShield = () => {
                 document.addEventListener('contextmenu', e => e.preventDefault());
                 document.addEventListener('dragstart', e => e.preventDefault());
-
                 document.onkeydown = (e) => {
                     const mod = e.metaKey || e.ctrlKey;
-                    const alt = e.altKey;
-                    const shift = e.shiftKey;
-                    
-                    // Logic to block Mac & Win DevTools
-                    if (e.keyCode == 123 || (mod && shift && (e.keyCode == 73 || e.keyCode == 74 || e.keyCode == 67)) || (mod && e.keyCode == 85)) {
-                        triggerLockdown();
-                        return false;
+                    if (e.keyCode == 123 || (mod && e.shiftKey && (e.keyCode == 73 || e.keyCode == 67)) || (mod && e.keyCode == 85)) {
+                        triggerLockdown(); return false;
                     }
-
-                    // Block Command+Option+I specifically for Mac
-                    if (mod && alt && e.keyCode == 73) { triggerLockdown(); return false; }
-
-                    // Block Save
-                    if (mod && e.keyCode == 83) return false;
-
-                    // Portal Navigation
-                    if (state.modalActive) {
-                        if (e.keyCode == 37) prev();
-                        if (e.keyCode == 39) next();
-                        if (e.keyCode == 27) closePortal();
+                    if (state.active) {
+                        if (e.keyCode == 37) prev(); if (e.keyCode == 39) next(); if (e.keyCode == 27) closePortal();
                     }
                 };
-
-                // Hidden DevTools Detect
-                const detector = new Image();
-                Object.defineProperty(detector, 'id', { get: () => triggerLockdown() });
-                // setInterval(() => { console.log(detector); }, 2500);
             };
 
             const triggerLockdown = () => {
@@ -315,127 +263,81 @@
                 }, 5000);
             };
 
-            // 4. RENDERING & UI ENGINE
             const refreshUI = () => {
                 const canvas = document.getElementById('main-canvas');
                 canvas.innerHTML = '';
-
-                state.currentList.forEach((item, i) => {
+                state.items.forEach((item, i) => {
                     const block = document.createElement('div');
                     block.className = 'room-card group cursor-pointer opacity-0 translate-y-12';
-                    
                     block.innerHTML = `
                         <div class="relative aspect-[4/5] overflow-hidden" onclick="vault.openPortal(${i})">
                             <div class="invisible-shield"></div>
-                            <div class="dynamic-mark text-[9px] opacity-10">LEGACY CONTENT</div>
-                            <img src="${URL_BASE}${item.file}" class="w-full h-full object-cover transition-transform duration-[2s] group-hover:scale-110" loading="lazy">
-                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000"></div>
-                            <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-700">
-                                <div class="w-24 h-24 bg-white/10 backdrop-blur-xl rounded-full flex items-center justify-center border border-white/30">
-                                    <i class="fas ${item.isVideo ? 'fa-play' : 'fa-expand'} text-white text-2xl"></i>
+                            <img src="${URL_BASE}${item.file}" class="w-full h-full object-cover transition-transform duration-[2s] group-hover:scale-110">
+                            <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all">
+                                <div class="w-20 h-20 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center border border-white/30">
+                                    <i class="fas ${item.isVideo ? 'fa-play' : 'fa-expand'} text-white"></i>
                                 </div>
                             </div>
                         </div>
                         <div class="p-16">
-                            <div class="flex justify-between items-center mb-6">
-                                <span class="text-[10px] font-bold text-[#556b2f] tracking-[0.4em] uppercase serif-text italic">${item.cat}</span>
-                                <span class="text-[10px] text-slate-300 font-mono tracking-widest uppercase">ID-${item.id}</span>
-                            </div>
-                            <h3 class="text-3xl font-bold text-slate-800 mb-4 serif-text italic tracking-tight">${item.name}</h3>
+                            <h3 class="text-3xl font-bold text-slate-800 mb-4 serif-text italic">${item.name}</h3>
                             <p class="text-slate-400 text-sm leading-[2] italic font-light line-clamp-3">${item.desc}</p>
-                        </div>
-                    `;
+                        </div>`;
                     canvas.appendChild(block);
-                    gsap.to(block, { opacity: 1, y: 0, duration: 1, delay: i * 0.15, ease: "power4.out" });
+                    gsap.to(block, { opacity: 1, y: 0, duration: 1, delay: i * 0.1 });
                 });
             };
 
             const filter = (tag) => {
-                state.currentFilter = tag;
-                document.querySelectorAll('.filter-tab').forEach(btn => {
-                    btn.classList.remove('active');
-                    if (btn.innerText.toLowerCase().includes(tag) || (tag === 'all' && btn.innerText.toLowerCase().includes('tastes'))) btn.classList.add('active');
+                state.filter = tag;
+                document.querySelectorAll('.filter-tab').forEach(b => {
+                    b.classList.remove('active');
+                    if (b.innerText.toLowerCase().includes(tag) || (tag === 'all' && b.innerText.toLowerCase().includes('tastes'))) b.classList.add('active');
                 });
-
-                state.currentList = tag === 'all' ? [...ROOM_COLLECTION] : ROOM_COLLECTION.filter(r => r.cat === tag);
-                gsap.to('.room-card', { opacity: 0, scale: 0.95, duration: 0.4, onComplete: refreshUI });
+                state.items = tag === 'all' ? [...ROOM_COLLECTION] : ROOM_COLLECTION.filter(r => r.cat === tag);
+                gsap.to('.room-card', { opacity: 0, duration: 0.3, onComplete: refreshUI });
             };
 
-            // 5. MODAL SYSTEM (Pop-up Logic)
-            const openPortal = (idx) => {
-                state.activeIdx = idx;
-                state.modalActive = true;
-                const portal = document.getElementById('media-portal');
-                portal.classList.remove('hidden');
-                document.body.style.overflow = 'hidden';
+            const openPortal = (i) => {
+                state.idx = i; state.active = true;
+                const p = document.getElementById('media-portal');
+                p.classList.remove('hidden');
                 updatePortal();
-                gsap.fromTo(portal, { opacity: 0, backdropFilter: "blur(0px)" }, { opacity: 1, backdropFilter: "blur(40px)", duration: 0.6 });
+                gsap.fromTo(p, { opacity: 0 }, { opacity: 1, duration: 0.5 });
             };
 
             const closePortal = () => {
-                state.modalActive = false;
-                const portal = document.getElementById('media-portal');
-                gsap.to(portal, { opacity: 0, duration: 0.4, onComplete: () => {
-                    portal.classList.add('hidden');
-                    document.body.style.overflow = 'auto';
-                    document.getElementById('portal-video').pause();
-                }});
+                state.active = false;
+                const p = document.getElementById('media-portal');
+                gsap.to(p, { opacity: 0, duration: 0.4, onComplete: () => { p.classList.add('hidden'); document.getElementById('portal-video').pause(); }});
             };
 
             const updatePortal = () => {
-                const item = state.currentList[state.activeIdx];
+                const item = state.items[state.idx];
                 const pic = document.getElementById('portal-image');
                 const vid = document.getElementById('portal-video');
-                const name = document.getElementById('portal-name');
-                const detail = document.getElementById('portal-details');
-
-                gsap.to([pic, vid, name, detail], { opacity: 0, y: 15, duration: 0.3, onComplete: () => {
-                    name.innerText = item.name;
-                    detail.innerText = item.desc;
-
-                    if (item.isVideo) {
-                        pic.classList.add('hidden');
-                        vid.classList.remove('hidden');
-                        vid.src = URL_BASE + item.file;
-                        vid.play();
-                    } else {
-                        vid.classList.add('hidden');
-                        pic.classList.remove('hidden');
-                        pic.src = URL_BASE + item.file;
-                    }
-                    gsap.to([pic, vid, name, detail], { opacity: 1, y: 0, duration: 0.7, ease: "power2.out" });
-                }});
+                document.getElementById('portal-name').innerText = item.name;
+                document.getElementById('portal-details').innerText = item.desc;
+                if (item.isVideo) { pic.classList.add('hidden'); vid.classList.remove('hidden'); vid.src = URL_BASE + item.file; vid.play(); }
+                else { vid.classList.add('hidden'); pic.classList.remove('hidden'); pic.src = URL_BASE + item.file; }
+                gsap.fromTo([pic, vid], { opacity: 0 }, { opacity: 1, duration: 0.5 });
             };
 
-            const next = () => { state.activeIdx = (state.activeIdx + 1) % state.currentList.length; updatePortal(); };
-            const prev = () => { state.activeIdx = (state.activeIdx - 1 + state.currentList.length) % state.currentList.length; updatePortal(); };
+            const next = () => { state.idx = (state.idx + 1) % state.items.length; updatePortal(); };
+            const prev = () => { state.idx = (state.idx - 1 + state.items.length) % state.items.length; updatePortal(); };
 
-            // 6. GESTURE ENGINE (iPhone Optimized)
             const initGestures = () => {
-                let startX = 0;
-                const portal = document.getElementById('media-portal');
-                
-                portal.addEventListener('touchstart', e => { startX = e.touches[0].clientX; }, { passive: true });
-                portal.addEventListener('touchend', e => {
-                    let endX = e.changedTouches[0].clientX;
-                    let drift = startX - endX;
-                    if (Math.abs(drift) > 70) {
-                        if (drift > 0) next(); else prev();
-                    }
-                }, { passive: true });
+                let s = 0;
+                document.getElementById('media-portal').addEventListener('touchstart', e => s = e.touches[0].clientX);
+                document.getElementById('media-portal').addEventListener('touchend', e => {
+                    let d = s - e.changedTouches[0].clientX;
+                    if (Math.abs(d) > 70) d > 0 ? next() : prev();
+                });
             };
 
             return { boot, filter, openPortal, closePortal, next, prev };
         })();
-
         window.onload = vault.boot;
-
-        /**
-         * SN KOH LARN - HERITAGE GALLERY v5.0
-         * SECURE & PROTECTED ARCHITECTURE
-         * STYLE: ENGLISH COTTAGE SAGE
-         * 4 CORE CATEGORIES & VIDEO PORTAL
-         */
     </script>
 </body>
 </html>
