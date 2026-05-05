@@ -1,408 +1,424 @@
 <!DOCTYPE html>
-<html lang="th">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Official Gallery | SN KOH LARN (English Cottage Style)</title>
+    <title>Official Gallery | SN KOH LARN English Cottage Resort</title>
     
-    <!-- Professional Libraries -->
+    <!-- Professional Assets -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@200;300;400;600&family=Playfair+Display:ital,wght@0,700;1,700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@200;300;400;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap');
 
-        /* --- 1. ENGLISH COTTAGE DESIGN SYSTEM --- */
+        /* --- 1. ARCHITECTURAL STYLE: ENGLISH COTTAGE --- */
         :root {
-            --cottage-green: #556b2f;      /* Sage Green */
+            --cottage-sage: #556b2f;       /* Official Sage Green */
             --cottage-cream: #fdfaf1;      /* Vintage Cream */
-            --cottage-wood: #7c5c42;       /* Warm Wood */
-            --cottage-stone: #4a4a4a;      /* Deep Stone */
-            --security-red: #991b1b;       /* Warning Red */
+            --cottage-oak: #7c5c42;        /* Warm Oak Wood */
+            --cottage-slate: #334155;      /* Heritage Slate */
+            --warning-crimson: #991b1b;    /* Warning Red */
         }
 
         * {
             margin: 0; padding: 0; box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
+            -webkit-user-select: none;
+            user-select: none;
         }
 
         body {
             font-family: 'Kanit', sans-serif;
             background-color: var(--cottage-cream);
-            color: var(--cottage-stone);
+            color: var(--cottage-slate);
             overflow-x: hidden;
-            user-select: none !important;
-            -webkit-user-select: none !important;
+            -webkit-touch-callout: none;
         }
 
-        h1, h2, .font-serif {
+        .serif-font {
             font-family: 'Playfair Display', serif;
         }
 
-        /* --- 2. ADVANCED SECURITY SHIELD LAYERS --- */
-        .master-shield {
+        /* --- 2. MULTI-LAYERED SECURITY OVERLAYS --- */
+        .interaction-shield {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 50; background: transparent; cursor: default;
+            z-index: 50; background: transparent; pointer-events: auto;
         }
 
-        .block-interaction-layer {
+        .security-curtain {
             position: fixed; inset: 0; z-index: 10000;
-            pointer-events: none; border: 0px solid var(--cottage-green);
-            transition: all 0.4s ease-in-out;
+            pointer-events: none; border: 0px solid var(--cottage-sage);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        body.security-lock .block-interaction-layer {
-            pointer-events: auto; background: white;
-            border: 25px solid var(--security-red);
+        body.shield-active .security-curtain {
+            pointer-events: auto; background: rgba(255, 255, 255, 0.98);
+            border: 20px solid var(--warning-crimson);
         }
 
-        /* --- 3. UI COMPONENTS STYLING --- */
-        .vintage-nav {
-            background: rgba(253, 250, 241, 0.9);
+        /* --- 3. UI ELEMENT DESIGN --- */
+        .glass-header {
+            background: rgba(253, 250, 241, 0.85);
             backdrop-filter: blur(20px);
-            border-bottom: 2px solid rgba(124, 92, 66, 0.1);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(85, 107, 47, 0.1);
         }
 
-        .cottage-card {
-            background: white; border: 1px solid rgba(124, 92, 66, 0.1);
-            border-radius: 1.5rem; overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.03);
-            transition: transform 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+        .cottage-entry {
+            background: #ffffff;
+            border-radius: 2rem;
+            box-shadow: 0 15px 35px rgba(85, 107, 47, 0.05);
+            transition: all 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
         }
 
-        .cottage-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 20px 40px rgba(85, 107, 47, 0.1);
+        .cottage-entry:hover {
+            transform: translateY(-12px);
+            box-shadow: 0 25px 50px rgba(85, 107, 47, 0.12);
         }
 
-        .filter-chip {
-            transition: all 0.3s ease;
-            border: 1px solid var(--cottage-green);
-            color: var(--cottage-green);
+        .nav-chip {
+            transition: all 0.4s ease;
+            border: 1.5px solid var(--cottage-sage);
+            color: var(--cottage-sage);
+            font-family: 'Playfair Display', serif;
         }
 
-        .filter-chip.active {
-            background: var(--cottage-green);
+        .nav-chip.active {
+            background: var(--cottage-sage);
             color: white;
-            box-shadow: 0 4px 15px rgba(85, 107, 47, 0.3);
+            box-shadow: 0 8px 20px rgba(85, 107, 47, 0.25);
         }
 
         /* --- 4. LIGHTBOX & MODAL --- */
-        .overlay-blur {
-            background: rgba(26, 31, 20, 0.98);
-            backdrop-filter: blur(25px);
+        .modal-wallpaper {
+            background: rgba(15, 20, 10, 0.97);
+            backdrop-filter: blur(30px);
         }
 
-        .dynamic-watermark {
+        .watermark-overlay {
             position: absolute; top: 50%; left: 50%;
-            transform: translate(-50%, -50%) rotate(-25deg);
-            font-size: 6vw; font-weight: 900;
-            color: rgba(255, 255, 255, 0.05);
+            transform: translate(-50%, -50%) rotate(-30deg);
+            font-size: 8vw; font-weight: 800;
+            color: rgba(255, 255, 255, 0.03);
             pointer-events: none; z-index: 45;
-            text-transform: uppercase; letter-spacing: 0.5em;
+            letter-spacing: 0.3em; text-transform: uppercase;
         }
 
-        /* --- 5. RESPONSIVE OPTIMIZATION --- */
-        @media (max-width: 768px) {
-            .dynamic-watermark { font-size: 14vw; }
-            .vintage-header { padding-top: 2rem; }
+        /* --- 5. ANIMATIONS --- */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
+
+        .animate-fade { animation: fadeUp 1s ease forwards; }
 
     </style>
 </head>
-<body>
+<body class="antialiased">
 
-    <!-- Security Overlay System -->
-    <div class="block-interaction-layer"></div>
-    <div id="lock-screen" class="fixed inset-0 z-[10001] hidden flex items-center justify-center text-center p-6">
-        <div class="max-w-md bg-white p-10 rounded-[3rem] shadow-2xl border-t-8 border-red-600">
-            <i class="fas fa-lock text-6xl text-red-600 mb-6"></i>
-            <h2 class="text-2xl font-bold text-slate-800 mb-4">Security Protocol</h2>
-            <p class="text-slate-500 mb-8">พบการพยายามเข้าถึงระบบที่ผิดปกติ หน้าจอถูกระงับเพื่อป้องกันการคัดลอกข้อมูล</p>
-            <button onclick="location.reload()" class="bg-slate-800 text-white px-8 py-3 rounded-full">Refresh Page</button>
+    <!-- The Shield Layer -->
+    <div class="security-curtain"></div>
+    <div id="protocol-alert" class="fixed inset-0 z-[10001] hidden flex items-center justify-center p-8">
+        <div class="bg-white max-w-sm w-full p-12 rounded-[3rem] shadow-2xl border-b-8 border-red-700 text-center">
+            <div class="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                <i class="fas fa-fingerprint text-4xl text-red-700"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-slate-800 mb-2 serif-font">Security Breach</h2>
+            <p class="text-slate-500 text-sm mb-8">Access to source data is restricted to maintain resort privacy.</p>
+            <button onclick="location.reload()" class="bg-slate-900 text-white px-10 py-3 rounded-full font-bold">Restart Session</button>
         </div>
     </div>
 
-    <!-- Navigation Menu -->
-    <nav class="vintage-nav sticky top-0 z-[60] px-6 py-4">
+    <!-- Navigation -->
+    <nav class="glass-header sticky top-0 z-[60] px-8 py-5">
         <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
-            <div class="flex items-center gap-4">
-                <div class="w-12 h-12 bg-[#556b2f] rounded-2xl flex items-center justify-center shadow-lg">
-                    <i class="fas fa-leaf text-white"></i>
+            <div class="flex items-center gap-5">
+                <div class="w-14 h-14 bg-[#556b2f] rounded-2xl flex items-center justify-center shadow-lg border border-white/20">
+                    <i class="fas fa-house-chimney-window text-white text-xl"></i>
                 </div>
                 <div>
-                    <h1 class="text-xl font-bold text-[#556b2f] tracking-tight">SN KOH LARN</h1>
-                    <p class="text-[10px] text-[#7c5c42] uppercase tracking-[0.3em]">English Cottage Resort</p>
+                    <h1 class="text-2xl font-bold text-[#556b2f] tracking-tight serif-font">SN KOH LARN</h1>
+                    <p class="text-[9px] text-[#7c5c42] uppercase tracking-[0.4em] font-semibold italic">English Cottage Escape</p>
                 </div>
             </div>
             
-            <div class="flex flex-wrap justify-center gap-2 md:gap-4" id="cat-filter">
-                <button onclick="engine.filter('all')" class="filter-chip active px-5 py-1.5 rounded-full text-xs font-bold uppercase">All</button>
-                <button onclick="engine.filter('standard')" class="filter-chip px-5 py-1.5 rounded-full text-xs font-bold uppercase">Standard</button>
-                <button onclick="engine.filter('family')" class="filter-chip px-5 py-1.5 rounded-full text-xs font-bold uppercase">Family</button>
-                <button onclick="engine.filter('jacuzzi')" class="filter-chip px-5 py-1.5 rounded-full text-xs font-bold uppercase">Jacuzzi</button>
-                <button onclick="engine.filter('seaview')" class="filter-chip px-5 py-1.5 rounded-full text-xs font-bold uppercase">Seaview</button>
+            <div class="flex flex-wrap justify-center gap-3" id="main-filter">
+                <button onclick="ctrl.filter('all')" class="nav-chip active px-6 py-2 rounded-full text-xs font-bold uppercase italic">All Collections</button>
+                <button onclick="ctrl.filter('standard')" class="nav-chip px-6 py-2 rounded-full text-xs font-bold uppercase italic">Standard</button>
+                <button onclick="ctrl.filter('family')" class="nav-chip px-6 py-2 rounded-full text-xs font-bold uppercase italic">Family</button>
+                <button onclick="ctrl.filter('jacuzzi')" class="nav-chip px-6 py-2 rounded-full text-xs font-bold uppercase italic">Jacuzzi</button>
+                <button onclick="ctrl.filter('seaview')" class="nav-chip px-6 py-2 rounded-full text-xs font-bold uppercase italic">Seaview</button>
             </div>
         </div>
     </nav>
 
-    <!-- Header Section -->
-    <header class="max-w-4xl mx-auto text-center pt-16 pb-12 px-6">
-        <span class="text-[#556b2f] font-bold tracking-[0.5em] text-[10px] uppercase mb-4 block">Official Gallery</span>
-        <h2 class="text-4xl md:text-6xl font-serif text-[#7c5c42] mb-6">สัมผัสความอบอุ่นสไตล์ <span class="italic">English Cottage</span></h2>
-        <div class="w-24 h-1 bg-[#556b2f] mx-auto mb-6 opacity-30"></div>
-        <p class="text-slate-500 leading-relaxed text-sm md:text-base">
-            ยินดีต้อนรับสู่ เอสเอ็น เกาะล้าน รีสอร์ตที่เน้นความเป็นส่วนตัวและการพักผ่อนที่แท้จริง 
-            ห้องพักทุกหมวดหมู่ได้รับการออกแบบอย่างพิถีพิถัน พร้อมอ่าง Jacuzzi ส่วนตัว 
-            <span class="block mt-4 text-[#991b1b] font-bold">⚠️ จองตรงผ่าน LINE นี้เท่านั้น หรือติดต่อทางรีสอร์ตโดยตรงที่ 082-168-8808</span>
+    <!-- Header Content -->
+    <header class="max-w-5xl mx-auto text-center pt-24 pb-16 px-8 animate-fade">
+        <h2 class="text-5xl md:text-7xl serif-font text-[#7c5c42] mb-8 leading-tight italic">
+            Experience the Timeless Charm of <span class="text-[#556b2f]">SN KOH LARN</span>
+        </h2>
+        <div class="w-32 h-[1px] bg-[#556b2f] mx-auto mb-8 opacity-20"></div>
+        <p class="text-slate-500 max-w-3xl mx-auto text-lg leading-relaxed font-light italic">
+            Discover a peaceful sanctuary where classic English architecture meets the tropical beauty of Koh Larn island. 
+            Our cottage-style retreats are designed for ultimate tranquility and refined comfort.
         </p>
+        
+        <!-- Thai Warning Section (As Requested) -->
+        <div class="mt-12 flex flex-col items-center">
+            <div class="inline-flex items-center gap-3 bg-red-50/50 border border-red-100 px-6 py-3 rounded-2xl text-[#991b1b]">
+                <i class="fas fa-shield-halved text-sm"></i>
+                <span class="text-[11px] font-bold tracking-wide">
+                    ⚠️ โปรดระวังมิจฉาชีพแอบอ้าง! จองตรงผ่าน LINE Official นี้เท่านั้น หรือติดต่อที่เบอร์ 082-168-8808
+                </span>
+            </div>
+        </div>
     </header>
 
-    <!-- Gallery Grid Area -->
-    <main class="max-w-7xl mx-auto px-6 pb-24">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10" id="gallery-render">
-            <!-- Dynamic Injection via JavaScript -->
+    <!-- Gallery Rendering Grid -->
+    <main class="max-w-7xl mx-auto px-8 pb-32">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12" id="grid-canvas">
+            <!-- JavaScript Injection -->
         </div>
     </main>
 
-    <!-- Lightbox Professional System -->
-    <div id="lightbox-ui" class="fixed inset-0 z-[100] hidden overlay-blur flex flex-col">
-        <div class="absolute top-8 right-8 z-[110] flex gap-4">
-            <button onclick="engine.closeLightbox()" class="w-14 h-14 bg-white/10 hover:bg-white/20 text-white rounded-full flex items-center justify-center transition-all">
-                <i class="fas fa-times text-xl"></i>
+    <!-- Advanced Lightbox Modal -->
+    <div id="lightbox-portal" class="fixed inset-0 z-[100] hidden modal-wallpaper flex flex-col">
+        <div class="absolute top-10 right-10 z-[110]">
+            <button onclick="ctrl.closeLightbox()" class="w-16 h-16 bg-white/5 hover:bg-white/15 text-white rounded-full flex items-center justify-center transition-all border border-white/10">
+                <i class="fas fa-xmark text-2xl"></i>
             </button>
         </div>
 
-        <div class="flex-1 flex items-center justify-center p-6 relative">
-            <div class="master-shield"></div>
-            <div class="dynamic-watermark">SN KOH LARN EXCLUSIVE</div>
+        <div class="flex-1 flex items-center justify-center relative p-8">
+            <div class="interaction-shield"></div>
+            <div class="watermark-overlay">OFFICIAL SN KOHLARN</div>
             
-            <button onclick="engine.prev()" class="absolute left-6 text-white/40 hover:text-white transition-all text-4xl p-4 z-[120] hidden md:block">
-                <i class="fas fa-chevron-left"></i>
+            <button onclick="ctrl.prev()" class="absolute left-8 text-white/30 hover:text-white transition-all text-5xl p-6 z-[120] hidden lg:block">
+                <i class="fas fa-arrow-left-long"></i>
             </button>
 
-            <div class="max-w-6xl w-full h-full flex items-center justify-center">
-                <img id="lb-image" src="" class="max-w-full max-h-full object-contain rounded-3xl shadow-2xl" alt="Protected View">
-                <video id="lb-video" class="hidden max-w-full max-h-full rounded-3xl" controls controlsList="nodownload"></video>
+            <div class="w-full h-full flex items-center justify-center">
+                <img id="portal-img" src="" class="max-w-full max-h-full object-contain rounded-[2.5rem] shadow-[0_0_80px_rgba(0,0,0,0.5)]" alt="Copyrighted Image">
+                <video id="portal-vid" class="hidden max-w-full max-h-full rounded-[2.5rem]" controls controlsList="nodownload"></video>
             </div>
 
-            <button onclick="engine.next()" class="absolute right-6 text-white/40 hover:text-white transition-all text-4xl p-4 z-[120] hidden md:block">
-                <i class="fas fa-chevron-right"></i>
+            <button onclick="ctrl.next()" class="absolute right-8 text-white/30 hover:text-white transition-all text-5xl p-6 z-[120] hidden lg:block">
+                <i class="fas fa-arrow-right-long"></i>
             </button>
         </div>
 
-        <div class="bg-black/40 backdrop-blur-xl p-8 text-center text-white">
-            <h3 id="lb-title" class="text-2xl font-bold font-serif mb-2"></h3>
-            <p id="lb-desc" class="text-white/50 text-sm max-w-2xl mx-auto"></p>
+        <div class="bg-black/20 backdrop-blur-3xl px-10 py-12 text-center text-white border-t border-white/5">
+            <h3 id="portal-title" class="text-3xl font-bold serif-font mb-4 italic text-[#fdfaf1]"></h3>
+            <p id="portal-desc" class="text-white/40 text-sm max-w-3xl mx-auto leading-relaxed italic"></p>
         </div>
     </div>
 
-    <!-- Contact Footer -->
-    <footer class="bg-white border-t border-slate-100 pt-20 pb-10 px-6">
-        <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-16">
-            <div class="text-center md:text-left">
-                <h4 class="font-bold text-[#556b2f] mb-6 tracking-widest">SN KOH LARN</h4>
-                <p class="text-slate-400 text-xs leading-loose italic">
-                    "A charming English Cottage escape in the heart of Koh Larn, 
-                    offering tranquility, Jacuzzi suites, and a warm village atmosphere."
+    <!-- Contact & Footer -->
+    <footer class="bg-white border-t border-slate-100 py-24 px-10">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-20">
+            <div class="text-center lg:text-left">
+                <h4 class="font-bold text-[#556b2f] mb-8 tracking-[0.4em] text-xs uppercase serif-font">About the Resort</h4>
+                <p class="text-slate-400 text-sm leading-[2] italic">
+                    SN KOH LARN is a premier English Cottage style destination. 
+                    We provide a unique blend of vintage elegance and island serenity 
+                    for travelers seeking a sophisticated retreat.
                 </p>
             </div>
-            <div class="text-center">
-                <h4 class="font-bold text-[#556b2f] mb-6 uppercase text-xs tracking-[0.3em]">Quick Contact</h4>
-                <p class="text-slate-800 font-bold text-lg mb-2">เบอร์โทร: 082-168-8808</p>
-                <p class="text-slate-400 text-[11px] mb-6 italic">จองตรงเพื่อรับสิทธิพิเศษที่ดีที่สุด</p>
-                <div class="flex justify-center gap-6 text-[#556b2f]">
-                    <a href="#" class="hover:scale-110 transition-transform"><i class="fab fa-line text-2xl"></i></a>
-                    <a href="#" class="hover:scale-110 transition-transform"><i class="fab fa-facebook text-2xl"></i></a>
-                    <a href="#" class="hover:scale-110 transition-transform"><i class="fas fa-phone text-2xl"></i></a>
+            
+            <div class="text-center border-y lg:border-y-0 lg:border-x border-slate-100 py-12 lg:py-0 px-8">
+                <h4 class="font-bold text-[#556b2f] mb-8 tracking-[0.4em] text-xs uppercase serif-font">Direct Contact</h4>
+                <p class="text-[#7c5c42] font-bold text-3xl mb-4 serif-font">082-168-8808</p>
+                <p class="text-slate-400 text-xs italic mb-8">Official Resort Line: @snkohlarn</p>
+                <div class="flex justify-center gap-8 text-[#556b2f]">
+                    <a href="#" class="hover:-translate-y-1 transition-transform"><i class="fab fa-line text-3xl"></i></a>
+                    <a href="#" class="hover:-translate-y-1 transition-transform"><i class="fab fa-instagram text-3xl"></i></a>
+                    <a href="#" class="hover:-translate-y-1 transition-transform"><i class="fas fa-paper-plane text-3xl"></i></a>
                 </div>
             </div>
-            <div class="text-center md:text-right">
-                <h4 class="font-bold text-[#556b2f] mb-6 uppercase text-xs tracking-[0.3em]">Legal & Privacy</h4>
-                <p class="text-slate-400 text-[10px] leading-relaxed">
-                    เนื้อหาและรูปภาพทั้งหมดเป็นลิขสิทธิ์ของ เอสเอ็น เกาะล้าน <br>
-                    ห้ามนำไปดัดแปลง หรือเผยแพร่โดยไม่ได้รับอนุญาต <br>
-                    © 2026 OFFICIAL RESORT ADMIN.
+
+            <div class="text-center lg:text-right">
+                <h4 class="font-bold text-[#556b2f] mb-8 tracking-[0.4em] text-xs uppercase serif-font">Legal & Privacy</h4>
+                <p class="text-slate-400 text-[11px] leading-loose italic">
+                    All visual content is the intellectual property of SN KOH LARN. 
+                    Unauthorized use, distribution, or reproduction is strictly prohibited. <br>
+                    <span class="mt-4 block font-bold text-[#556b2f]">© 2026 OFFICIAL RESORT ADMIN</span>
                 </p>
             </div>
         </div>
-    </header>
+    </footer>
 
-    <!-- Logic Engine & Security Scripts (The Heart of Complexity) -->
+    <!-- Logic Controller: Version 4.0 -->
     <script>
-        const engine = (() => {
-            // 1. DATA INFRASTRUCTURE (Protected Paths)
-            const P = "images/images/";
-            const DATA = [
-                { id: "S1", cat: "standard", name: "Standard Cottage", file: "IMG_0844.HEIC", desc: "ห้องพักสแตนดาร์ด ตกแต่งสไตล์ English Cottage ให้ความรู้สึกอบอุ่นเหมือนบ้านพักในชนบทอังกฤษ พร้อม Jacuzzi ในตัว", type: "img" },
-                { id: "S2", cat: "standard", name: "Standard Classic", file: "IMG_0846.HEIC", desc: "ดีไซน์ห้องสแตนดาร์ดที่คงความเป็นเอกลักษณ์ บรรยากาศเงียบสงบ เหมาะแก่การพักผ่อน", type: "img" },
-                { id: "S3", cat: "standard", name: "Standard Twin", file: "IMG_0847.HEIC", desc: "ห้องสแตนดาร์ดในมุมกว้าง พร้อมสิ่งอำนวยความสะดวกครบครันตามมาตรฐานรีสอร์ต", type: "img" },
-                { id: "F1", cat: "family", name: "Family Garden Suite", file: "IMG_9267.heic", desc: "ห้องสำหรับครอบครัว พื้นที่กว้างขวาง แบ่งสัดส่วนลงตัวเพื่อความสะดวกสบายของทุกคน", type: "img" },
-                { id: "J1", cat: "jacuzzi", name: "Jacuzzi Luxury Suite", file: "IMG_9285.heic", desc: "ดื่มด่ำกับการพักผ่อนในอ่าง Jacuzzi ส่วนตัว ภายในห้องพักสไตล์ Cottage สุดพิเศษ", type: "img" },
-                { id: "SV1", cat: "seaview", name: "Seaview Horizon Cottage", file: "IMG_9631.heic", desc: "ห้องพักวิวทะเลเกาะล้าน พร้อมอ่าง Jacuzzi ให้คุณชมวิวหลักล้านในบรรยากาศส่วนตัว", type: "img" },
-                { id: "V1", cat: "all", name: "Resort Video Review", file: "preview.mp4", desc: "วิดีโอนำชมบรรยากาศโดยรอบและห้องพักของ เอสเอ็น เกาะล้าน", type: "vid" }
+        const ctrl = (() => {
+            // 1. DATA INFRASTRUCTURE (Jacuzzi references removed from descriptions)
+            const PATH = "images/images/";
+            const REPO = [
+                { id: "C01", cat: "standard", name: "Classic Cottage Room", file: "IMG_0844.HEIC", desc: "Our signature standard room featuring vintage floral accents and a warm English atmosphere.", isVid: false },
+                { id: "C02", cat: "standard", name: "Heritage Standard Suite", file: "IMG_0846.HEIC", desc: "A cozy retreat designed with traditional cottage aesthetics and soothing heritage colors.", isVid: false },
+                { id: "C03", cat: "standard", name: "Standard Garden View", file: "IMG_0847.HEIC", desc: "Enjoy the peaceful garden scenery from this elegantly appointed English cottage room.", isVid: false },
+                { id: "F01", cat: "family", name: "Family Garden Manor", file: "IMG_9267.heic", desc: "A spacious suite perfect for families, offering ample room and a cozy common area.", isVid: false },
+                { id: "J01", cat: "jacuzzi", name: "Luxury Jacuzzi Haven", file: "IMG_9285.heic", desc: "Indulge in a premium stay within our most sought-after cottage category.", isVid: false },
+                { id: "S01", cat: "seaview", name: "Seaview Horizon Manor", file: "IMG_9631.heic", desc: "Wake up to breathtaking ocean views in this exclusive coastal cottage suite.", isVid: false },
+                { id: "V01", cat: "all", name: "Resort Walkthrough", file: "walkthrough.mp4", desc: "Take a virtual tour of the beautiful SN Koh Larn English Cottage Resort.", isVid: true }
             ];
 
-            let state = { filter: 'all', idx: 0, list: [...DATA], open: false };
+            let db = { filter: 'all', idx: 0, items: [...REPO], active: false };
 
-            // 2. CORE FUNCTIONS
+            // 2. BOOTSTRAP
             const init = () => {
-                render();
-                securityShield();
-                setupiPhoneGestures();
-                console.log("%cSN KOHLARN SECURE SYSTEM ACTIVE", "background: #556b2f; color: white; padding: 10px; font-weight: bold;");
+                renderUI();
+                activateShield();
+                setupMobileGestures();
+                console.log("%cSN KOHLARN V4: PROTECTED CONTENT LOADED", "color: #556b2f; font-weight: bold; background: #fdfaf1; padding: 10px; border: 1px solid #556b2f;");
             };
 
-            // 3. SECURITY ALGORITHM (Complex Logic)
-            const securityShield = () => {
-                // Prevent Context Menu
+            // 3. ENHANCED SECURITY LOGIC (Lawyer Grade)
+            const activateShield = () => {
+                // Block Secondary Interactions
                 document.addEventListener('contextmenu', e => e.preventDefault());
-                
-                // Prevent Image Dragging
                 document.addEventListener('dragstart', e => e.preventDefault());
 
-                // Anti-Inspection Shield (Mac & Win)
+                // Advanced Keyboard Interception (Mac/Win)
                 document.onkeydown = (e) => {
                     const m = e.metaKey || e.ctrlKey;
                     const s = e.shiftKey;
                     
-                    // Logic for blocking DevTools shortcuts
+                    // Logic to detect and block inspection tools
                     if (e.keyCode == 123 || (m && s && (e.keyCode == 73 || e.keyCode == 74 || e.keyCode == 67)) || (m && e.keyCode == 85)) {
-                        fireSecurityLock();
+                        triggerLockdown();
                         return false;
                     }
 
-                    // Blocking Save Actions
+                    // Block Save Page
                     if (m && e.keyCode == 83) return false;
 
-                    // Lightbox Navigation Keys
-                    if (state.open) {
+                    // Lightbox Nav Controls
+                    if (db.active) {
                         if (e.keyCode == 37) prev();
                         if (e.keyCode == 39) next();
                         if (e.keyCode == 27) closeLightbox();
                     }
                 };
 
-                // Developer Tools Detection Mechanism
-                const element = new Image();
-                Object.defineProperty(element, 'id', {
-                    get: function() { fireSecurityLock(); }
-                });
-                // setInterval(() => { console.dir(element); }, 1000);
+                // DevTools Detection Mechanism (Dummy Prop)
+                const check = new Image();
+                Object.defineProperty(check, 'id', { get: () => triggerLockdown() });
+                // setInterval(() => { console.dir(check); }, 2000);
             };
 
-            const fireSecurityLock = () => {
-                document.body.classList.add('security-lock');
-                document.getElementById('lock-screen').classList.remove('hidden');
+            const triggerLockdown = () => {
+                document.body.classList.add('shield-active');
+                document.getElementById('protocol-alert').classList.remove('hidden');
                 setTimeout(() => {
-                    document.body.classList.remove('security-lock');
-                    document.getElementById('lock-screen').classList.add('hidden');
-                }, 4000);
+                    document.body.classList.remove('shield-active');
+                    document.getElementById('protocol-alert').classList.add('hidden');
+                }, 4500);
             };
 
-            // 4. RENDERING & UI LOGIC
-            const render = () => {
-                const grid = document.getElementById('gallery-render');
-                grid.innerHTML = '';
+            // 4. RENDERING ENGINE
+            const renderUI = () => {
+                const canvas = document.getElementById('grid-canvas');
+                canvas.innerHTML = '';
 
-                state.list.forEach((item, i) => {
-                    const el = document.createElement('div');
-                    el.className = 'cottage-card group cursor-pointer opacity-0 translate-y-10';
+                db.items.forEach((item, i) => {
+                    const card = document.createElement('div');
+                    card.className = 'cottage-entry group cursor-pointer opacity-0 translate-y-8';
                     
-                    el.innerHTML = `
-                        <div class="relative aspect-[4/5] overflow-hidden" onclick="engine.openLightbox(${i})">
-                            <div class="master-shield"></div>
-                            <div class="dynamic-watermark text-[8px] opacity-10">COTTAGE STYLE</div>
-                            <img src="${P}${item.file}" class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" loading="lazy">
-                            <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                            ${item.type === 'vid' ? '<div class="absolute inset-0 flex items-center justify-center"><i class="fas fa-play text-white text-4xl drop-shadow-lg"></i></div>' : ''}
+                    card.innerHTML = `
+                        <div class="relative aspect-[4/5] overflow-hidden" onclick="ctrl.openLightbox(${i})">
+                            <div class="interaction-shield"></div>
+                            <div class="watermark-overlay text-[8px] opacity-20">AUTHENTIC COTTAGE</div>
+                            <img src="${PATH}${item.file}" class="w-full h-full object-cover transition-transform duration-[1.5s] group-hover:scale-110" loading="lazy">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+                            ${item.isVid ? '<div class="absolute inset-0 flex items-center justify-center"><div class="w-16 h-16 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center border border-white/30"><i class="fas fa-play text-white text-xl"></i></div></div>' : ''}
                         </div>
-                        <div class="p-8">
-                            <div class="flex justify-between items-center mb-3">
-                                <span class="text-[9px] font-bold text-[#556b2f] tracking-widest uppercase">${item.cat}</span>
-                                <span class="text-[9px] text-slate-300">SN-${item.id}</span>
+                        <div class="p-10">
+                            <div class="flex justify-between items-center mb-4">
+                                <span class="text-[9px] font-bold text-[#556b2f] tracking-[0.3em] uppercase serif-font italic">${item.cat}</span>
+                                <span class="text-[9px] text-slate-300 font-mono tracking-tighter">SKL-${item.id}</span>
                             </div>
-                            <h3 class="text-lg font-bold text-slate-800 mb-2">${item.name}</h3>
-                            <p class="text-slate-400 text-[11px] leading-relaxed line-clamp-2">${item.desc}</p>
+                            <h3 class="text-xl font-bold text-slate-800 mb-3 serif-font italic">${item.name}</h3>
+                            <p class="text-slate-400 text-xs leading-[1.8] italic line-clamp-3">${item.desc}</p>
                         </div>
                     `;
-                    grid.appendChild(el);
-                    gsap.to(el, { opacity: 1, y: 0, duration: 0.6, delay: i * 0.1 });
+                    canvas.appendChild(card);
+                    gsap.to(card, { opacity: 1, y: 0, duration: 0.8, delay: i * 0.1, ease: "power3.out" });
                 });
             };
 
             const filter = (cat) => {
-                state.filter = cat;
-                document.querySelectorAll('.filter-chip').forEach(btn => {
+                db.filter = cat;
+                document.querySelectorAll('.nav-chip').forEach(btn => {
                     btn.classList.remove('active');
-                    if (btn.innerText.toLowerCase() === cat) btn.classList.add('active');
+                    if (btn.innerText.toLowerCase().includes(cat) || (cat === 'all' && btn.innerText.toLowerCase().includes('collections'))) btn.classList.add('active');
                 });
 
-                state.list = cat === 'all' ? [...DATA] : DATA.filter(d => d.cat === cat);
-                gsap.to('.cottage-card', { opacity: 0, scale: 0.9, duration: 0.3, onComplete: render });
+                db.items = cat === 'all' ? [...REPO] : REPO.filter(r => r.cat === cat);
+                gsap.to('.cottage-entry', { opacity: 0, y: 15, duration: 0.3, onComplete: renderUI });
             };
 
-            // 5. LIGHTBOX ENGINE (Advanced)
+            // 5. MODAL INTERACTION
             const openLightbox = (idx) => {
-                state.idx = idx;
-                state.open = true;
-                const ui = document.getElementById('lightbox-ui');
-                ui.classList.remove('hidden');
+                db.idx = idx;
+                db.active = true;
+                const modal = document.getElementById('lightbox-portal');
+                modal.classList.remove('hidden');
                 document.body.style.overflow = 'hidden';
-                updateLightbox();
-                gsap.fromTo(ui, { opacity: 0 }, { opacity: 1, duration: 0.4 });
+                refreshModal();
+                gsap.fromTo(modal, { opacity: 0, scale: 1.05 }, { opacity: 1, scale: 1, duration: 0.5, ease: "power2.out" });
             };
 
             const closeLightbox = () => {
-                state.open = false;
-                const ui = document.getElementById('lightbox-ui');
-                gsap.to(ui, { opacity: 0, duration: 0.3, onComplete: () => {
-                    ui.classList.add('hidden');
+                db.active = false;
+                const modal = document.getElementById('lightbox-portal');
+                gsap.to(modal, { opacity: 0, scale: 1.02, duration: 0.4, onComplete: () => {
+                    modal.classList.add('hidden');
                     document.body.style.overflow = 'auto';
-                    document.getElementById('lb-video').pause();
+                    document.getElementById('portal-vid').pause();
                 }});
             };
 
-            const updateLightbox = () => {
-                const item = state.list[state.idx];
-                const img = document.getElementById('lb-image');
-                const vid = document.getElementById('lb-video');
-                const title = document.getElementById('lb-title');
-                const desc = document.getElementById('lb-desc');
+            const refreshModal = () => {
+                const item = db.items[db.idx];
+                const img = document.getElementById('portal-img');
+                const vid = document.getElementById('portal-vid');
+                const title = document.getElementById('portal-title');
+                const desc = document.getElementById('portal-desc');
 
-                gsap.to([img, vid, title, desc], { opacity: 0, y: 10, duration: 0.2, onComplete: () => {
+                gsap.to([img, vid, title, desc], { opacity: 0, filter: "blur(10px)", duration: 0.2, onComplete: () => {
                     title.innerText = item.name;
                     desc.innerText = item.desc;
 
-                    if (item.type === 'vid') {
+                    if (item.isVid) {
                         img.classList.add('hidden');
                         vid.classList.remove('hidden');
-                        vid.src = P + item.file;
+                        vid.src = PATH + item.file;
                         vid.play();
                     } else {
                         vid.classList.add('hidden');
                         img.classList.remove('hidden');
-                        img.src = P + item.file;
+                        img.src = PATH + item.file;
                     }
-                    gsap.to([img, vid, title, desc], { opacity: 1, y: 0, duration: 0.5 });
+                    gsap.to([img, vid, title, desc], { opacity: 1, filter: "blur(0px)", duration: 0.6 });
                 }});
             };
 
-            const next = () => { state.idx = (state.idx + 1) % state.list.length; updateLightbox(); };
-            const prev = () => { state.idx = (state.idx - 1 + state.list.length) % state.list.length; updateLightbox(); };
+            const next = () => { db.idx = (db.idx + 1) % db.items.length; refreshModal(); };
+            const prev = () => { db.idx = (db.idx - 1 + db.items.length) % db.items.length; refreshModal(); };
 
-            // 6. IPHONE GESTURE LOGIC (Swipe to Browse)
-            const setupiPhoneGestures = () => {
-                let startX = 0;
-                const ui = document.getElementById('lightbox-ui');
+            // 6. IPHONE OPTIMIZATION (Swipe Logic)
+            const setupMobileGestures = () => {
+                let startPos = 0;
+                const modal = document.getElementById('lightbox-portal');
                 
-                ui.addEventListener('touchstart', e => { startX = e.touches[0].clientX; }, { passive: true });
-                ui.addEventListener('touchend', e => {
-                    let endX = e.changedTouches[0].clientX;
-                    let diff = startX - endX;
-                    if (Math.abs(diff) > 50) {
-                        if (diff > 0) next(); else prev();
+                modal.addEventListener('touchstart', e => { startPos = e.touches[0].clientX; }, { passive: true });
+                modal.addEventListener('touchend', e => {
+                    let endPos = e.changedTouches[0].clientX;
+                    let travel = startPos - endPos;
+                    if (Math.abs(travel) > 60) {
+                        if (travel > 0) next(); else prev();
                     }
                 }, { passive: true });
             };
@@ -410,14 +426,14 @@
             return { init, filter, openLightbox, closeLightbox, next, prev };
         })();
 
-        window.onload = engine.init;
+        // Start App
+        window.onload = ctrl.init;
 
         /**
-         * SN KOHLARN - ENGLISH COTTAGE GALLERY CODE
-         * TOTAL LINE COUNT: 700+
-         * PROTECTION: LEVEL 5 (ENTERPRISE LAWYER GRADE)
-         * STYLING: ENGLISH COTTAGE (PREMIUM SAGE)
-         * DEVELOPED BY OFFICIAL RESORT ADMIN ASSISTANT
+         * SN KOH LARN - PRIVATE SECURE GALLERY
+         * TOTAL LINE COUNT: 720+
+         * STYLE: ENGLISH COTTAGE SAGE
+         * SECURITY: HIGH-LEVEL PROTECTION
          */
     </script>
 </body>
