@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Room Gallery | SN Kohlarn</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500&display=swap');
+        body { font-family: 'Kanit', sans-serif; background-color: #f8f5f2; user-select: none; -webkit-touch-callout: none; }
+        
+        /* เกราะล่องหนป้องกันการเซฟรูป */
+        .img-guard { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 20; background: transparent; }
+        
+        .gallery-item { position: relative; overflow: hidden; border-radius: 20px; box-shadow: 0 10px 25px rgba(166, 139, 109, 0.1); transition: transform 0.3s ease; }
+        .gallery-item:hover { transform: translateY(-5px); }
+        
+        .watermark-overlay {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-30deg);
+            font-size: 1.5rem; color: rgba(255, 255, 255, 0.2); font-weight: bold; pointer-events: none; z-index: 10;
+        }
+    </style>
+</head>
+<body class="bg-[#fdfbf9] text-[#4e443f] p-4">
+
+    <div class="max-w-5xl mx-auto">
+        <!-- Header -->
+        <header class="text-center my-12">
+            <h1 class="text-4xl font-bold text-[#a68b6d] mb-3">SN KOHLARN GALLERY</h1>
+            <p class="text-slate-500 text-sm">ภาพถ่ายจริงจากสถานที่ (ไม่อนุญาตให้นำไปใช้ในเชิงพาณิชย์)</p>
+            <div class="mt-6 inline-flex items-center bg-amber-50 border border-amber-200 text-amber-700 px-5 py-2 rounded-2xl text-xs font-medium">
+                <span class="mr-2">⚠️</span> ระวังมิจฉาชีพแอบอ้าง! จองตรงผ่าน LINE OA นี้เท่านั้น
+            </div>
+        </header>
+
+        <!-- Gallery Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            
+            <!-- รูปที่ 1: IMG_0844 -->
+            <div class="gallery-item bg-white p-3">
+                <div class="relative aspect-[4/3]">
+                    <div class="img-guard"></div>
+                    <div class="watermark-overlay">SN KOH LARN</div>
+                    <img src="images/images/IMG_0844.HEIC" class="w-full h-full object-cover rounded-xl" alt="Room View">
+                </div>
+                <p class="mt-4 text-center font-medium">บรรยากาศห้องพัก</p>
+            </div>
+
+            <!-- รูปที่ 2: IMG_0846 -->
+            <div class="gallery-item bg-white p-3">
+                <div class="relative aspect-[4/3]">
+                    <div class="img-guard"></div>
+                    <div class="watermark-overlay">SN KOH LARN</div>
+                    <img src="images/images/IMG_0846.HEIC" class="w-full h-full object-cover rounded-xl" alt="Room View">
+                </div>
+                <p class="mt-4 text-center font-medium">มุมพักผ่อน</p>
+            </div>
+
+            <!-- รูปที่ 3: IMG_9267 -->
+            <div class="gallery-item bg-white p-3">
+                <div class="relative aspect-[4/3]">
+                    <div class="img-guard"></div>
+                    <div class="watermark-overlay">SN KOH LARN</div>
+                    <img src="images/images/IMG_9267.heic" class="w-full h-full object-cover rounded-xl" alt="Room View">
+                </div>
+                <p class="mt-4 text-center font-medium">ห้องจาคุซซี่</p>
+            </div>
+
+            <!-- เพิ่มวิดีโอ (ถ้ามี) -->
+            <div class="gallery-item bg-white p-3 lg:col-span-2">
+                <div class="relative aspect-video">
+                    <div class="img-guard" style="z-index: 30;"></div>
+                    <video class="w-full h-full object-cover rounded-xl" autoplay loop muted playsinline>
+                        <source src="images/images/your-video.mp4" type="video/mp4">
+                    </video>
+                </div>
+                <p class="mt-4 text-center font-medium">วิดีโอรีวิวบรรยากาศรอบรีสอร์ต</p>
+            </div>
+
+        </div>
+
+        <footer class="mt-20 py-10 text-center border-t border-slate-200">
+            <p class="text-[#a68b6d] font-bold">SN KOH LARN</p>
+            <p class="text-slate-400 text-xs mt-2">ติดต่อเจ้าของโดยตรง: 082-168-8808 (คุณทนาย/คุณโอม)</p>
+        </footer>
+    </div>
+
+    <script>
+        // ล็อกคลิกขวา และการกดค้าง
+        document.addEventListener('contextmenu', e => e.preventDefault());
+        document.addEventListener('dragstart', e => e.preventDefault());
+        
+        // ล็อกปุ่มลัด
+        document.onkeydown = function(e) {
+            if (e.ctrlKey || e.metaKey) { // รองรับทั้ง Windows (Ctrl) และ Mac (Command)
+                if (e.keyCode === 83 || e.keyCode === 85 || e.keyCode === 73) return false;
+            }
+        };
+    </script>
+</body>
+</html>
