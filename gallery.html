@@ -3,99 +3,206 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Room Gallery | SN Kohlarn</title>
+    <title>Premium Gallery | SN Kohlarn</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500&display=swap');
-        body { font-family: 'Kanit', sans-serif; background-color: #f8f5f2; user-select: none; -webkit-touch-callout: none; }
+        @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@200;400;600&display=swap');
         
-        /* เกราะล่องหนป้องกันการเซฟรูป */
-        .img-guard { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 20; background: transparent; }
-        
-        .gallery-item { position: relative; overflow: hidden; border-radius: 20px; box-shadow: 0 10px 25px rgba(166, 139, 109, 0.1); transition: transform 0.3s ease; }
-        .gallery-item:hover { transform: translateY(-5px); }
-        
-        .watermark-overlay {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-30deg);
-            font-size: 1.5rem; color: rgba(255, 255, 255, 0.2); font-weight: bold; pointer-events: none; z-index: 10;
+        :root {
+            --primary: #a68b6d;
+            --bg-soft: #fcfaf8;
+        }
+
+        body { 
+            font-family: 'Kanit', sans-serif; 
+            background-color: var(--bg-soft);
+            user-select: none;
+            -webkit-touch-callout: none;
+        }
+
+        /* ระบบป้องกันการเจาะไฟล์ */
+        .content-shield {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 40; background: rgba(255,255,255,0.001);
+        }
+
+        .gallery-card {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .filter-btn.active {
+            background-color: var(--primary);
+            color: white;
+            box-shadow: 0 4px 12px rgba(166, 139, 109, 0.3);
+        }
+
+        /* Modal Animation */
+        #videoModal {
+            transition: opacity 0.3s ease;
+            backdrop-filter: blur(8px);
+        }
+
+        .watermark-text {
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%) rotate(-25deg);
+            font-size: 1.8rem; color: rgba(255,255,255,0.15);
+            font-weight: 800; pointer-events: none; z-index: 30;
+            white-space: nowrap; text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
         }
     </style>
 </head>
-<body class="bg-[#fdfbf9] text-[#4e443f] p-4">
+<body class="overflow-x-hidden">
 
-    <div class="max-w-5xl mx-auto">
-        <!-- Header -->
-        <header class="text-center my-12">
-            <h1 class="text-4xl font-bold text-[#a68b6d] mb-3">SN KOHLARN GALLERY</h1>
-            <p class="text-slate-500 text-sm">ภาพถ่ายจริงจากสถานที่ (ไม่อนุญาตให้นำไปใช้ในเชิงพาณิชย์)</p>
-            <div class="mt-6 inline-flex items-center bg-amber-50 border border-amber-200 text-amber-700 px-5 py-2 rounded-2xl text-xs font-medium">
-                <span class="mr-2">⚠️</span> ระวังมิจฉาชีพแอบอ้าง! จองตรงผ่าน LINE OA นี้เท่านั้น
-            </div>
+    <!-- แถบเตือนภัยมิจฉาชีพ (Sticky) -->
+    <div class="bg-rose-600 text-white text-center py-2 px-4 text-xs font-bold sticky top-0 z-50">
+        📢 โปรดระวังมิจฉาชีพ! จองผ่าน LINE นี้เท่านั้น (บัญชีจริง: คุณพรญาณี ผึ้งนาม)
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 py-8 md:py-16">
+        <!-- Header Section -->
+        <header class="text-center mb-12">
+            <h1 class="text-4xl md:text-5xl font-semibold text-[#a68b6d] tracking-tight">SN KOH LARN</h1>
+            <p class="text-slate-400 mt-2 uppercase tracking-[0.2em] text-xs">Exclusivity & Comfort Gallery</p>
+            <div class="w-20 h-1 bg-[#a68b6d] mx-auto mt-6 rounded-full"></div>
         </header>
 
-        <!-- Gallery Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            
-            <!-- รูปที่ 1: IMG_0844 -->
-            <div class="gallery-item bg-white p-3">
-                <div class="relative aspect-[4/3]">
-                    <div class="img-guard"></div>
-                    <div class="watermark-overlay">SN KOH LARN</div>
-                    <img src="images/images/IMG_0844.HEIC" class="w-full h-full object-cover rounded-xl" alt="Room View">
-                </div>
-                <p class="mt-4 text-center font-medium">บรรยากาศห้องพัก</p>
-            </div>
-
-            <!-- รูปที่ 2: IMG_0846 -->
-            <div class="gallery-item bg-white p-3">
-                <div class="relative aspect-[4/3]">
-                    <div class="img-guard"></div>
-                    <div class="watermark-overlay">SN KOH LARN</div>
-                    <img src="images/images/IMG_0846.HEIC" class="w-full h-full object-cover rounded-xl" alt="Room View">
-                </div>
-                <p class="mt-4 text-center font-medium">มุมพักผ่อน</p>
-            </div>
-
-            <!-- รูปที่ 3: IMG_9267 -->
-            <div class="gallery-item bg-white p-3">
-                <div class="relative aspect-[4/3]">
-                    <div class="img-guard"></div>
-                    <div class="watermark-overlay">SN KOH LARN</div>
-                    <img src="images/images/IMG_9267.heic" class="w-full h-full object-cover rounded-xl" alt="Room View">
-                </div>
-                <p class="mt-4 text-center font-medium">ห้องจาคุซซี่</p>
-            </div>
-
-            <!-- เพิ่มวิดีโอ (ถ้ามี) -->
-            <div class="gallery-item bg-white p-3 lg:col-span-2">
-                <div class="relative aspect-video">
-                    <div class="img-guard" style="z-index: 30;"></div>
-                    <video class="w-full h-full object-cover rounded-xl" autoplay loop muted playsinline>
-                        <source src="images/images/your-video.mp4" type="video/mp4">
-                    </video>
-                </div>
-                <p class="mt-4 text-center font-medium">วิดีโอรีวิวบรรยากาศรอบรีสอร์ต</p>
-            </div>
-
+        <!-- Category Filter Logic -->
+        <div class="flex flex-wrap justify-center gap-3 mb-12" id="filter-container">
+            <button onclick="filterGallery('all')" class="filter-btn active px-6 py-2 rounded-full border border-[#a68b6d] text-[#a68b6d] text-sm font-medium transition-all">ทั้งหมด</button>
+            <button onclick="filterGallery('standard')" class="filter-btn px-6 py-2 rounded-full border border-[#a68b6d] text-[#a68b6d] text-sm font-medium transition-all">Standard Rooms</button>
+            <button onclick="filterGallery('family')" class="filter-btn px-6 py-2 rounded-full border border-[#a68b6d] text-[#a68b6d] text-sm font-medium transition-all">Family Rooms</button>
+            <button onclick="filterGallery('jacuzzi')" class="filter-btn px-6 py-2 rounded-full border border-[#a68b6d] text-[#a68b6d] text-sm font-medium transition-all">Jacuzzi Rooms</button>
+            <button onclick="filterGallery('seaview')" class="filter-btn px-6 py-2 rounded-full border border-[#a68b6d] text-[#a68b6d] text-sm font-medium transition-all">Seaview Rooms</button>
         </div>
 
-        <footer class="mt-20 py-10 text-center border-t border-slate-200">
-            <p class="text-[#a68b6d] font-bold">SN KOH LARN</p>
-            <p class="text-slate-400 text-xs mt-2">ติดต่อเจ้าของโดยตรง: 082-168-8808 (คุณทนาย/คุณโอม)</p>
+        <!-- Dynamic Gallery Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8" id="gallery-grid">
+            <!-- ข้อมูลจะถูกฉีดเข้าที่นี่ด้วย JavaScript -->
+        </div>
+
+        <footer class="mt-24 pt-12 border-t border-slate-200 text-center">
+            <div class="flex justify-center gap-6 mb-6 text-slate-400">
+                <a href="#"><i class="fab fa-facebook text-xl"></i></a>
+                <a href="#"><i class="fab fa-line text-xl"></i></a>
+                <a href="#"><i class="fas fa-phone text-xl"></i></a>
+            </div>
+            <p class="text-xs text-slate-400">© 2026 SN KOH LARN. Protected Content by PORNYANEE Legal Services.</p>
         </footer>
     </div>
 
+    <!-- Video Modal (Hidden by Default) -->
+    <div id="videoModal" class="fixed inset-0 z-[100] hidden flex items-center justify-center bg-black/90 p-4">
+        <div class="relative w-full max-w-4xl aspect-video bg-black rounded-2xl overflow-hidden shadow-2xl">
+            <button onclick="closeVideo()" class="absolute top-4 right-4 z-[110] bg-white/20 hover:bg-white/40 text-white w-10 h-10 rounded-full flex items-center justify-center transition-all">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="content-shield"></div> <!-- ป้องกันในตัว Modal ด้วย -->
+            <video id="mainVideo" class="w-full h-full object-contain" controls controlsList="nodownload">
+                <source src="" type="video/mp4">
+            </video>
+        </div>
+    </div>
+
     <script>
-        // ล็อกคลิกขวา และการกดค้าง
+        // ข้อมูลห้องพัก (คุณทนายแก้ Path ไฟล์ตรงนี้ได้เลยครับ)
+        const roomData = [
+            { id: 1, cat: 'standard', name: 'Standard Room A1', img: 'images/images/IMG_0844.HEIC', video: 'images/video_std.mp4', desc: 'ห้องพักเรียบง่าย สไตล์มินิมอล' },
+            { id: 2, cat: 'family', name: 'Family Grand Suite', img: 'images/images/IMG_0846.HEIC', video: 'images/video_family.mp4', desc: 'ห้องใหญ่พักได้ทั้งครอบครัว' },
+            { id: 3, cat: 'jacuzzi', name: 'Jacuzzi Deluxe', img: 'images/images/IMG_9267.heic', video: 'images/video_jacuzzi.mp4', desc: 'ผ่อนคลายกับอ่างจาคุซซี่ส่วนตัว' },
+            { id: 4, cat: 'seaview', name: 'Seaview Terrace', img: 'images/images/IMG_9285.heic', video: 'images/video_sea.mp4', desc: 'ตื่นมาพบวิวทะเลเกาะล้าน 180 องศา' },
+            // เพิ่มห้องอื่นๆ ได้เรื่อยๆ ครับ...
+        ];
+
+        // ฟังก์ชันแสดงผล Gallery
+        function renderGallery(filter = 'all') {
+            const grid = document.getElementById('gallery-grid');
+            grid.innerHTML = ''; // Clear เก่า
+
+            const filtered = filter === 'all' ? roomData : roomData.filter(r => r.cat === filter);
+
+            filtered.forEach(room => {
+                const card = `
+                    <div class="gallery-card bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl border border-slate-100 group">
+                        <div class="relative overflow-hidden aspect-[4/3]">
+                            <div class="content-shield"></div>
+                            <div class="watermark-text">SN KOH LARN</div>
+                            <img src="${room.img}" alt="${room.name}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                            
+                            <!-- ปุ่มดูวิดีโอ -->
+                            <button onclick="openVideo('${room.video}')" class="absolute bottom-4 right-4 z-[45] bg-white/90 text-[#a68b6d] px-4 py-2 rounded-xl text-xs font-bold shadow-lg hover:bg-[#a68b6d] hover:text-white transition-all">
+                                <i class="fas fa-play mr-2"></i> ชมวิดีโอ
+                            </button>
+                        </div>
+                        <div class="p-6">
+                            <span class="text-[10px] uppercase tracking-widest text-[#a68b6d] font-bold">${room.cat}</span>
+                            <h3 class="text-xl font-semibold mt-1">${room.name}</h3>
+                            <p class="text-slate-400 text-sm mt-2">${room.desc}</p>
+                        </div>
+                    </div>
+                `;
+                grid.innerHTML += card;
+            });
+        }
+
+        // ระบบ Filter Logic
+        function filterGallery(category) {
+            // Update ปุ่ม
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if(btn.innerText.toLowerCase().includes(category) || (category === 'all' && btn.innerText === 'ทั้งหมด')) {
+                    btn.classList.add('active');
+                }
+            });
+            renderGallery(category);
+        }
+
+        // ระบบ Video Modal Logic
+        function openVideo(url) {
+            const modal = document.getElementById('videoModal');
+            const video = document.getElementById('mainVideo');
+            video.src = url;
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden'; // กันเลื่อนหน้าจอ
+            video.play();
+        }
+
+        function closeVideo() {
+            const modal = document.getElementById('videoModal');
+            const video = document.getElementById('mainVideo');
+            video.pause();
+            modal.classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        // --- ระบบความปลอดภัยขั้นสูง (Lawyer Edition) ---
+        
+        // 1. บล็อกคลิกขวาและลากวาง
         document.addEventListener('contextmenu', e => e.preventDefault());
         document.addEventListener('dragstart', e => e.preventDefault());
-        
-        // ล็อกปุ่มลัด
+
+        // 2. บล็อกปุ่มลัดขั้นสูง (Mac + Windows)
         document.onkeydown = function(e) {
-            if (e.ctrlKey || e.metaKey) { // รองรับทั้ง Windows (Ctrl) และ Mac (Command)
-                if (e.keyCode === 83 || e.keyCode === 85 || e.keyCode === 73) return false;
+            // บล็อก F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U
+            if (e.keyCode == 123 || (e.ctrlKey && e.shiftKey && (e.keyCode == 73 || e.keyCode == 74)) || (e.ctrlKey && e.keyCode == 85)) {
+                return false;
+            }
+            // บล็อก Cmd+Opt+I (Mac)
+            if (e.metaKey && e.altKey && e.keyCode == 73) {
+                return false;
+            }
+            // บล็อก Cmd+Shift+C (Mac)
+            if (e.metaKey && e.shiftKey && e.keyCode == 67) {
+                return false;
+            }
+            // บล็อก Cmd+S / Ctrl+S
+            if ((e.ctrlKey || e.metaKey) && e.keyCode == 83) {
+                return false;
             }
         };
+
+        // เริ่มต้นแสดงผล
+        renderGallery();
     </script>
 </body>
 </html>
