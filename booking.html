@@ -410,11 +410,11 @@
         btn.innerText = "⏳ กำลังบันทึก...";
         
         callAPI('processBooking', currentPayload).then(response => {
-            // 🚨 เพิ่มบรรทัดนี้เพื่อแอบดูว่า Google ตอบอะไรกลับมา
             console.log("ข้อความตอบกลับจาก Google:", response); 
 
-            // เช็คว่า Google บอกว่า "สำเร็จ" จริงๆ ใช่ไหม (ดักได้ทั้ง status และ result)
-            if (response.status === "success" || response.result === "success") {
+            // 🌟 แก้ตรงนี้จุดเดียวครับ: สอนให้หน้าเว็บรู้จักคำว่า WALKIN_SUCCESS
+            if (response === "WALKIN_SUCCESS" || response === "SUCCESS" || response.status === "success" || response.result === "success") {
+                
                 alert("✅ บันทึกข้อมูลสำเร็จ!"); 
                 btn.innerText = "🚀 บันทึกแล้ว"; 
                 
@@ -429,7 +429,7 @@
                 clearPendingData(); 
                 fetchBookedRooms();
             } else {
-                // 🛑 ถ้า Google ตอบกลับมาว่ามี Error (เช่น หาชีทไม่เจอ, บรรทัดพัง)
+                // ถ้า Error จริงๆ ถึงจะเด้งกากบาท ❌
                 let errorMsg = response.message || response.error || JSON.stringify(response);
                 alert("❌ หลังบ้านฟ้องว่า: " + errorMsg);
                 btn.disabled = false; 
@@ -442,7 +442,7 @@
             btn.innerText = "🚀 ยืนยันบันทึกบัญชี"; 
         });
     }
-
+    
     function loadBookings() {
         document.getElementById('loadingManage').style.display = 'block'; document.getElementById('bookingListContainer').innerHTML = '';
         callAPI('getActiveBookings').then(data => {
