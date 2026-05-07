@@ -7,7 +7,6 @@
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@200;300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap');
@@ -45,13 +44,19 @@
             height: 500px;
             overflow: hidden;
             cursor: pointer;
+            display: block; /* แก้บัคไม่โชว์การ์ด */
         }
         .album-card:hover { transform: translateY(-12px) scale(1.02); }
 
         .album-video-bg {
             position: absolute; inset: 0;
             width: 100%; height: 100%; object-fit: cover;
-            filter: brightness(0.7);
+            filter: brightness(0.65);
+            transition: all 1.5s ease;
+        }
+        .album-card:hover .album-video-bg {
+            transform: scale(1.05);
+            filter: brightness(0.5);
         }
 
         /* --- CINEMATIC VIDEO INDICATOR --- */
@@ -60,7 +65,7 @@
             color: white;
             padding: 0.6rem 1.2rem;
             border-radius: 999px;
-            font-size: 0.7rem;
+            font-size: 0.75rem;
             font-weight: bold;
             display: flex;
             align-items: center;
@@ -81,6 +86,8 @@
             display: flex; align-items: center; justify-content: center;
             position: relative;
             transition: all 0.3s ease;
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(4px);
         }
         .play-ring::before {
             content: '';
@@ -89,6 +96,11 @@
             border: 1px solid rgba(255,255,255,0.3);
             border-radius: 50%;
             animation: pulse-ring 2s infinite;
+        }
+        .play-ring:hover {
+            background: var(--gold-accent);
+            border-color: var(--gold-accent);
+            transform: scale(1.1);
         }
 
         @keyframes pulse-ring {
@@ -99,14 +111,12 @@
         .feature-list li {
             position: relative; padding-left: 1.8rem;
             font-size: 0.95rem; margin-bottom: 0.8rem;
+            line-height: 1.5;
         }
         .feature-list li::before {
             content: '\f058'; font-family: 'Font Awesome 6 Free'; font-weight: 900;
             position: absolute; left: 0; color: var(--gold-accent);
         }
-
-        /* SECURITY LAYER */
-        body.lock-active { pointer-events: none; filter: blur(10px); }
     </style>
 </head>
 <body>
@@ -115,7 +125,7 @@
         <div class="max-w-7xl mx-auto flex justify-between items-center">
             <div class="flex items-center gap-4 cursor-pointer" onclick="App.Router.navigate('home')">
                 <div class="w-12 h-12 bg-[#1a365d] rounded-2xl flex items-center justify-center shadow-lg">
-                    <i class="fas fa-crown text-white text-xl"></i>
+                    <i class="fas fa-anchor text-white text-xl"></i>
                 </div>
                 <div>
                     <h1 class="text-2xl font-bold text-[#1a365d] serif-text italic">SN KOH LARN</h1>
@@ -129,14 +139,14 @@
     <div id="view-albums" class="page-view">
         <header class="max-w-4xl mx-auto text-center pt-24 pb-16 px-6">
             <span class="text-[#c4a77d] font-bold tracking-[0.4em] text-xs uppercase mb-6 block">Experience the Extraordinary</span>
-            <h2 class="text-6xl md:text-8xl serif-text text-[#1a365d] mb-8 leading-tight italic">
+            <h2 class="text-5xl md:text-7xl serif-text text-[#1a365d] mb-8 leading-tight italic">
                 Luxury <span class="text-[#c4a77d]">Cottage</span>
             </h2>
-            <p class="text-slate-500 max-w-2xl mx-auto text-lg font-light leading-relaxed mb-12">
+            <p class="text-slate-500 max-w-2xl mx-auto text-base font-light leading-relaxed mb-12">
                 ดื่มด่ำไปกับความงามสไตล์ English Cottage ที่ผสมผสานความหรูหราและความอบอุ่นได้อย่างลงตัว 
                 สัมผัสความเอ็กซ์คลูซีฟในทุกตารางนิ้วที่ SN KOH LARN
             </p>
-            <div class="inline-flex items-center gap-4 bg-[#1a365d] px-8 py-4 rounded-3xl text-white shadow-2xl">
+            <div class="inline-flex items-center gap-4 bg-[#1a365d] px-8 py-4 rounded-3xl text-white shadow-xl">
                 <i class="fas fa-phone-volume animate-bounce"></i>
                 <span class="text-sm font-medium">จองตรง: 082-168-8808 (ระวังมิจฉาชีพ)</span>
             </div>
@@ -155,63 +165,70 @@
                 <div class="video-btn-label">
                     <i class="fas fa-play-circle"></i> กดดูวิดีโอพรีเซนเทชัน
                 </div>
-                <div class="play-ring group-hover:scale-110 transition-transform">
+                <div class="play-ring">
                     <i class="fas fa-play text-white text-3xl ml-1"></i>
                 </div>
-                <h2 id="hero-room-title" class="text-5xl md:text-7xl font-bold text-white serif-text italic mt-4"></h2>
+                <h2 id="hero-room-title" class="text-5xl md:text-7xl font-bold text-white serif-text italic mt-4 drop-shadow-lg"></h2>
             </div>
         </div>
 
         <main class="max-w-7xl mx-auto px-6 -mt-20 relative z-20">
-            <div class="bg-white rounded-[4rem] shadow-2xl p-10 md:p-16 flex flex-col lg:flex-row gap-16 border border-[#1a365d]/5">
+            <div class="bg-white rounded-[3rem] shadow-2xl p-10 md:p-14 flex flex-col lg:flex-row gap-12 border border-[#1a365d]/5">
                 <div class="lg:w-1/2">
-                    <div class="flex items-center gap-3 mb-6">
+                    <div class="flex flex-wrap items-center gap-3 mb-6">
                         <span id="room-badge" class="bg-[#c4a77d] text-white text-[10px] font-bold px-4 py-1.5 rounded-full uppercase"></span>
-                        <span id="room-guest-count" class="text-slate-400 text-sm italic"></span>
+                        <span id="room-guest-count" class="text-slate-500 text-sm italic font-medium bg-slate-100 px-4 py-1 rounded-full"></span>
                     </div>
-                    <h3 class="text-4xl font-bold text-[#1a365d] serif-text italic mb-6">Details & Comfort</h3>
-                    <p id="room-hook" class="text-slate-600 text-lg leading-relaxed mb-10 font-light"></p>
+                    <h3 class="text-3xl font-bold text-[#1a365d] serif-text italic mb-4">Details & Comfort</h3>
+                    <p id="room-hook" class="text-slate-600 text-base leading-relaxed mb-8 font-light"></p>
                     
                     <h4 class="font-bold text-[#1a365d] uppercase tracking-widest text-sm mb-6 flex items-center gap-2">
                         <i class="fas fa-star text-[#c4a77d]"></i> Premium Amenities
                     </h4>
                     <ul id="room-features" class="feature-list grid grid-cols-1 md:grid-cols-2 gap-x-6"></ul>
                 </div>
-                <div class="lg:w-1/2 flex flex-col gap-6">
-                    <div class="bg-[#1a365d] text-white p-10 rounded-[3rem] shadow-xl relative overflow-hidden">
-                        <div class="absolute -right-10 -bottom-10 text-[15rem] text-white/5 font-serif italic">SN</div>
-                        <h4 class="text-2xl serif-text italic mb-4">Official Gallery</h4>
-                        <p class="text-white/60 text-sm mb-8 leading-relaxed font-light">สัมผัสบรรยากาศจริงผ่านทุกมุมมองที่เราตั้งใจบันทึกมาเพื่อคุณ</p>
-                        <button onclick="window.scrollTo({top: 1500, behavior: 'smooth'})" class="bg-white text-[#1a365d] px-8 py-4 rounded-2xl font-bold text-xs uppercase hover:bg-[#c4a77d] hover:text-white transition-all">เลื่อนชมอัลบั้มภาพ</button>
+                <div class="lg:w-1/2 flex flex-col justify-center">
+                    <div class="bg-[#1a365d] text-white p-10 rounded-[2.5rem] shadow-xl relative overflow-hidden h-full flex flex-col justify-center items-center text-center">
+                        <div class="absolute -right-10 -bottom-10 text-[12rem] text-white/5 font-serif italic pointer-events-none">SN</div>
+                        <h4 class="text-2xl serif-text italic mb-4 relative z-10">Official Gallery</h4>
+                        <p class="text-white/70 text-sm mb-8 leading-relaxed font-light relative z-10">สัมผัสบรรยากาศจริงผ่านภาพถ่ายมุมต่างๆ ที่เราตั้งใจบันทึกมาเพื่อคุณ เลื่อนลงเพื่อรับชมภาพทั้งหมด</p>
+                        <button onclick="window.scrollTo({top: 1000, behavior: 'smooth'})" class="bg-white text-[#1a365d] px-8 py-3.5 rounded-xl font-bold text-xs uppercase hover:bg-[#c4a77d] hover:text-white transition-all relative z-10 shadow-lg">
+                            <i class="fas fa-chevron-down mr-2"></i> เลื่อนชมอัลบั้มภาพ
+                        </button>
                     </div>
                 </div>
             </div>
 
-            <div class="text-center mt-24 mb-12">
-                <p class="text-[#c4a77d] font-bold uppercase tracking-[0.5em] text-xs mb-4">Photography Album</p>
-                <h3 class="text-4xl text-[#1a365d] serif-text italic">ภายในห้องพัก</h3>
+            <div class="text-center mt-20 mb-10">
+                <p class="text-[#c4a77d] font-bold uppercase tracking-[0.4em] text-xs mb-3">Photography Album</p>
+                <h3 class="text-3xl text-[#1a365d] serif-text italic">ภาพถ่ายภายในห้องพัก</h3>
             </div>
             
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 pb-40" id="room-gallery-grid"></div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pb-32" id="room-gallery-grid"></div>
         </main>
     </div>
 
-    <div id="video-portal" class="fixed inset-0 z-[200] hidden bg-black/95 backdrop-blur-3xl flex flex-col items-center justify-center p-4">
-        <button onclick="App.UI.closeVideoPortal()" class="absolute top-8 right-8 text-white text-5xl hover:text-[#c4a77d] transition-colors"><i class="fas fa-times-circle"></i></button>
-        <div class="w-full max-w-6xl aspect-video rounded-[2rem] overflow-hidden shadow-2xl border border-white/10">
+    <div id="video-portal" class="fixed inset-0 z-[200] hidden bg-black/95 backdrop-blur-md flex flex-col items-center justify-center p-4 transition-opacity">
+        <button onclick="App.UI.closeVideoPortal()" class="absolute top-6 right-6 md:top-10 md:right-10 text-white/70 text-5xl hover:text-white transition-colors z-50">
+            <i class="fas fa-times-circle"></i>
+        </button>
+        <div class="w-full max-w-5xl aspect-video rounded-2xl overflow-hidden shadow-2xl bg-black">
             <video id="featured-video-player" class="w-full h-full object-contain" controls controlsList="nodownload"></video>
         </div>
-        <p class="text-white/60 mt-8 font-light italic">SN KOH LARN - Walkthrough Presentation</p>
     </div>
 
-    <div id="media-portal" class="fixed inset-0 z-[100] hidden bg-black/98 backdrop-blur-2xl flex flex-col">
-        <button onclick="App.UI.closePortal()" class="absolute top-8 right-8 text-white text-4xl"><i class="fas fa-times"></i></button>
-        <div class="flex-1 flex items-center justify-center p-8">
-            <img id="portal-image" src="" class="max-w-full max-h-full object-contain rounded-2xl shadow-2xl">
+    <div id="media-portal" class="fixed inset-0 z-[100] hidden bg-black/98 backdrop-blur-lg flex flex-col">
+        <button onclick="App.UI.closePortal()" class="absolute top-6 right-6 text-white/70 hover:text-white text-4xl z-50">
+            <i class="fas fa-times"></i>
+        </button>
+        <div class="flex-1 flex items-center justify-center p-4 md:p-8 relative">
+            <button onclick="App.UI.prev()" class="absolute left-4 text-white/40 hover:text-white text-5xl p-4 z-50 hidden md:block"><i class="fas fa-chevron-left"></i></button>
+            <img id="portal-image" src="" class="max-w-full max-h-full object-contain rounded-xl shadow-2xl">
+            <button onclick="App.UI.next()" class="absolute right-4 text-white/40 hover:text-white text-5xl p-4 z-50 hidden md:block"><i class="fas fa-chevron-right"></i></button>
         </div>
-        <div class="p-10 text-center text-white">
-            <h3 id="portal-name" class="text-3xl font-bold serif-text italic mb-2"></h3>
-            <p id="portal-details" class="text-[#c4a77d] text-sm italic"></p>
+        <div class="p-6 md:p-8 text-center text-white bg-black/50 border-t border-white/10">
+            <h3 id="portal-name" class="text-2xl font-bold serif-text italic mb-1"></h3>
+            <p id="portal-details" class="text-[#c4a77d] text-sm"></p>
         </div>
     </div>
 
@@ -219,42 +236,44 @@
         const App = (function() {
             'use strict';
 
+            // 1. ตั้งค่าพื้นฐานและเส้นทางภาพ
             const Config = {
                 path: "images/images/",
                 counts: { std: 4, fam: 11, jac: 5, sea: 7 }
             };
 
+            // 2. ข้อมูลห้องพัก (เหมือนเดิมเป๊ะ)
             const RoomSpecs = {
                 standard: {
                     title: "Standard Cottage",
                     badge: "Signature Classic",
-                    baseGuests: "เข้าพัก 2 ท่าน (มาตรฐาน)",
+                    baseGuests: "เข้าพัก 2 ท่าน (ไม่มีค่าใช้จ่ายเพิ่ม)",
                     hook: "ดื่มด่ำกับความเรียบหรูในสไตล์อังกฤษดั้งเดิม ทุกรายละเอียดถูกคัดสรรเพื่อการพักผ่อนที่สมบูรณ์แบบ",
-                    features: ["เตียง 6 ฟุต โรงแรม 5 ดาว", "Smart TV 55\" & Netflix", "Amenity Set ครบครัน", "Service น้ำดื่ม/กาแฟ"],
+                    features: ["เตียงเดี่ยวขนาด 6 ฟุต หนานุ่มระดับโรงแรม", "ทีวี LG ขนาด 55 นิ้ว พร้อมบัญชี NETFLIX ฟรี", "ชุดสบู่ ยาสระผม ไดร์เป่าผม เครื่องทำน้ำอุ่น", "ผ้าขนหนู 2 ชุด พร้อมบริการน้ำดื่ม ชา กาแฟ"],
                     video: "std-1.mp4", cover: "std-2.jpg", prefix: "std"
                 },
                 family: {
                     title: "The Family Manor",
                     badge: "Spacious Comfort",
-                    baseGuests: "เข้าพัก 3 ท่าน (มาตรฐาน)",
+                    baseGuests: "เข้าพัก 3 ท่าน (ไม่มีค่าใช้จ่ายเพิ่ม)",
                     hook: "พื้นที่แห่งความสุขสำหรับครอบครัว จัดสรรสัดส่วนอย่างกว้างขวาง ให้ความรู้สึกเหมือนอยู่บ้านพักตากอากาศ",
-                    features: ["เตียง 3 ฟุต 3 ตำแหน่ง", "พื้นที่นั่งเล่นกว้างขวาง", "Smart TV 55\" & Netflix", "Mini Bar ครบชุด"],
+                    features: ["เตียงเดี่ยวขนาด 3 ฟุต จำนวน 3 เตียง", "ทีวี LG ขนาด 55 นิ้ว พร้อมบัญชี NETFLIX ฟรี", "ชุดสบู่ ยาสระผม ไดร์เป่าผม เครื่องทำน้ำอุ่น", "ผ้าขนหนู 3 ชุด พร้อมบริการน้ำดื่ม ชา กาแฟ"],
                     video: "fam-1.mp4", cover: "fam-2.jpg", prefix: "fam"
                 },
                 jacuzzi: {
                     title: "Jacuzzi Suite",
                     badge: "Ultimate Romance",
-                    baseGuests: "เข้าพัก 2 ท่าน (มาตรฐาน)",
+                    baseGuests: "เข้าพัก 2 ท่าน (ไม่มีค่าใช้จ่ายเพิ่ม)",
                     hook: "นิยามแห่งความหรูหราที่มาพร้อมอ่างจากุซซี่ส่วนตัว ให้คุณผ่อนคลายท่ามกลางบรรยากาศสุดโรแมนติก",
-                    features: ["Private Jacuzzi Spa", "Free Onsen Powder", "Starbucks Coffee Set", "Bathrobe & Slippers"],
+                    features: ["อ่าง JACUZZI ส่วนตัว พร้อมระบบสปาตีฟอง", "ฟรี! ผง ONSEN มูลค่า 130 บาท", "เตียง 6 ฟุต ทีวี 55 นิ้ว พร้อม NETFLIX", "ชุดคลุมอาบน้ำ พร้อมชา/กาแฟแบรนด์ดัง"],
                     video: "jac-1.mp4", cover: "jac-2.jpg", prefix: "jac"
                 },
                 seaview: {
                     title: "The Ocean Seaview",
                     badge: "Breathtaking View",
-                    baseGuests: "เข้าพัก 2 ท่าน (มาตรฐาน)",
+                    baseGuests: "เข้าพัก 2 ท่าน (ไม่มีค่าใช้จ่ายเพิ่ม)",
                     hook: "ตื่นมารับพลังงานจากท้องทะเลด้วยวิวพาโนรามาที่หาไม่ได้จากที่ไหน พร้อมลมทะเลที่พัดผ่านระเบียงส่วนตัว",
-                    features: ["เตียง 7 ฟุต (King Size)", "Ocean View Terrace", "Netflix Entertainment", "Premium Shower Set"],
+                    features: ["เตียงใหญ่ 7 ฟุต (สามารถแยกเป็น 2 เตียงได้)", "ทีวี LG ขนาด 55 นิ้ว พร้อมบัญชี NETFLIX ฟรี", "ชุดสบู่ ยาสระผม ไดร์เป่าผม เครื่องทำน้ำอุ่น", "ผ้าขนหนู 2 ชุด พร้อมบริการน้ำดื่ม ชา กาแฟ"],
                     video: "sea-1.mp4", cover: "sea-2.jpg", prefix: "sea"
                 }
             };
@@ -267,9 +286,11 @@
                 currentIndex: 0
             };
 
+            // 3. ฟังก์ชันเตรียมรูปภาพเข้าคลัง
             const buildData = () => {
                 Object.keys(RoomSpecs).forEach(key => {
-                    for(let i=1; i<=Config.counts[RoomSpecs[key].prefix]; i++) {
+                    // วนลูปตามจำนวนรูป เริ่มที่ 2 เพราะรูปที่ 1 เราเอาไปทำวิดีโอปกแล้ว
+                    for(let i=2; i<=Config.counts[RoomSpecs[key].prefix]; i++) {
                         state.allImages.push({
                             cat: key,
                             url: `${RoomSpecs[key].prefix}-${i}.jpg`
@@ -278,6 +299,7 @@
                 });
             };
 
+            // 4. ระบบเปลี่ยนหน้า
             const Router = {
                 init: () => {
                     window.addEventListener('hashchange', Router.sync);
@@ -295,41 +317,50 @@
                     state.view = view;
                     const home = document.getElementById('view-albums');
                     const room = document.getElementById('view-room-details');
+                    const navActions = document.getElementById('nav-actions');
+
+                    // ปิดวิดีโอที่กำลังเล่นอยู่ทุกครั้งที่เปลี่ยนหน้า
+                    document.querySelectorAll('video').forEach(v => v.pause());
 
                     if(view === 'home') {
                         room.classList.add('hidden');
                         home.classList.remove('hidden');
+                        navActions.innerHTML = '';
                         UI.renderHome();
                     } else {
                         home.classList.add('hidden');
                         room.classList.remove('hidden');
+                        navActions.innerHTML = `<button onclick="App.Router.navigate('home')" class="px-5 py-2 bg-[#1a365d] text-white text-xs font-bold rounded-full hover:bg-[#c4a77d] transition-colors shadow-md"><i class="fas fa-arrow-left mr-1"></i> กลับหน้ารวม</button>`;
                         UI.renderRoom(param);
                     }
                     window.scrollTo(0,0);
                 }
             };
 
+            // 5. ระบบวาดหน้าจอ (UI)
             const UI = {
                 renderHome: () => {
                     const grid = document.getElementById('album-grid');
-                    grid.innerHTML = '';
+                    grid.innerHTML = ''; // ล้างของเก่า
+
                     Object.keys(RoomSpecs).forEach(key => {
                         const s = RoomSpecs[key];
                         const el = document.createElement('div');
                         el.className = 'album-card group';
-                        el.onclick = () => Router.navigate('room', key);
+                        el.onclick = () => Router.navigate('room', key); // ตั้งค่าการคลิก
+                        
                         el.innerHTML = `
                             <video src="${Config.path}${s.video}" class="album-video-bg" autoplay muted loop playsinline></video>
-                            <div class="absolute inset-0 bg-gradient-to-t from-[#0f172a] via-transparent opacity-80"></div>
-                            <div class="absolute top-8 right-8 bg-white/10 backdrop-blur-md border border-white/20 text-white text-[10px] font-bold px-5 py-2 rounded-full uppercase tracking-widest">
+                            <div class="absolute inset-0 bg-gradient-to-t from-[#0f172a] via-[#0f172a]/20 to-transparent opacity-90 transition-opacity group-hover:opacity-100"></div>
+                            <div class="absolute top-6 right-6 bg-white/10 backdrop-blur-md border border-white/20 text-white text-[10px] font-bold px-4 py-1.5 rounded-full uppercase tracking-widest z-10 shadow-lg">
                                 ${s.badge}
                             </div>
-                            <div class="absolute bottom-10 left-10 right-10 text-white">
-                                <h3 class="text-4xl font-bold serif-text italic mb-2">${s.title}</h3>
-                                <p class="text-white/60 text-sm mb-6 flex items-center gap-2"><i class="fas fa-users text-[#c4a77d]"></i> ${s.baseGuests}</p>
-                                <div class="flex items-center gap-4">
-                                    <div class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-[#1a365d]"><i class="fas fa-arrow-right"></i></div>
-                                    <span class="text-xs font-bold uppercase tracking-widest">View Details</span>
+                            <div class="absolute bottom-8 left-8 right-8 text-white z-10">
+                                <h3 class="text-4xl font-bold serif-text italic mb-2 drop-shadow-md">${s.title}</h3>
+                                <p class="text-white/80 text-sm mb-6 flex items-center gap-2 font-light"><i class="fas fa-users text-[#c4a77d]"></i> ${s.baseGuests}</p>
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-white border border-white/30 group-hover:bg-[#c4a77d] group-hover:border-[#c4a77d] transition-all"><i class="fas fa-search"></i></div>
+                                    <span class="text-xs font-bold uppercase tracking-widest text-white/90 group-hover:text-white transition-colors">คลิกดูรายละเอียดห้อง</span>
                                 </div>
                             </div>
                         `;
@@ -339,13 +370,84 @@
 
                 renderRoom: (key) => {
                     const s = RoomSpecs[key];
+                    if(!s) return Router.navigate('home'); // กันเหนียวเผื่อข้อมูลผิด
+
                     state.activeRoom = key;
                     state.currentGallery = state.allImages.filter(img => img.cat === key);
 
+                    // อัปเดตข้อมูลส่วนหัว
                     document.getElementById('hero-bg-img').src = Config.path + s.cover;
                     document.getElementById('hero-room-title').innerText = s.title;
                     document.getElementById('room-badge').innerText = s.badge;
                     document.getElementById('room-guest-count').innerText = s.baseGuests;
                     document.getElementById('room-hook').innerText = s.hook;
                     
+                    // อัปเดตสิ่งอำนวยความสะดวก
                     const fList = document.getElementById('room-features');
+                    fList.innerHTML = s.features.map(f => `<li>${f}</li>`).join('');
+
+                    // อัปเดตคลังภาพ
+                    const gGrid = document.getElementById('room-gallery-grid');
+                    gGrid.innerHTML = '';
+                    state.currentGallery.forEach((img, idx) => {
+                        const div = document.createElement('div');
+                        div.className = 'aspect-[4/3] bg-slate-100 rounded-2xl overflow-hidden cursor-pointer shadow-md group';
+                        div.onclick = () => UI.openPortal(idx);
+                        div.innerHTML = `<img src="${Config.path}${img.url}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" loading="lazy">`;
+                        gGrid.appendChild(div);
+                    });
+                },
+
+                // ฟังก์ชันวิดีโอ
+                playFeaturedVideo: () => {
+                    const s = RoomSpecs[state.activeRoom];
+                    const player = document.getElementById('featured-video-player');
+                    player.src = Config.path + s.video;
+                    document.getElementById('video-portal').classList.remove('hidden');
+                    player.play();
+                },
+                closeVideoPortal: () => {
+                    const player = document.getElementById('featured-video-player');
+                    player.pause();
+                    document.getElementById('video-portal').classList.add('hidden');
+                },
+
+                // ฟังก์ชันดูรูปภาพใหญ่
+                openPortal: (idx) => {
+                    state.currentIndex = idx;
+                    const portal = document.getElementById('media-portal');
+                    portal.classList.remove('hidden');
+                    document.body.style.overflow = 'hidden';
+                    UI.syncPortal();
+                },
+                closePortal: () => {
+                    document.getElementById('media-portal').classList.add('hidden');
+                    document.body.style.overflow = 'auto';
+                },
+                syncPortal: () => {
+                    const img = state.currentGallery[state.currentIndex];
+                    document.getElementById('portal-image').src = Config.path + img.url;
+                    document.getElementById('portal-name').innerText = RoomSpecs[img.cat].title;
+                    document.getElementById('portal-details').innerText = `ภาพที่ ${state.currentIndex + 1} จากทั้งหมด ${state.currentGallery.length} ภาพ`;
+                },
+                next: () => { state.currentIndex = (state.currentIndex + 1) % state.currentGallery.length; UI.syncPortal(); },
+                prev: () => { state.currentIndex = (state.currentIndex - 1 + state.currentGallery.length) % state.currentGallery.length; UI.syncPortal(); }
+            };
+
+            return {
+                boot: () => {
+                    buildData();
+                    Router.init();
+                    console.log("System Online: All images loaded.");
+                },
+                UI: UI,
+                Router: Router
+            };
+        })();
+
+        // 🔥 กุญแจสำคัญ: สั่งให้ระบบตื่นขึ้นมาวาดรูปทันที ไม่ต้องรอ
+        App.boot();
+
+    </script>
+</body>
+</html>
