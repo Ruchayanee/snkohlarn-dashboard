@@ -2,187 +2,437 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Official Gallery | SN KOH LARN</title>
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบบัญชี SN Kohlarn</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@200;300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap');
-
-        :root {
-            --navy-primary: #1a365d;
-            --navy-light: #2c5282;
-            --navy-dark: #0f172a;
-            --warm-cream: #fdfaf1;
-            --gold-accent: #c4a77d;
-        }
-
-        * {
-            margin: 0; padding: 0; box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-            -webkit-user-select: none; user-select: none;
-        }
-
-        body {
-            font-family: 'Kanit', sans-serif;
-            background-color: var(--warm-cream);
-            color: var(--navy-dark);
-            overflow-x: hidden;
-        }
-
-        .serif-text { font-family: 'Playfair Display', serif; }
-
-        /* --- UI COMPONENTS --- */
-        .album-card {
-            background: #ffffff;
-            border-radius: 2.5rem;
-            box-shadow: 0 20px 40px rgba(26, 54, 93, 0.1);
-            transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
-            position: relative;
-            height: 500px;
-            overflow: hidden;
-            cursor: pointer;
-            display: block; /* แก้บัคไม่โชว์การ์ด */
-        }
-        .album-card:hover { transform: translateY(-12px) scale(1.02); }
-
-        .album-video-bg {
-            position: absolute; inset: 0;
-            width: 100%; height: 100%; object-fit: cover;
-            filter: brightness(0.65);
-            transition: all 1.5s ease;
-        }
-        .album-card:hover .album-video-bg {
-            transform: scale(1.05);
-            filter: brightness(0.5);
-        }
-
-        /* --- CINEMATIC VIDEO INDICATOR --- */
-        .video-btn-label {
-            background: var(--gold-accent);
-            color: white;
-            padding: 0.6rem 1.2rem;
-            border-radius: 999px;
-            font-size: 0.75rem;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            box-shadow: 0 10px 20px rgba(196, 167, 125, 0.4);
-            animation: bounce-slow 3s infinite;
-        }
-
-        @keyframes bounce-slow {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-5px); }
-        }
-
-        .play-ring {
-            width: 70px; height: 70px;
-            border-radius: 50%;
-            border: 2px solid white;
-            display: flex; align-items: center; justify-content: center;
-            position: relative;
-            transition: all 0.3s ease;
-            background: rgba(255,255,255,0.1);
-            backdrop-filter: blur(4px);
-        }
-        .play-ring::before {
-            content: '';
-            position: absolute;
-            inset: -8px;
-            border: 1px solid rgba(255,255,255,0.3);
-            border-radius: 50%;
-            animation: pulse-ring 2s infinite;
-        }
-        .play-ring:hover {
-            background: var(--gold-accent);
-            border-color: var(--gold-accent);
-            transform: scale(1.1);
-        }
-
-        @keyframes pulse-ring {
-            0% { transform: scale(0.8); opacity: 0.8; }
-            100% { transform: scale(1.4); opacity: 0; }
-        }
-
-        .feature-list li {
-            position: relative; padding-left: 1.8rem;
-            font-size: 0.95rem; margin-bottom: 0.8rem;
-            line-height: 1.5;
-        }
-        .feature-list li::before {
-            content: '\f058'; font-family: 'Font Awesome 6 Free'; font-weight: 900;
-            position: absolute; left: 0; color: var(--gold-accent);
-        }
+        @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;700&display=swap');
+        body { font-family: 'Sarabun', sans-serif; background-color: #f1f5f9; }
+        .resort-map { position: relative; width: 100%; max-width: 500px; aspect-ratio: 4 / 5; margin: 0 auto; background-color: #fff; border: 2px solid #e2e8f0; border-radius: 20px; overflow: hidden; }
+        .room-overlay { position: absolute; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; font-weight: bold; transition: all 0.3s ease; border-radius: 12px; border: 2px solid rgba(255,255,255,0.3); }
+        .room-number { font-size: 1.2rem; }
+        .room-label { font-size: 0.6rem; font-weight: normal; }
+        #room-1 { top: 58%; left: 52%; width: 34%; height: 16%; }
+        #room-2 { top: 39%; left: 52%; width: 34%; height: 17%; }
+        #room-3 { top: 21%; left: 52%; width: 34%; height: 16%; }
+        #room-4 { top: 2%;  left: 52%; width: 34%; height: 17%; }
+        #room-5 { top: 62%; left: 7%;  width: 33%; height: 17%; }
+        #room-6 { top: 48%; left: 6%;  width: 35%; height: 12%; }
+        #room-7 { top: 34%; left: 6%;  width: 35%; height: 12%; }
+        #room-8 { top: 19%; left: 27%; width: 17%; height: 13%; }
+        #room-9 { top: 19%; left: 5%;  width: 17%; height: 13%; }
+        #room-10{ top: 4%;  left: 5%;  width: 44%; height: 13%; }
+        .vacant { background-color: #10b981; } 
+        .occupied { background-color: #f43f5e; box-shadow: inset 0 0 20px rgba(0,0,0,0.2); } 
+        .tab-btn { transition: all 0.3s ease; }
+        .tab-active { background-color: #1e293b; color: white; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
+        .tab-inactive { background-color: #e2e8f0; color: #64748b; }
     </style>
 </head>
-<body>
+<body class="p-4 md:p-8">
+    <div class="max-w-6xl mx-auto bg-white p-6 md:p-10 rounded-[2.5rem] shadow-2xl border border-slate-100 relative">
+        
+        <a href="index.html" class="inline-flex items-center gap-2 bg-slate-100 text-slate-700 px-4 py-2 rounded-xl font-bold hover:bg-slate-200 transition-all text-sm mb-6 md:absolute md:top-8 md:left-8 md:mb-0 decoration-none">
+            🔙 กลับหน้าแรก
+        </a>
 
-    <nav class="sticky top-0 z-[60] px-6 py-4 bg-[#fdfaf1]/95 backdrop-blur-xl border-b border-[#1a365d]/10">
-        <div class="max-w-7xl mx-auto flex justify-between items-center">
-            <div class="flex items-center gap-4 cursor-pointer" onclick="App.Router.navigate('home')">
-                <div class="w-12 h-12 bg-[#1a365d] rounded-2xl flex items-center justify-center shadow-lg">
-                    <i class="fas fa-anchor text-white text-xl"></i>
-                </div>
-                <div>
-                    <h1 class="text-2xl font-bold text-[#1a365d] serif-text italic">SN KOH LARN</h1>
-                    <p class="text-[9px] text-[#c4a77d] uppercase tracking-[0.4em] font-bold">The Elite Gallery</p>
-                </div>
-            </div>
-            <div id="nav-actions"></div>
-        </div>
-    </nav>
-
-    <div id="view-albums" class="page-view">
-        <header class="max-w-4xl mx-auto text-center pt-24 pb-16 px-6">
-            <span class="text-[#c4a77d] font-bold tracking-[0.4em] text-xs uppercase mb-6 block">Experience the Extraordinary</span>
-            <h2 class="text-5xl md:text-7xl serif-text text-[#1a365d] mb-8 leading-tight italic">
-                Luxury <span class="text-[#c4a77d]">Cottage</span>
-            </h2>
-            <p class="text-slate-500 max-w-2xl mx-auto text-base font-light leading-relaxed mb-12">
-                ดื่มด่ำไปกับความงามสไตล์ English Cottage ที่ผสมผสานความหรูหราและความอบอุ่นได้อย่างลงตัว 
-                สัมผัสความเอ็กซ์คลูซีฟในทุกตารางนิ้วที่ SN KOH LARN
-            </p>
-            <div class="inline-flex items-center gap-4 bg-[#1a365d] px-8 py-4 rounded-3xl text-white shadow-xl">
-                <i class="fas fa-phone-volume animate-bounce"></i>
-                <span class="text-sm font-medium">จองตรง: 082-168-8808 (ระวังมิจฉาชีพ)</span>
-            </div>
+        <header class="text-center mb-8 mt-4 md:mt-0">
+            <img src="https://i.postimg.cc/zDw9HWXS/IMG-5036.jpg" alt="SN Kohlarn Logo" style="width: 120px; margin: 0 auto 15px auto; display: block; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+            <h1 class="text-3xl font-bold text-slate-800">📊 SN Kohlarn Dashboard</h1>
         </header>
 
-        <main class="max-w-7xl mx-auto px-6 pb-40">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-10" id="album-grid"></div>
-        </main>
-    </div>
+        <div class="flex flex-wrap justify-center gap-3 mb-8">
+            <button id="btn-finance" onclick="switchTab('finance')" class="tab-btn tab-active px-6 py-3 rounded-2xl font-bold flex items-center gap-2">
+                💰 ระบบรายได้
+            </button>
+            <button id="btn-stock" onclick="switchTab('stock')" class="tab-btn tab-inactive px-6 py-3 rounded-2xl font-bold flex items-center gap-2">
+                📦 เช็คสต๊อก
+            </button>
+            <button id="btn-verify" onclick="switchTab('verify')" class="tab-btn tab-inactive px-6 py-3 rounded-2xl font-bold flex items-center gap-2">
+                🔔 ตรวจสอบการโอน
+            </button>
+        </div>
 
-    <div id="view-room-details" class="page-view hidden">
-        <div id="room-detail-hero" class="relative h-[60vh] md:h-[70vh] w-full overflow-hidden flex items-center justify-center">
-            <img id="hero-bg-img" src="" class="absolute inset-0 w-full h-full object-cover brightness-[0.4]">
-            
-            <div class="relative z-10 text-center flex flex-col items-center gap-6 cursor-pointer group" onclick="App.UI.playFeaturedVideo()">
-                <div class="video-btn-label">
-                    <i class="fas fa-play-circle"></i> กดดูวิดีโอพรีเซนเทชัน
+        <!-- หน้าต่างที่ 1: ระบบรายได้ -->
+        <div id="view-finance">
+            <div class="text-center mb-10">
+                <div class="flex items-center justify-center gap-3">
+                    <label class="font-bold text-slate-600">ดูข้อมูลเดือน:</label>
+                    <select id="month-selector" onchange="changeMonth()" class="p-2 border-2 border-slate-200 rounded-xl font-bold text-slate-700 bg-slate-50 outline-none"></select>
                 </div>
-                <div class="play-ring">
-                    <i class="fas fa-play text-white text-3xl ml-1"></i>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+                <div class="bg-blue-600 p-6 rounded-3xl text-white shadow-lg">
+                    <p class="text-blue-100 text-xs font-bold uppercase">1. รายได้รวม (ก่อนหัก)</p>
+                    <p id="total-income" class="text-3xl font-bold mt-1">0 ฿</p>
                 </div>
-                <h2 id="hero-room-title" class="text-5xl md:text-7xl font-bold text-white serif-text italic mt-4 drop-shadow-lg"></h2>
+                <div class="bg-amber-400 p-6 rounded-3xl text-white shadow-lg">
+                    <p class="text-amber-100 text-xs font-bold uppercase">2. หักค่าไฟ</p>
+                    <p id="total-electricity" class="text-3xl font-bold mt-1">0 ฿</p>
+                </div>
+                <div class="bg-rose-500 p-6 rounded-3xl text-white shadow-lg">
+                    <p class="text-rose-100 text-xs font-bold uppercase">3. หักค่าคนงาน/ทิป</p>
+                    <p id="total-expenses" class="text-3xl font-bold mt-1">0 ฿</p>
+                </div>
+                <div class="bg-emerald-600 p-6 rounded-3xl text-white shadow-lg border-b-8 border-emerald-800">
+                    <p class="text-emerald-100 text-xs font-bold uppercase">4. ส่วนแบ่ง 30% (สุทธิ)</p>
+                    <p id="share-amount" class="text-3xl font-bold mt-1">0 ฿</p>
+                </div>
+            </div>
+
+            <div class="mb-12 bg-slate-50 p-6 rounded-3xl border border-slate-200">
+                <h2 class="text-lg font-bold mb-4 text-slate-700">📈 ผลประกอบการรายวัน</h2>
+                <canvas id="monthlyChart" height="100"></canvas>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start mb-10">
+                <div class="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
+                    <h2 class="text-xl font-bold mb-6 text-slate-700">🔍 รายละเอียดรายวัน</h2>
+                    <input type="date" id="date-select" class="w-full p-4 border-2 border-blue-100 rounded-2xl bg-blue-50 font-bold text-blue-800 outline-none mb-6" onchange="updateDailyView()">
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center p-5 bg-slate-50 rounded-2xl">
+                            <span class="text-slate-500">สถานะ:</span>
+                            <span id="daily-status" class="px-4 py-1 rounded-full text-sm font-bold bg-slate-200 text-slate-600">ว่าง</span>
+                        </div>
+                        <div class="flex justify-between items-center p-5 bg-blue-600 rounded-2xl text-white">
+                            <span class="font-medium">รายได้วันนี้:</span>
+                            <span id="daily-total" class="text-2xl font-bold">0 ฿</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center">
+                    <h3 class="font-bold text-slate-400 mb-4 uppercase text-xs">แผนผังห้องพัก</h3>
+                    <div class="resort-map shadow-inner">
+                        <div id="room-1" class="room-overlay vacant"><span class="room-label">R</span><span class="room-number">1</span></div>
+                        <div id="room-2" class="room-overlay vacant"><span class="room-label">R</span><span class="room-number">2</span></div>
+                        <div id="room-3" class="room-overlay vacant"><span class="room-label">R</span><span class="room-number">3</span></div>
+                        <div id="room-4" class="room-overlay vacant"><span class="room-label">R</span><span class="room-number">4</span></div>
+                        <div id="room-5" class="room-overlay vacant"><span class="room-label">R</span><span class="room-number">5</span></div>
+                        <div id="room-6" class="room-overlay vacant"><span class="room-label">R</span><span class="room-number">6</span></div>
+                        <div id="room-7" class="room-overlay vacant"><span class="room-label">R</span><span class="room-number">7</span></div>
+                        <div id="room-8" class="room-overlay vacant"><span class="room-label">R</span><span class="room-number">8</span></div>
+                        <div id="room-9" class="room-overlay vacant"><span class="room-label">R</span><span class="room-number">9</span></div>
+                        <div id="room-10" class="room-overlay vacant"><span class="room-label">R</span><span class="room-number">10</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-slate-900 p-8 rounded-[2.5rem] text-center text-white max-w-sm mx-auto shadow-2xl">
+                <h2 class="text-lg font-bold mb-4 uppercase tracking-widest">ชำระยอดส่วนแบ่ง 30%</h2>
+                <div class="bg-white p-3 rounded-2xl inline-block mb-4">
+                    <img src="https://i.postimg.cc/QMvzFd8d/IMG-1752.jpg" alt="QR Code" class="w-48 h-48 object-contain">
+                </div>
+                <p class="text-slate-400 text-xs mb-1">ยอดที่ต้องโอน (หลังหักค่าใช้จ่าย):</p>
+                <p id="qr-amount" class="text-4xl font-bold text-emerald-400">0 ฿</p>
             </div>
         </div>
 
-        <main class="max-w-7xl mx-auto px-6 -mt-20 relative z-20">
-            <div class="bg-white rounded-[3rem] shadow-2xl p-10 md:p-14 flex flex-col lg:flex-row gap-12 border border-[#1a365d]/5">
-                <div class="lg:w-1/2">
-                    <div class="flex flex-wrap items-center gap-3 mb-6">
-                        <span id="room-badge" class="bg-[#c4a77d] text-white text-[10px] font-bold px-4 py-1.5 rounded-full uppercase"></span>
-                        <span id="room-guest-count" class="text-slate-500 text-sm italic font-medium bg-slate-100 px-4 py-1 rounded-full"></span>
-                    </div>
-                    <h3 class="text-3xl font-bold text-[#1a365d] serif-text italic mb-4">Details & Comfort</h3>
-                    <p id="room-hook" class="text-slate-600 text-base leading-relaxed mb-8 font-light"></p>
-                    
-                    <h4 class="font-bold text-[#1a365d] uppercase tracking-widest text-sm mb-6 flex items-center gap-2">
-                        <i class="fas fa-star text-[#c4a77d]"></i> Premium Amenities
-                    </h4>
-                    <ul id="room-features" class="feature-list grid grid-cols-1 md:grid-cols-2 gap-x-6
+        <!-- หน้าต่างที่ 2: ระบบจัดการสต๊อก -->
+        <div id="view-stock" class="hidden">
+            <div id="stock-alert-box" class="bg-rose-50 border-2 border-rose-200 p-6 rounded-3xl mb-8 flex items-start gap-4 hidden">
+                <div class="bg-rose-100 p-3 rounded-full text-rose-600 text-2xl">⚠️</div>
+                <div>
+                    <h3 class="text-lg font-bold text-rose-700">แจ้งเตือนด่วน! ของใกล้หมด/หมดแล้ว</h3>
+                    <p id="stock-alert-text" class="text-rose-600 text-sm mt-1 font-bold"></p>
+                </div>
+            </div>
+
+            <div class="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm">
+                <div class="bg-slate-50 p-4 border-b border-slate-200 flex justify-between items-center">
+                    <h2 class="font-bold text-slate-700">รายการของใช้สิ้นเปลือง</h2>
+                    <button onclick="refreshStock()" class="text-xs text-blue-600 bg-blue-50 px-3 py-1 rounded-full font-bold hover:bg-blue-100">🔄 โหลดข้อมูลล่าสุด</button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-100 text-slate-500 text-sm">
+                                <th class="p-4 font-bold">รายการสินค้า</th>
+                                <th class="p-4 font-bold text-center">ยอดคงเหลือ</th>
+                                <th class="p-4 font-bold text-center">จุดสั่งซื้อ</th>
+                                <th class="p-4 font-bold text-center">สถานะ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="stock-table-body" class="text-slate-700">
+                            <tr><td colspan="4" class="p-4 text-center text-slate-400">กำลังโหลดข้อมูล...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- หน้าต่างที่ 3: ระบบตรวจสอบการโอน -->
+        <div id="view-verify" class="hidden">
+            <div class="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm">
+                <div class="bg-slate-50 p-4 border-b border-slate-200 flex justify-between items-center">
+                    <h2 class="font-bold text-slate-700">รายการแจ้งโอน & ประวัติสลิป</h2>
+                    <button onclick="loadPendingOrders()" class="text-xs text-blue-600 bg-blue-50 px-3 py-1 rounded-full font-bold hover:bg-blue-100">🔄 ดึงข้อมูลล่าสุด</button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-100 text-slate-500 text-sm">
+                                <th class="p-4 font-bold">วัน/เวลา</th>
+                                <th class="p-4 font-bold">ลูกค้า</th>
+                                <th class="p-4 font-bold">เบอร์โทร</th>
+                                <th class="p-4 font-bold text-center">สลิป</th>
+                                <th class="p-4 font-bold text-center">ดำเนินการ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="verify-table-body" class="text-slate-700">
+                            <tr><td colspan="5" class="p-8 text-center text-slate-400">กำลังโหลดรายการ...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div id="load-more-container" class="bg-slate-50 p-4 text-center border-t border-slate-200">
+                    <button onclick="loadPendingOrders('all')" class="bg-white border border-slate-300 text-slate-600 px-6 py-2 rounded-xl text-sm font-bold hover:bg-slate-100 shadow-sm transition-all">
+                        📂 โหลดประวัติย้อนหลังทั้งหมด
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const BACKEND_URL = "https://script.google.com/macros/s/AKfycbyLFO7dgjgdeDY5ETh7B_mV-bJG8T_tHnw-a41sOTfw9EKCoknUv2MJ2CP9yVJtL9CbfA/exec";
+
+        function switchTab(tabName) {
+            const btnFinance = document.getElementById('btn-finance');
+            const btnStock = document.getElementById('btn-stock');
+            const btnVerify = document.getElementById('btn-verify');
+            const viewFinance = document.getElementById('view-finance');
+            const viewStock = document.getElementById('view-stock');
+            const viewVerify = document.getElementById('view-verify');
+
+            [btnFinance, btnStock, btnVerify].forEach(b => b.className = "tab-btn tab-inactive px-6 py-3 rounded-2xl font-bold flex items-center gap-2");
+            [viewFinance, viewStock, viewVerify].forEach(v => v.classList.add('hidden'));
+
+            if (tabName === 'finance') {
+                btnFinance.className = "tab-btn tab-active px-6 py-3 rounded-2xl font-bold flex items-center gap-2";
+                viewFinance.classList.remove('hidden');
+            } else if (tabName === 'stock') {
+                btnStock.className = "tab-btn tab-active px-6 py-3 rounded-2xl font-bold flex items-center gap-2";
+                viewStock.classList.remove('hidden');
+            } else {
+                btnVerify.className = "tab-btn tab-active px-6 py-3 rounded-2xl font-bold flex items-center gap-2";
+                viewVerify.classList.remove('hidden');
+                loadPendingOrders();
+            }
+        }
+
+        function loadPendingOrders(limit = 30) {
+            const tbody = document.getElementById('verify-table-body');
+            const loadMoreBtn = document.getElementById('load-more-container');
+            
+            tbody.innerHTML = '<tr><td colspan="5" class="p-8 text-center text-slate-400">กำลังดึงข้อมูล...</td></tr>';
+
+            if (limit === 'all') {
+                loadMoreBtn.style.display = 'none';
+            } else {
+                loadMoreBtn.style.display = 'block';
+            }
+
+            fetch(`${BACKEND_URL}?action=getPending&limit=${limit}`, {
+                method: 'GET',
+                redirect: 'follow' 
+            })
+            .then(res => {
+                if (!res.ok) throw new Error('Network response was not ok');
+                return res.json();
+            })
+            .then(res => {
+                if (res.status !== "success") {
+                    tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-rose-500">เกิดข้อผิดพลาด: ${res.message}</td></tr>`;
+                    return;
+                }
+
+                const rawData = res.data;
+                tbody.innerHTML = '';
+
+                if (!rawData || rawData.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" class="p-8 text-center text-slate-400">ไม่มีรายการแจ้งโอนใหม่ 🟢</td></tr>';
+                    return;
+                }
+
+                rawData.sort((a, b) => new Date(b[0]) - new Date(a[0]));
+
+                rawData.forEach((row, index) => {
+                    const item = {
+                        date: row[0],
+                        lineName: row[1],
+                        custName: row[2],
+                        phone: row[3] ? row[3].toString().replace(/'/g, '') : '', 
+                        slipUrl: row[4],
+                        status: row[5],
+                        rowId: index + 2
+                    };
+
+                    let actionButton = '';
+                    if (item.status === 'อนุมัติแล้ว') {
+                        actionButton = '<span class="text-emerald-600 font-bold text-xs">✅ อนุมัติแล้ว</span>';
+                    } else if (item.status === 'ยกเลิก') {
+                        actionButton = '<span class="text-rose-500 font-bold text-xs">❌ ยกเลิกแล้ว</span>';
+                    } else {
+                        actionButton = `<button onclick="goToBooking('${item.custName}', '${item.phone}', '${item.lineName}', '${item.slipUrl}', '${item.rowId}')" class="bg-blue-600 text-white px-3 py-2 rounded-xl text-[11px] font-bold hover:bg-blue-700 shadow-md w-full">📝 จัดการการจอง</button>`;
+                    }
+
+                    const tr = document.createElement('tr');
+                    tr.className = "border-b border-slate-100 hover:bg-slate-50";
+                    tr.innerHTML = `<td class="p-4 text-xs text-slate-500">${new Date(item.date).toLocaleString('th-TH')}</td><td class="p-4 font-bold text-sm text-slate-700">${item.custName}<br><span class="text-[10px] text-slate-400 font-normal">Line: ${item.lineName}</span></td><td class="p-4 text-sm text-slate-600">${item.phone}</td><td class="p-4 text-center"><a href="${item.slipUrl}" target="_blank" class="text-blue-500 underline text-xs font-bold">เปิดสลิป</a></td><td class="p-4 text-center" style="width: 120px;">${actionButton}</td>`;
+                    tbody.appendChild(tr);
+                });
+            })
+            .catch(err => {
+                tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-rose-500">การเชื่อมต่อขัดข้อง: ตรวจสอบ URL หรือลองล้างแคชเบราว์เซอร์<br><span class="text-xs text-slate-400">${err}</span></td></tr>`;
+            });
+        }
+
+        function goToBooking(name, phone, line, slip, rowId) {
+            const bookingPackage = { name: name, phone: phone, line: line, slip: slip, rowId: rowId };
+            sessionStorage.setItem('pendingBooking', JSON.stringify(bookingPackage));
+            window.location.href = 'booking.html'; 
+        }
+
+        const FINANCE_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSFeS1r3x0m5TlzHS8O19Qy0uuY9aGXJlEogF1lZkEdlgPewwdCLefvSNmch6MBm83CvUYTEOBMvK2T/pub?gid=109167594&single=true&output=csv';
+        const STOCK_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQk1DLhmM8DEn1BEc8DWFUWjHAxYvGBXNKuEPZQKZw_pMBA3eQc_w1pS8QIea9fyOKGOCYUQygjyLzf/pub?gid=0&single=true&output=csv';
+
+        let allDataByMonth = {}; 
+        let currentChart = null;
+
+        window.onload = () => {
+            Papa.parse(FINANCE_CSV_URL, {
+                download: true, header: true, skipEmptyLines: true,
+                complete: function(results) { processData(results.data); }
+            });
+            loadStockData();
+        };
+
+        function loadStockData() {
+            Papa.parse(STOCK_CSV_URL, {
+                download: true, header: true, skipEmptyLines: true,
+                complete: function(results) { processStockData(results.data); }
+            });
+        }
+
+        function refreshStock() { loadStockData(); }
+
+        function processStockData(rows) {
+            const tbody = document.getElementById('stock-table-body');
+            tbody.innerHTML = '';
+            let alertItems = [];
+            rows.forEach(row => {
+                const itemName = row["รายการสินค้า"];
+                if (!itemName) return;
+                const remaining = parseInt(row["ยอดคงเหลือ"]) || 0;
+                const reorderPoint = parseInt(row["จุดสั่งซื้อ (แจ้งเตือน)"]) || 0;
+                const unit = row["หน่วยนับ"] || "";
+                let statusHTML = remaining <= 0 ? '<span class="bg-rose-100 text-rose-600 px-3 py-1 rounded-full text-xs font-bold">หมด 🔴</span>' : remaining <= reorderPoint ? '<span class="bg-amber-100 text-amber-600 px-3 py-1 rounded-full text-xs font-bold">ใกล้หมด 🟡</span>' : '<span class="bg-emerald-100 text-emerald-600 px-3 py-1 rounded-full text-xs font-bold">ปกติ 🟢</span>';
+                const tr = document.createElement('tr');
+                tr.className = 'border-b border-slate-100 hover:bg-slate-50';
+                tr.innerHTML = `<td class="p-4 font-medium text-sm">${itemName} <span class="text-[10px] text-slate-400">(${unit})</span></td><td class="p-4 text-center font-bold">${remaining}</td><td class="p-4 text-center text-slate-400 text-xs">${reorderPoint}</td><td class="p-4 text-center">${statusHTML}</td>`;
+                tbody.appendChild(tr);
+                if (remaining <= reorderPoint) alertItems.push(itemName);
+            });
+            const alertBox = document.getElementById('stock-alert-box');
+            const alertText = document.getElementById('stock-alert-text');
+            if (alertItems.length > 0) { alertBox.classList.remove('hidden'); alertText.innerText = "สั่งซื้อเพิ่ม: " + alertItems.join(', '); } else { alertBox.classList.add('hidden'); }
+        }
+
+        function extractAmount(text, keywords) {
+            if (!text) return 0;
+            const str = text.toString();
+            let isFound = false;
+            keywords.forEach(kw => { if(str.includes(kw)) isFound = true; });
+            if (!isFound) return 0;
+            const match = str.match(/\d+[\d,.]*/);
+            return match ? parseFloat(match[0].replace(/,/g, '')) : 0;
+        }
+
+        function processData(rows) {
+            allDataByMonth = {};
+            rows.forEach(row => {
+                let dateStr = row["วันที่เข้าพัก"];
+                let roomStr = row["เลขห้อง"];
+                let priceStr = row["ราคาขายจริง"];
+                let noteStr = row["หมายเหตุ"];
+                if (!dateStr) return;
+                let formattedDate = dateStr;
+                let monthStr = "";
+                if (dateStr.includes('/')) {
+                    let parts = dateStr.split('/');
+                    if(parts.length === 3) { formattedDate = `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`; monthStr = `${parts[2]}-${parts[1].padStart(2, '0')}`; }
+                } else if (dateStr.includes('-')) { monthStr = dateStr.substring(0, 7); }
+                if(!monthStr) return; 
+                if (!allDataByMonth[monthStr]) allDataByMonth[monthStr] = { totalIncome: 0, totalElec: 0, totalExp: 0, dailyData: {} };
+                if (!allDataByMonth[monthStr].dailyData[formattedDate]) allDataByMonth[monthStr].dailyData[formattedDate] = { income: 0, rooms: [] };
+                let price = parseFloat(priceStr?.toString().replace(/,/g, '')) || 0;
+                allDataByMonth[monthStr].totalIncome += price;
+                allDataByMonth[monthStr].dailyData[formattedDate].income += price;
+                allDataByMonth[monthStr].totalElec += extractAmount(noteStr, ["ค่าไฟ"]);
+                allDataByMonth[monthStr].totalExp += extractAmount(noteStr, ["คนงาน", "ทิป"]);
+                let room = parseInt(roomStr);
+                if (!isNaN(room) && !allDataByMonth[monthStr].dailyData[formattedDate].rooms.includes(room)) allDataByMonth[monthStr].dailyData[formattedDate].rooms.push(room);
+            });
+            setupMonthSelector();
+        }
+
+        function setupMonthSelector() {
+            const s = document.getElementById('month-selector');
+            s.innerHTML = '';
+            const sorted = Object.keys(allDataByMonth).sort();
+            sorted.forEach(m => {
+                let opt = document.createElement('option');
+                opt.value = m;
+                let p = m.split('-');
+                let mNames = ["","ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย.","ต.ค.","พ.ย.","ธ.ค."];
+                opt.text = `${mNames[parseInt(p[1])]} ${p[0]}`;
+                s.appendChild(opt);
+            });
+            if(sorted.length > 0) {
+                s.value = sorted[sorted.length - 1];
+                changeMonth();
+            }
+        }
+
+        function changeMonth() {
+            const m = document.getElementById('month-selector').value;
+            const d = allDataByMonth[m];
+            if(!d) return;
+            let shareAmount = (d.totalIncome - d.totalElec - d.totalExp) * 0.3;
+            document.getElementById('total-income').innerText = d.totalIncome.toLocaleString() + " ฿";
+            document.getElementById('total-electricity').innerText = "- " + d.totalElec.toLocaleString() + " ฿";
+            document.getElementById('total-expenses').innerText = "- " + d.totalExp.toLocaleString() + " ฿";
+            document.getElementById('share-amount').innerText = shareAmount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + " ฿";
+            document.getElementById('qr-amount').innerText = shareAmount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + " ฿";
+            const sortedDates = Object.keys(d.dailyData).sort();
+            document.getElementById('date-select').value = sortedDates[sortedDates.length - 1] || "";
+            updateDailyView();
+            renderChart(m, d.dailyData);
+        }
+
+        function updateDailyView() {
+            const m = document.getElementById('month-selector').value;
+            const ds = document.getElementById('date-select').value;
+            let data = (allDataByMonth[m] && allDataByMonth[m].dailyData[ds]) ? allDataByMonth[m].dailyData[ds] : { income: 0, rooms: [] };
+            document.getElementById('daily-total').innerText = data.income.toLocaleString() + " ฿";
+            const elStatus = document.getElementById('daily-status');
+            elStatus.innerText = data.rooms.length === 10 ? "เต็ม" : `พัก ${data.rooms.length} ห้อง`;
+            for(let i=1; i<=10; i++) { document.getElementById(`room-${i}`).className = `room-overlay ${data.rooms.includes(i) ? 'occupied' : 'vacant'}`; }
+        }
+
+        function renderChart(m, dailyData) {
+            const ctx = document.getElementById('monthlyChart').getContext('2d');
+            const sorted = Object.keys(dailyData).sort();
+            if(currentChart) currentChart.destroy();
+            currentChart = new Chart(ctx, {
+                type: 'bar',
+                data: { labels: sorted.map(d => parseInt(d.split('-')[2])), datasets: [{ label: 'รายได้', data: sorted.map(d => dailyData[d].income), backgroundColor: '#3b82f6', borderRadius: 8 }] },
+                options: { responsive: true, plugins: { legend: { display: false } } }
+            });
+        }
+    </script>
+</body>
+</html>
