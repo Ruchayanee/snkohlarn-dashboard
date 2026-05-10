@@ -6,7 +6,7 @@
 <title>SN Kohlarn - ระบบจองห้องพัก</title>
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;700&display=swap" rel="stylesheet">
 <style>
-/* โครงสร้าง CSS สำหรับ SN Kohlarn [cite: 1] */
+/* โครงสร้าง CSS สำหรับ SN Kohlarn */
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { font-family: 'Sarabun', sans-serif; background: #f4f7f6; color: #333; padding: 20px; }
 .container { max-width: 1100px; margin: auto; }
@@ -19,7 +19,7 @@ body { font-family: 'Sarabun', sans-serif; background: #f4f7f6; color: #333; pad
 .form-group label { display: block; margin-bottom: 8px; font-weight: 600; }
 .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 15px; }
 
-/* ส่วนแสดงผลวิดีโอจากโฟลเดอร์ gallery */
+/* ส่วนแสดงผลวิดีโอจากโฟลเดอร์ images */
 .room-video-container { width: 100%; height: 220px; overflow: hidden; background: #000; border-radius: 12px 12px 0 0; }
 .room-video-container video { width: 100%; height: 100%; object-fit: cover; }
 
@@ -78,7 +78,7 @@ body { font-family: 'Sarabun', sans-serif; background: #f4f7f6; color: #333; pad
         <div class="room-grid">
             <div class="room-card">
                 <div class="room-video-container">
-                    <video autoplay muted loop playsinline><source src="gallery/std-1.mp4" type="video/mp4"></video>
+                    <video autoplay muted loop playsinline><source src="images/std-1.mp4" type="video/mp4"></video>
                 </div>
                 <div class="room-content">
                     <div class="badge">Standard</div><h3 class="room-title">Standard Room</h3>
@@ -91,7 +91,7 @@ body { font-family: 'Sarabun', sans-serif; background: #f4f7f6; color: #333; pad
             </div>
             <div class="room-card">
                 <div class="room-video-container">
-                    <video autoplay muted loop playsinline><source src="gallery/jac-1.mp4" type="video/mp4"></video>
+                    <video autoplay muted loop playsinline><source src="images/jac-1.mp4" type="video/mp4"></video>
                 </div>
                 <div class="room-content">
                     <div class="badge">Jacuzzi</div><h3 class="room-title">Jacuzzi Room</h3>
@@ -104,7 +104,7 @@ body { font-family: 'Sarabun', sans-serif; background: #f4f7f6; color: #333; pad
             </div>
             <div class="room-card">
                 <div class="room-video-container">
-                    <video autoplay muted loop playsinline><source src="gallery/fam-1.mp4" type="video/mp4"></video>
+                    <video autoplay muted loop playsinline><source src="images/fam-1.mp4" type="video/mp4"></video>
                 </div>
                 <div class="room-content">
                     <div class="badge">Family</div><h3 class="room-title">Family Room</h3>
@@ -144,7 +144,7 @@ body { font-family: 'Sarabun', sans-serif; background: #f4f7f6; color: #333; pad
 </div>
 
 <script>
-// [cite: 111] ลิงก์ Web App URL ที่คุณทนายให้มา
+// ลิงก์ Web App URL
 const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzKj6d7mAV-9SVvIKHA1SyWMJcUFMQ5241Mz5xWTLMtOaPRQgfQFfdaGOqOHRkrShd5/exec';
 
 function increaseRoom(id) { const input = document.getElementById(id); input.value = parseInt(input.value) + 1; calculateCapacity(); }
@@ -175,11 +175,11 @@ async function submitBooking() {
     document.getElementById('loadingBox').style.display = 'block';
     document.getElementById('submitBtn').style.display = 'none';
 
-    // 🌟 ดึง psid เพื่อใช้ส่งข้อความกลับ Facebook [cite: 143]
+    // ดึง psid จาก URL เพื่อส่งข้อความกลับ Facebook [cite: 143, 271-272]
     const psid = new URLSearchParams(window.location.search).get('psid');
 
     const payload = {
-        action: "advancedBooking", // [cite: 140]
+        action: "advancedBooking", [cite: 140]
         psid: psid,
         customerName: name,
         phone: document.getElementById('phone').value,
@@ -194,7 +194,7 @@ async function submitBooking() {
         jacuzziRoom: document.getElementById('jacuzziQty').value,
         familyRoom: document.getElementById('familyQty').value,
         motorbike: document.getElementById('motorbikeService').checked,
-        // ส่งค่า false เพื่อรักษาลำดับคอลัมน์ใน Sheet [cite: 128]
+        // ส่งค่า false เพื่อรักษาลำดับคอลัมน์เดิมใน Sheet [cite: 128]
         breakfast: false, pickup: false, seaTrip: false, birthday: false, honeymoon: false,
         specialRequest: document.getElementById('specialRequest').value,
         bookingStatus: 'Pending'
