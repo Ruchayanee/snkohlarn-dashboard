@@ -6,7 +6,7 @@
 <title>SN Kohlarn - ระบบจองห้องพัก</title>
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;700&display=swap" rel="stylesheet">
 <style>
-/* [cite: 1] โครงสร้าง CSS เดิมของคุณทนาย */
+/* โครงสร้าง CSS สำหรับ SN Kohlarn [cite: 1] */
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { font-family: 'Sarabun', sans-serif; background: #f4f7f6; color: #333; padding: 20px; }
 .container { max-width: 1100px; margin: auto; }
@@ -19,23 +19,23 @@ body { font-family: 'Sarabun', sans-serif; background: #f4f7f6; color: #333; pad
 .form-group label { display: block; margin-bottom: 8px; font-weight: 600; }
 .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 15px; }
 
-/* ส่วนแสดงผลวิดีโอ */
-.room-video-container { width: 100%; height: 200px; overflow: hidden; background: #000; border-radius: 12px 12px 0 0; }
+/* ส่วนแสดงผลวิดีโอจากโฟลเดอร์ gallery */
+.room-video-container { width: 100%; height: 220px; overflow: hidden; background: #000; border-radius: 12px 12px 0 0; }
 .room-video-container video { width: 100%; height: 100%; object-fit: cover; }
 
 .room-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(280px,1fr)); gap: 18px; }
-.room-card { border: 1px solid #ddd; border-radius: 12px; overflow: hidden; background: #fff; }
+.room-card { border: 1px solid #ddd; border-radius: 12px; overflow: hidden; background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
 .room-content { padding: 18px; }
 .badge { display: inline-block; background: #e8f5e9; color: #158d35; padding: 5px 12px; border-radius: 100px; font-size: 12px; font-weight: 700; }
 .qty-control { display: flex; gap: 10px; align-items: center; margin-top: 12px; }
-.qty-control button { width: 36px; height: 36px; border: none; border-radius: 50%; background: #1DB446; color: white; cursor: pointer; }
-.qty-control input { width: 60px; text-align: center; border: none; font-weight: bold; }
+.qty-control button { width: 40px; height: 40px; border: none; border-radius: 50%; background: #1DB446; color: white; cursor: pointer; font-size: 20px; }
+.qty-control input { width: 50px; text-align: center; border: none; font-weight: bold; font-size: 18px; }
 .summary-box { background: #f8fff9; border: 1px solid #c7efcf; border-radius: 12px; padding: 20px; margin-top: 20px; }
 .alert { padding: 15px; border-radius: 10px; margin-top: 15px; font-weight: bold; display: none; }
 .alert-danger { background: #fff0f0; color: #c62828; }
 .alert-success { background: #effff3; color: #2e7d32; }
-.btn { border: none; border-radius: 10px; padding: 14px 22px; cursor: pointer; font-weight: 700; transition: .3s; }
-.btn-primary { background: #1DB446; color: white; width: 100%; }
+.btn { border: none; border-radius: 10px; padding: 16px 22px; cursor: pointer; font-weight: 700; transition: .3s; font-size: 16px; }
+.btn-primary { background: #1DB446; color: white; width: 100%; box-shadow: 0 4px 10px rgba(29, 180, 70, 0.3); }
 .loading { display: none; text-align: center; padding: 20px; }
 </style>
 </head>
@@ -44,7 +44,7 @@ body { font-family: 'Sarabun', sans-serif; background: #f4f7f6; color: #333; pad
 <div class="container">
     <div class="header">
         <h1>🏝️ SN Kohlarn Booking System</h1>
-        <p>ระบุรายละเอียดการเข้าพักเพื่อรับใบยืนยันการจองผ่าน Facebook</p>
+        <p>ระบุรายละเอียดการเข้าพักเพื่อรับใบยืนยันการจองผ่าน Facebook Messenger</p>
     </div>
 
     <div class="booking-card">
@@ -53,7 +53,7 @@ body { font-family: 'Sarabun', sans-serif; background: #f4f7f6; color: #333; pad
             <div>
                 <div class="form-group"><label>ชื่อผู้ติดต่อ</label><input type="text" id="customerName" placeholder="กรอกชื่อผู้จอง"></div>
                 <div class="form-group"><label>เบอร์โทรศัพท์</label><input type="tel" id="phone" placeholder="08x-xxx-xxxx"></div>
-                <div class="form-group"><label>Facebook Name</label><input type="text" id="facebookName" placeholder="ระบุชื่อ Facebook เพื่อส่งสรุปข้อมูล"></div>
+                <div class="form-group"><label>Facebook Name</label><input type="text" id="facebookName" placeholder="ระบุชื่อ Facebook เพื่อความสะดวกในการติดต่อ"></div>
             </div>
             <div>
                 <div class="form-group"><label>วันที่ Check-in</label><input type="date" id="checkinDate"></div>
@@ -74,11 +74,11 @@ body { font-family: 'Sarabun', sans-serif; background: #f4f7f6; color: #333; pad
     </div>
 
     <div class="booking-card">
-        <div class="section-title">เลือกห้องพัก (ชมวิดีโอแต่ละประเภท)</div>
+        <div class="section-title">เลือกห้องพัก (คลิกดูวิดีโอ)</div>
         <div class="room-grid">
             <div class="room-card">
                 <div class="room-video-container">
-                    <video autoplay muted loop playsinline><source src="std-1.mp4" type="video/mp4"></video>
+                    <video autoplay muted loop playsinline><source src="gallery/std-1.mp4" type="video/mp4"></video>
                 </div>
                 <div class="room-content">
                     <div class="badge">Standard</div><h3 class="room-title">Standard Room</h3>
@@ -91,7 +91,7 @@ body { font-family: 'Sarabun', sans-serif; background: #f4f7f6; color: #333; pad
             </div>
             <div class="room-card">
                 <div class="room-video-container">
-                    <video autoplay muted loop playsinline><source src="jac-1.mp4" type="video/mp4"></video>
+                    <video autoplay muted loop playsinline><source src="gallery/jac-1.mp4" type="video/mp4"></video>
                 </div>
                 <div class="room-content">
                     <div class="badge">Jacuzzi</div><h3 class="room-title">Jacuzzi Room</h3>
@@ -104,7 +104,7 @@ body { font-family: 'Sarabun', sans-serif; background: #f4f7f6; color: #333; pad
             </div>
             <div class="room-card">
                 <div class="room-video-container">
-                    <video autoplay muted loop playsinline><source src="fam-1.mp4" type="video/mp4"></video>
+                    <video autoplay muted loop playsinline><source src="gallery/fam-1.mp4" type="video/mp4"></video>
                 </div>
                 <div class="room-content">
                     <div class="badge">Family</div><h3 class="room-title">Family Room</h3>
@@ -122,14 +122,16 @@ body { font-family: 'Sarabun', sans-serif; background: #f4f7f6; color: #333; pad
     <div class="booking-card">
         <div class="section-title">บริการเสริม</div>
         <div class="form-group">
-            <label><input type="checkbox" id="motorbikeService"> 🛵 ต้องการเช่ามอเตอร์ไซค์ (300.-/วัน)</label>
+            <label style="font-size: 18px; cursor: pointer;">
+                <input type="checkbox" id="motorbikeService" style="width: 20px; height: 20px; vertical-align: middle;"> 🛵 ต้องการเช่ามอเตอร์ไซค์ (300.-/วัน)
+            </label>
         </div>
     </div>
 
     <div class="booking-card">
         <div class="section-title">คำขอเพิ่มเติม</div>
         <div class="form-group">
-            <textarea id="specialRequest" rows="4" placeholder="เช่น ขอห้องชั้นล่าง หรือ แจ้งเวลาเดินทางถึงท่าเรือ"></textarea>
+            <textarea id="specialRequest" rows="4" placeholder="ระบุรายละเอียดเพิ่มเติมที่ต้องการให้แอดมินทราบ..."></textarea>
         </div>
     </div>
 
@@ -137,13 +139,13 @@ body { font-family: 'Sarabun', sans-serif; background: #f4f7f6; color: #333; pad
         <div id="validationAlert" class="alert alert-danger"></div>
         <div id="successAlert" class="alert alert-success"></div>
         <button class="btn btn-primary" id="submitBtn" onclick="submitBooking()">ยืนยันข้อมูลการจอง</button>
-        <div class="loading" id="loadingBox"><p>⏳ กำลังส่งข้อมูลไปยังแอดมิน...</p></div>
+        <div class="loading" id="loadingBox"><p>⏳ กำลังส่งข้อมูลไปยังแอดมินและสรุปเข้าแชท...</p></div>
     </div>
 </div>
 
 <script>
-// [cite: 111] เปลี่ยน URL เป็น Web App ของคุณทนายเอง
-const GOOGLE_SCRIPT_URL = 'YOUR_WEB_APP_URL_HERE';
+// [cite: 111] ลิงก์ Web App URL ที่คุณทนายให้มา
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzKj6d7mAV-9SVvIKHA1SyWMJcUFMQ5241Mz5xWTLMtOaPRQgfQFfdaGOqOHRkrShd5/exec';
 
 function increaseRoom(id) { const input = document.getElementById(id); input.value = parseInt(input.value) + 1; calculateCapacity(); }
 function decreaseRoom(id) { const input = document.getElementById(id); if(parseInt(input.value) > 0) { input.value = parseInt(input.value) - 1; } calculateCapacity(); }
@@ -160,20 +162,20 @@ function calculateCapacity() {
     const roomAlert = document.getElementById('roomAlert');
     if(totalCapacity > 0 && totalCapacity < guestTotal) {
         roomAlert.style.display = 'block';
-        roomAlert.innerHTML = `⚠️ จำนวนที่นอนไม่พอสำหรับ ${guestTotal} ท่าน (เลือกไว้จุได้แค่ ${totalCapacity} ท่าน)`;
+        roomAlert.innerHTML = `⚠️ พื้นที่รองรับไม่พอสำหรับ ${guestTotal} ท่าน (จำนวนห้องที่เลือกจุได้ ${totalCapacity} ท่าน)`;
     } else { roomAlert.style.display = 'none'; }
     
-    document.getElementById('guestSummary').innerHTML = `<h3>สรุป: ผู้เข้าพัก ${guestTotal} ท่าน | ห้องรวม ${standardQty + jacuzziQty + familyQty} ห้อง</h3>`;
+    document.getElementById('guestSummary').innerHTML = `<h3>สรุป: ผู้เข้าพัก ${guestTotal} ท่าน | เลือกไว้ ${standardQty + jacuzziQty + familyQty} ห้อง</h3>`;
 }
 
 async function submitBooking() {
     const name = document.getElementById('customerName').value;
-    if(!name || !document.getElementById('checkinDate').value) { alert("กรุณากรอกชื่อและเลือกวันเข้าพักค่ะ"); return; }
+    if(!name || !document.getElementById('checkinDate').value) { alert("กรุณากรอกชื่อและเลือกวันเข้าพักด้วยนะคะ"); return; }
     
     document.getElementById('loadingBox').style.display = 'block';
     document.getElementById('submitBtn').style.display = 'none';
 
-    // 🌟 ดึง psid จาก URL เพื่อใช้ส่งข้อความกลับ Facebook [cite: 143]
+    // 🌟 ดึง psid เพื่อใช้ส่งข้อความกลับ Facebook [cite: 143]
     const psid = new URLSearchParams(window.location.search).get('psid');
 
     const payload = {
@@ -192,7 +194,7 @@ async function submitBooking() {
         jacuzziRoom: document.getElementById('jacuzziQty').value,
         familyRoom: document.getElementById('familyQty').value,
         motorbike: document.getElementById('motorbikeService').checked,
-        // ส่งค่า false สำหรับบริการที่ลบออกเพื่อคงโครงสร้างฐานข้อมูล [cite: 128]
+        // ส่งค่า false เพื่อรักษาลำดับคอลัมน์ใน Sheet [cite: 128]
         breakfast: false, pickup: false, seaTrip: false, birthday: false, honeymoon: false,
         specialRequest: document.getElementById('specialRequest').value,
         bookingStatus: 'Pending'
@@ -202,8 +204,12 @@ async function submitBooking() {
         await fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) });
         document.getElementById('loadingBox').style.display = 'none';
         document.getElementById('successAlert').style.display = 'block';
-        document.getElementById('successAlert').innerHTML = "✅ สำเร็จ! ข้อมูลถูกส่งไปยังแอดมินและแชท Facebook ของคุณแล้วค่ะ";
-    } catch(e) { alert("เกิดข้อผิดพลาด กรุณาลองใหม่ค่ะ"); }
+        document.getElementById('successAlert').innerHTML = "✅ เรียบร้อยค่ะ! ข้อมูลถูกส่งให้แอดมินแล้ว และจะมีการส่งสรุปเข้าแชท Facebook ของคุณในทันทีค่ะ";
+    } catch(e) { 
+        document.getElementById('loadingBox').style.display = 'none';
+        document.getElementById('submitBtn').style.display = 'block';
+        alert("เกิดข้อผิดพลาดในการส่งข้อมูล กรุณาลองใหม่อีกครั้งนะคะ"); 
+    }
 }
 window.onload = calculateCapacity;
 </script>
