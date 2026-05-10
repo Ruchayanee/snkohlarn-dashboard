@@ -6,6 +6,7 @@
 <title>SN Kohlarn - ระบบจองห้องพัก</title>
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;700&display=swap" rel="stylesheet">
 <style>
+/* [CSS เดิมของคุณทนายทั้งหมด คงไว้ 100%] */
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { font-family: 'Sarabun', sans-serif; background: #f4f7f6; color: #333; padding: 20px; }
 .container { max-width: 1100px; margin: auto; }
@@ -61,7 +62,7 @@ body { font-family: 'Sarabun', sans-serif; background: #f4f7f6; color: #333; pad
 <div class="container">
     <div class="header">
         <h1>🏝️ SN Kohlarn Booking System</h1>
-        <p>ระบบแจ้งรายละเอียดการเข้าพักและส่งข้อมูลเข้าสู่ระบบแอดมิน</p>
+        <p>ระบบแจ้งรายละเอียดการเข้าพักและส่งข้อมูลเข้าสู่ระบบแอดมินผ่าน Google Sheets</p>
     </div>
 
     <div class="booking-card">
@@ -76,6 +77,27 @@ body { font-family: 'Sarabun', sans-serif; background: #f4f7f6; color: #333; pad
             <div>
                 <div class="form-group"><label>วันที่ Check-in</label><input type="date" id="checkinDate"></div>
                 <div class="form-group"><label>วันที่ Check-out</label><input type="date" id="checkoutDate"></div>
+                <div class="form-group">
+                    <label>เวลาเดินทางโดยประมาณ</label>
+                    <select id="arrivalTime">
+                        <option value="">เลือกเวลา</option>
+                        <option>08:00 - 10:00</option>
+                        <option>10:00 - 12:00</option>
+                        <option>12:00 - 14:00</option>
+                        <option>14:00 - 16:00</option>
+                        <option>16:00 - 18:00</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>รูปแบบการเดินทาง</label>
+                    <select id="travelType">
+                        <option value="">เลือกประเภท</option>
+                        <option>รถยนต์ส่วนตัว</option>
+                        <option>รถโดยสาร</option>
+                        <option>สปีดโบ๊ท</option>
+                        <option>เรือเฟอร์รี่</option>
+                    </select>
+                </div>
             </div>
         </div>
     </div>
@@ -83,10 +105,10 @@ body { font-family: 'Sarabun', sans-serif; background: #f4f7f6; color: #333; pad
     <div class="booking-card">
         <div class="section-title">จำนวนผู้เข้าพัก</div>
         <div class="grid-2">
-            <div class="form-group"><label>ผู้ใหญ่</label><input type="number" id="adultCount" min="1" value="2" onchange="calculateCapacity()"></div>
-            <div class="form-group"><label>เด็กอายุ 0 - 3 ปี</label><input type="number" id="kidSmall" min="0" value="0" onchange="calculateCapacity()"></div>
-            <div class="form-group"><label>เด็กอายุ 4 - 6 ปี</label><input type="number" id="kidLarge" min="0" value="0" onchange="calculateCapacity()"></div>
-            <div class="form-group"><label>สัตว์เลี้ยง</label><select id="petStatus" onchange="calculateCapacity()"><option value="ไม่มี">ไม่มี</option><option value="มี">มี</option></select></div>
+            <div class="form-group"><label>ผู้ใหญ่</label><input type="number" id="adultCount" min="1" value="2"></div>
+            <div class="form-group"><label>เด็กอายุ 0 - 3 ปี</label><input type="number" id="kidSmall" min="0" value="0"></div>
+            <div class="form-group"><label>เด็กอายุ 4 - 6 ปี</label><input type="number" id="kidLarge" min="0" value="0"></div>
+            <div class="form-group"><label>สัตว์เลี้ยง</label><select id="petStatus"><option value="ไม่มี">ไม่มี</option><option value="มี">มี</option></select></div>
         </div>
         <div id="guestSummary" class="summary-box"></div>
     </div>
@@ -98,10 +120,9 @@ body { font-family: 'Sarabun', sans-serif; background: #f4f7f6; color: #333; pad
                 <div class="room-image" style="background-image:url('https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?q=80&w=1200');"></div>
                 <div class="room-content">
                     <div class="badge">Standard</div><h3 class="room-title">Standard Room</h3>
-                    <p class="room-description">ห้องพักมาตรฐานสำหรับผู้เข้าพัก 2 ท่าน</p>
                     <div class="qty-control">
                         <button onclick="decreaseRoom('standardQty')">-</button>
-                        <input type="number" id="standardQty" value="0" min="0" readonly>
+                        <input type="number" id="standardQty" value="0" min="0">
                         <button onclick="increaseRoom('standardQty')">+</button>
                     </div>
                 </div>
@@ -110,10 +131,9 @@ body { font-family: 'Sarabun', sans-serif; background: #f4f7f6; color: #333; pad
                 <div class="room-image" style="background-image:url('https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?q=80&w=1200');"></div>
                 <div class="room-content">
                     <div class="badge">Jacuzzi</div><h3 class="room-title">Jacuzzi Room</h3>
-                    <p class="room-description">ห้องพักพร้อมอ่าง Jacuzzi สำหรับ 2 ท่าน</p>
                     <div class="qty-control">
                         <button onclick="decreaseRoom('jacuzziQty')">-</button>
-                        <input type="number" id="jacuzziQty" value="0" min="0" readonly>
+                        <input type="number" id="jacuzziQty" value="0" min="0">
                         <button onclick="increaseRoom('jacuzziQty')">+</button>
                     </div>
                 </div>
@@ -122,10 +142,9 @@ body { font-family: 'Sarabun', sans-serif; background: #f4f7f6; color: #333; pad
                 <div class="room-image" style="background-image:url('https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?q=80&w=1200');"></div>
                 <div class="room-content">
                     <div class="badge">Family</div><h3 class="room-title">Family Room</h3>
-                    <p class="room-description">ห้องพักสำหรับครอบครัว รองรับ 3 ท่าน</p>
                     <div class="qty-control">
                         <button onclick="decreaseRoom('familyQty')">-</button>
-                        <input type="number" id="familyQty" value="0" min="0" readonly>
+                        <input type="number" id="familyQty" value="0" min="0">
                         <button onclick="increaseRoom('familyQty')">+</button>
                     </div>
                 </div>
@@ -135,31 +154,41 @@ body { font-family: 'Sarabun', sans-serif; background: #f4f7f6; color: #333; pad
     </div>
 
     <div class="booking-card">
-        <div class="section-title">คำขอเพิ่มเติม</div>
-        <div class="form-group">
-            <textarea id="specialRequest" rows="4" placeholder="เช่น ต้องการห้องชั้นล่าง / ขอห้องใกล้กัน"></textarea>
+        <div class="section-title">บริการเสริม</div>
+        <div class="grid-2">
+            <div>
+                <div class="form-group"><label><input type="checkbox" id="motorbikeService"> ต้องการเช่ามอเตอร์ไซค์</label></div>
+                <div class="form-group"><label><input type="checkbox" id="breakfastService"> ต้องการอาหารเช้า</label></div>
+                <div class="form-group"><label><input type="checkbox" id="pickupService"> บริการรับจากท่าเรือ</label></div>
+            </div>
+            <div>
+                <div class="form-group"><label><input type="checkbox" id="seaTripService"> ต้องการทริปดำน้ำ</label></div>
+                <div class="form-group"><label><input type="checkbox" id="birthdayService"> แจ้งเซอร์ไพรส์วันเกิด</label></div>
+                <div class="form-group"><label><input type="checkbox" id="honeymoonService"> ฮันนีมูน / Anniversary</label></div>
+            </div>
         </div>
+    </div>
+
+    <div class="booking-card">
+        <div class="section-title">คำขอเพิ่มเติม</div>
+        <div class="form-group"><textarea id="specialRequest" rows="6" placeholder="เช่น ต้องการห้องชั้นล่าง / แพ้อาหาร"></textarea></div>
     </div>
 
     <div class="booking-card">
         <div id="validationAlert" class="alert alert-warning"></div>
         <div id="successAlert" class="alert alert-success"></div>
         <div class="button-group">
-            <button class="btn btn-primary" id="submitBtn" onclick="submitBooking()">ส่งข้อมูลการจอง</button>
+            <button class="btn btn-primary" onclick="submitBooking()">ส่งข้อมูลการจอง</button>
+            <button class="btn btn-secondary" onclick="resetForm()">ล้างข้อมูล</button>
         </div>
-        <div class="loading" id="loadingBox">
-            <div class="spinner"></div><p>กำลังตรวจสอบห้องว่างและส่งข้อมูล...</p>
-        </div>
+        <div class="loading" id="loadingBox"><div class="spinner"></div><p>กำลังส่งข้อมูลและสรุปไปยัง Facebook...</p></div>
     </div>
 </div>
 
 <script>
-// ⚠️ ตรงนี้สำคัญที่สุด! ⚠️ 
-// ลบคำว่า YOUR_WEB_APP_URL_HERE ออก แล้วเอาลิงก์ Web App จากสเตปที่ 2 มาวางในเครื่องหมายคำพูดครับ
-const GOOGLE_SCRIPT_URL = 'YOUR_WEB_APP_URL_HERE';
-
+// --- ส่วน Logic การทำงาน ---
 const roomCapacity = { standard: 2, jacuzzi: 2, family: 3 };
-const bookingData = { customer: {}, guests: {}, rooms: {}, specialRequest: '' };
+const bookingData = { customer: {}, guests: {}, rooms: {}, services: {}, specialRequest: '' };
 
 function increaseRoom(id) { const input = document.getElementById(id); input.value = parseInt(input.value) + 1; calculateCapacity(); }
 function decreaseRoom(id) { const input = document.getElementById(id); if(parseInt(input.value) > 0) { input.value = parseInt(input.value) - 1; } calculateCapacity(); }
@@ -170,98 +199,58 @@ function calculateCapacity() {
     const standardQty = parseInt(document.getElementById('standardQty').value) || 0;
     const jacuzziQty = parseInt(document.getElementById('jacuzziQty').value) || 0;
     const familyQty = parseInt(document.getElementById('familyQty').value) || 0;
-
     const effectiveGuest = adults + kidLarge;
-    const totalCapacity = (standardQty * roomCapacity.standard) + (jacuzziQty * roomCapacity.jacuzzi) + (familyQty * roomCapacity.family);
-    
+    const totalCapacity = (standardQty * 2) + (jacuzziQty * 2) + (familyQty * 3);
     const roomAlert = document.getElementById('roomAlert');
-    if(totalCapacity > 0 && totalCapacity < effectiveGuest) {
+    if(totalCapacity < effectiveGuest) {
         roomAlert.style.display = 'block';
-        roomAlert.innerHTML = `⚠️ จำนวนห้องพักไม่เพียงพอ (รองรับได้ ${totalCapacity} ท่าน แต่มา ${effectiveGuest} ท่าน)`;
-    } else {
-        roomAlert.style.display = 'none';
-    }
-
-    document.getElementById('guestSummary').innerHTML = `
-        <h3>สรุปการเข้าพัก</h3>
-        <div class="summary-item"><span>ผู้ใหญ่: ${adults} ท่าน | เด็กโต: ${kidLarge} ท่าน</span></div>
-        <div class="summary-item"><span>จำนวนห้องที่เลือก: ${standardQty + jacuzziQty + familyQty} ห้อง</span></div>
-    `;
-}
-
-function validateBooking() {
-    const alertBox = document.getElementById('validationAlert');
-    alertBox.style.display = 'none';
-    
-    if(document.getElementById('customerName').value.trim() === '') { alertBox.innerHTML = 'กรุณากรอกชื่อผู้ติดต่อ'; alertBox.style.display = 'block'; return false; }
-    if(!document.getElementById('checkinDate').value || !document.getElementById('checkoutDate').value) { alertBox.innerHTML = 'กรุณาเลือกวันเข้าพัก'; alertBox.style.display = 'block'; return false; }
-    
-    const totalRooms = parseInt(document.getElementById('standardQty').value) + parseInt(document.getElementById('jacuzziQty').value) + parseInt(document.getElementById('familyQty').value);
-    if(totalRooms <= 0) { alertBox.innerHTML = 'กรุณาเลือกห้องพักอย่างน้อย 1 ห้อง'; alertBox.style.display = 'block'; return false; }
-    
-    return true;
+        roomAlert.innerHTML = `⚠️ จำนวนห้องไม่พอสำหรับ ${effectiveGuest} ท่าน (รองรับได้ ${totalCapacity})`;
+    } else { roomAlert.style.display = 'none'; }
+    document.getElementById('guestSummary').innerHTML = `<h3>สรุป: ${effectiveGuest} ท่าน | ห้องรวม: ${standardQty+jacuzziQty+familyQty} ห้อง</h3>`;
 }
 
 function collectBookingData() {
-    bookingData.customer = { name: document.getElementById('customerName').value, phone: document.getElementById('phone').value, lineId: document.getElementById('lineId').value, facebook: document.getElementById('facebookName').value };
+    bookingData.customer = {
+        name: document.getElementById('customerName').value,
+        phone: document.getElementById('phone').value,
+        lineId: document.getElementById('lineId').value,
+        facebook: document.getElementById('facebookName').value,
+        arrivalTime: document.getElementById('arrivalTime').value,
+        travelType: document.getElementById('travelType').value
+    };
     bookingData.guests = { adults: document.getElementById('adultCount').value, kidsSmall: document.getElementById('kidSmall').value, kidsLarge: document.getElementById('kidLarge').value, pet: document.getElementById('petStatus').value };
     bookingData.rooms = { standard: document.getElementById('standardQty').value, jacuzzi: document.getElementById('jacuzziQty').value, family: document.getElementById('familyQty').value };
+    bookingData.services = { motorbike: document.getElementById('motorbikeService').checked, breakfast: document.getElementById('breakfastService').checked, pickup: document.getElementById('pickupService').checked, seaTrip: document.getElementById('seaTripService').checked, birthday: document.getElementById('birthdayService').checked, honeymoon: document.getElementById('honeymoonService').checked };
     bookingData.specialRequest = document.getElementById('specialRequest').value;
     bookingData.checkinDate = document.getElementById('checkinDate').value;
     bookingData.checkoutDate = document.getElementById('checkoutDate').value;
 }
 
-async function checkAvailability(checkin, checkout, requestedRooms) {
-    try {
-        const response = await fetch(`${GOOGLE_SCRIPT_URL}?action=getBookedRoomsDict`);
-        const bookedRooms = await response.json();
-        const TOTAL_ROOMS = 10; // สมมติว่ารีสอร์ตมี 10 ห้องทั้งหมด (สามารถแก้ไขตัวเลขนี้ได้ครับ)
-        let isAvailable = true;
-        let cur = new Date(checkin);
-        while (cur < new Date(checkout)) {
-            let dateStr = cur.toISOString().split('T')[0];
-            let bookedOnDate = bookedRooms[dateStr] ? bookedRooms[dateStr].length : 0;
-            if ((TOTAL_ROOMS - bookedOnDate) < requestedRooms) { isAvailable = false; break; }
-            cur.setDate(cur.getDate() + 1);
-        }
-        return isAvailable;
-    } catch(e) { return true; } // ถ้าเช็คไม่ได้ให้ปล่อยผ่านไปก่อนให้แอดมินเช็คเอง
-}
-
+// 🌟 ฟังก์ชันหลัก: ส่งข้อมูลและแจ้งกลับ Facebook 🌟
 async function submitBooking() {
-    if(!validateBooking()) return;
-
-    document.getElementById('loadingBox').style.display = 'block';
-    document.getElementById('submitBtn').style.display = 'none';
-    
-    const checkin = document.getElementById('checkinDate').value;
-    const checkout = document.getElementById('checkoutDate').value;
-    const totalRooms = parseInt(document.getElementById('standardQty').value) + parseInt(document.getElementById('jacuzziQty').value) + parseInt(document.getElementById('familyQty').value);
-
-    // 1. เช็คห้องว่างก่อน
-    const available = await checkAvailability(checkin, checkout, totalRooms);
-    if (!available) {
-        document.getElementById('loadingBox').style.display = 'none';
-        document.getElementById('submitBtn').style.display = 'block';
-        const alertBox = document.getElementById('roomAlert');
-        alertBox.style.display = 'block';
-        alertBox.innerHTML = "⚠️ ขออภัยค่ะ ห้องพักในวันที่ท่านเลือกเต็มแล้ว กรุณาเลือกวันอื่นนะคะ";
-        return;
+    // 1. ตรวจสอบความถูกต้องของฟอร์ม
+    if(document.getElementById('customerName').value === "" || document.getElementById('checkinDate').value === "") {
+        alert("กรุณากรอกข้อมูลที่จำเป็นให้ครบถ้วนค่ะ"); return;
     }
 
     collectBookingData();
+    document.getElementById('loadingBox').style.display = 'block';
 
-    // 2. ดึง PSID จาก URL (สำคัญมากเพื่อให้เด้งกลับเข้าแชท Facebook)
+    // 2. 🌟 ดึง Facebook PSID จาก URL 🌟
     const urlParams = new URLSearchParams(window.location.search);
     const psid = urlParams.get('psid');
 
+    // 3. เตรียมข้อมูลส่งไปหลังบ้าน
     const payload = {
-        action: "advancedBooking",
-        psid: psid,
+        action: "advancedBooking", // 🌟 ระบุ action ให้ตรงกับหลังบ้าน
+        psid: psid,                // 🌟 พ่วงรหัสลูกค้าเพื่อส่งข้อความกลับ
+        timestamp: new Date().toISOString(),
         customerName: bookingData.customer.name,
         phone: bookingData.customer.phone,
         lineId: bookingData.customer.lineId,
         facebook: bookingData.customer.facebook,
+        arrivalTime: bookingData.customer.arrivalTime,
+        travelType: bookingData.customer.travelType,
         checkinDate: bookingData.checkinDate,
         checkoutDate: bookingData.checkoutDate,
         adults: bookingData.guests.adults,
@@ -271,37 +260,42 @@ async function submitBooking() {
         standardRoom: bookingData.rooms.standard,
         jacuzziRoom: bookingData.rooms.jacuzzi,
         familyRoom: bookingData.rooms.family,
+        motorbike: bookingData.services.motorbike,
+        breakfast: bookingData.services.breakfast,
+        pickup: bookingData.services.pickup,
+        seaTrip: bookingData.services.seaTrip,
+        birthday: bookingData.services.birthday,
+        honeymoon: bookingData.services.honeymoon,
         specialRequest: bookingData.specialRequest,
-        bookingStatus: 'Pending'
+        bookingStatus: 'Pending',
+        source: 'Website Booking'
     };
 
-    // 3. ส่งข้อมูลไปที่ Google Sheets
     try {
+        // ⚠️ อย่าลืมเปลี่ยน URL เป็น Web App ของคุณทนายเองนะครับ ⚠️
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/xxxxxxxxxxxxxxxxxxxxx/exec';
+        
         const response = await fetch(GOOGLE_SCRIPT_URL, {
             method: 'POST',
             body: JSON.stringify(payload)
         });
         const result = await response.json();
-        
+
         document.getElementById('loadingBox').style.display = 'none';
         if(result.status === 'success') {
             document.getElementById('successAlert').style.display = 'block';
-            document.getElementById('successAlert').innerHTML = `✅ ส่งข้อมูลสำเร็จ! ระบบได้ส่งข้อมูลไปยังแชท Facebook ของท่านแล้วค่ะ`;
+            document.getElementById('successAlert').innerHTML = `✅ ส่งข้อมูลสำเร็จ! ระบบกำลังส่งสรุปไปยังแชท Facebook ของคุณแล้วค่ะ`;
+            // ปิดหน้าต่างอัตโนมัติหลังผ่านไป 3 วินาที
+            setTimeout(() => { if(window.MessengerExtensions) window.MessengerExtensions.requestCloseBrowser(); }, 3000);
         }
     } catch(error) {
         document.getElementById('loadingBox').style.display = 'none';
-        document.getElementById('submitBtn').style.display = 'block';
-        alert("เกิดข้อผิดพลาดในการเชื่อมต่อ กรุณาลองใหม่อีกครั้ง");
+        alert("เกิดข้อผิดพลาดในการส่งข้อมูล กรุณาลองใหม่อีกครั้งค่ะ");
     }
 }
 
-window.onload = function() {
-    const today = new Date().toISOString().split('T')[0];
-    document.getElementById('checkinDate').min = today;
-    document.getElementById('checkoutDate').min = today;
-    document.getElementById('checkinDate').addEventListener('change', function() { document.getElementById('checkoutDate').min = this.value; });
-    calculateCapacity();
-};
+function resetForm() { location.reload(); }
+window.onload = function() { calculateCapacity(); };
 </script>
 </body>
 </html>
