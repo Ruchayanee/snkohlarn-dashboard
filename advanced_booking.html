@@ -7,156 +7,194 @@
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary-color: #1DB446;
+            --primary: #1DB446;
             --primary-dark: #158d35;
-            --bg-color: #f8fafc;
-            --card-bg: #ffffff;
-            --text-main: #1e293b;
-            --text-sub: #64748b;
+            --bg: #f8fafc;
+            --card: #ffffff;
             --radius: 20px;
-            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            --shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
         }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        
-        body { 
-            font-family: 'Sarabun', sans-serif; 
-            background-color: var(--bg-color); 
-            color: var(--text-main);
-            line-height: 1.6;
-            padding: 15px;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Sarabun', sans-serif; }
+        body { background-color: var(--bg); color: #1e293b; padding: 15px; }
         .container { max-width: 800px; margin: 0 auto; }
-
-        /* Header ธีมเดียวกับ Gallery */
         .header-banner {
-            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
-            color: white;
-            padding: 40px 20px;
-            border-radius: var(--radius);
-            text-align: center;
-            margin-bottom: 25px;
-            box-shadow: var(--shadow);
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white; padding: 40px 20px; border-radius: var(--radius);
+            text-align: center; margin-bottom: 25px; box-shadow: var(--shadow);
         }
-
-        .header-banner h1 { font-size: 28px; font-weight: 700; margin-bottom: 10px; }
-        .header-banner p { font-size: 14px; opacity: 0.9; font-weight: 300; }
-
-        /* Card Style */
         .card {
-            background: var(--card-bg);
-            border-radius: var(--radius);
-            padding: 25px;
-            margin-bottom: 20px;
-            box-shadow: var(--shadow);
-            border: 1px solid rgba(255,255,255,0.8);
+            background: var(--card); border-radius: var(--radius);
+            padding: 25px; margin-bottom: 20px; box-shadow: var(--shadow);
         }
-
-        .section-title {
-            font-size: 18px;
-            font-weight: 600;
-            color: var(--primary-color);
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        /* Input Style ธีมทันสมัย */
+        .section-title { font-size: 18px; font-weight: 600; color: var(--primary); margin-bottom: 20px; }
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         @media (max-width: 500px) { .form-grid { grid-template-columns: 1fr; } }
-
         .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: var(--text-sub); }
+        .form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: #64748b; }
         .form-group input, .form-group select, .form-group textarea {
-            width: 100%;
-            padding: 12px 15px;
-            border: 1.5px solid #e2e8f0;
-            border-radius: 12px;
-            font-size: 15px;
-            color: var(--text-main);
-            transition: all 0.3s;
-            background: #fdfdfd;
+            width: 100%; padding: 12px; border: 1.5px solid #e2e8f0; border-radius: 12px; font-size: 15px;
         }
-
-        .form-group input:focus {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 4px rgba(29, 180, 70, 0.1);
-            outline: none;
-        }
-
-        /* Room Selection แบบ Gallery */
-        .room-scroll {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 15px;
-        }
-
-        .room-item {
-            background: #fff;
-            border-radius: 15px;
-            overflow: hidden;
-            border: 1px solid #f1f5f9;
-            transition: transform 0.3s;
-        }
-
-        .video-box {
-            width: 100%;
-            height: 140px;
-            background: #000;
-            position: relative;
-        }
-
+        .room-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; }
+        .room-item { background: #fff; border-radius: 15px; overflow: hidden; border: 1px solid #f1f5f9; }
+        .video-box { width: 100%; height: 140px; background: #000; }
         .video-box video { width: 100%; height: 100%; object-fit: cover; }
-
         .room-info { padding: 15px; text-align: center; }
-        .room-name { font-size: 15px; font-weight: 600; margin-bottom: 10px; }
-
-        /* ตัวเลขปรับจำนวน */
-        .qty-wrap {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-        }
-
-        .btn-qty {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            border: none;
-            background: #f1f5f9;
-            color: var(--text-main);
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        .btn-qty:active { background: var(--primary-color); color: white; }
-
-        .qty-val { font-weight: 700; font-size: 16px; width: 25px; text-align: center; }
-
-        /* บริการเสริม */
-        .service-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px;
-            background: #f8fafc;
-            border-radius: 12px;
-            cursor: pointer;
-        }
-
-        .service-item input { width: 18px; height: 18px; accent-color: var(--primary-color); }
-
-        /* ปุ่มยืนยัน */
+        .qty-wrap { display: flex; align-items: center; justify-content: center; gap: 15px; margin-top: 10px; }
+        .btn-qty { width: 35px; height: 35px; border-radius: 50%; border: none; background: #f1f5f9; cursor: pointer; font-weight: bold; }
+        .qty-val { font-weight: 700; font-size: 18px; width: 20px; }
         .btn-submit {
-            width: 100%;
-            padding: 18px;
-            border-radius: 15px;
-            border: none;
-            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
-            color: white;
-            font-size: 18px;
-            font-weight:
+            width: 100%; padding: 20px; border-radius: 15px; border: none;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white; font-size: 18px; font-weight: 700; cursor: pointer;
+            box-shadow: 0 10px 20px -10px rgba(29, 180, 70, 0.5);
+        }
+        #loadingBox { display: none; text-align: center; padding: 20px; color: var(--primary); font-weight: 600; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header-banner">
+        <h1>🏡 SN Kohlarn</h1>
+        <p>ระบบแจ้งข้อมูลการเข้าพัก</p>
+    </div>
+
+    <div class="card">
+        <div class="section-title">👤 ข้อมูลผู้ติดต่อ</div>
+        <div class="form-group">
+            <label>ชื่อ-นามสกุล</label>
+            <input type="text" id="customerName" placeholder="กรอกชื่อผู้จอง">
+        </div>
+        <div class="form-grid">
+            <div class="form-group">
+                <label>เบอร์โทรศัพท์</label>
+                <input type="tel" id="phone" placeholder="08x-xxx-xxxx">
+            </div>
+            <div class="form-group">
+                <label>ชื่อ Facebook</label>
+                <input type="text" id="facebookName" placeholder="ชื่อ Facebook ของคุณ">
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="section-title">📅 วันเข้าพัก</div>
+        <div class="form-grid">
+            <div class="form-group"><label>เช็คอิน</label><input type="date" id="checkinDate"></div>
+            <div class="form-group"><label>เช็คเอาท์</label><input type="date" id="checkoutDate"></div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="section-title">🛏️ เลือกห้องพัก</div>
+        <div class="room-grid">
+            <div class="room-item">
+                <div class="video-box"><video autoplay muted loop playsinline poster="images/images/std-1.jpg"><source src="images/images/std-1.mp4" type="video/mp4"></video></div>
+                <div class="room-info">
+                    <div style="font-weight:600">Standard Room</div>
+                    <div class="qty-wrap">
+                        <button class="btn-qty" onclick="changeQty('standardQty', -1)">-</button>
+                        <span class="qty-val" id="standardQty">0</span>
+                        <button class="btn-qty" onclick="changeQty('standardQty', 1)">+</button>
+                    </div>
+                </div>
+            </div>
+            <div class="room-item">
+                <div class="video-box"><video autoplay muted loop playsinline poster="images/images/jac-1.jpg"><source src="images/images/jac-1.mp4" type="video/mp4"></video></div>
+                <div class="room-info">
+                    <div style="font-weight:600">Jacuzzi Room</div>
+                    <div class="qty-wrap">
+                        <button class="btn-qty" onclick="changeQty('jacuzziQty', -1)">-</button>
+                        <span class="qty-val" id="jacuzziQty">0</span>
+                        <button class="btn-qty" onclick="changeQty('jacuzziQty', 1)">+</button>
+                    </div>
+                </div>
+            </div>
+            <div class="room-item">
+                <div class="video-box"><video autoplay muted loop playsinline poster="images/images/fam-1.jpg"><source src="images/images/fam-1.mp4" type="video/mp4"></video></div>
+                <div class="room-info">
+                    <div style="font-weight:600">Family Room</div>
+                    <div class="qty-wrap">
+                        <button class="btn-qty" onclick="changeQty('familyQty', -1)">-</button>
+                        <span class="qty-val" id="familyQty">0</span>
+                        <button class="btn-qty" onclick="changeQty('familyQty', 1)">+</button>
+                    </div>
+                </div>
+            </div>
+            <div class="room-item">
+                <div class="video-box"><video autoplay muted loop playsinline poster="images/images/sea-1.jpg"><source src="images/images/sea-1.mp4" type="video/mp4"></video></div>
+                <div class="room-info">
+                    <div style="font-weight:600">Sea View Room</div>
+                    <div class="qty-wrap">
+                        <button class="btn-qty" onclick="changeQty('seaQty', -1)">-</button>
+                        <span class="qty-val" id="seaQty">0</span>
+                        <button class="btn-qty" onclick="changeQty('seaQty', 1)">+</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="section-title">🛵 บริการเสริม</div>
+        <label style="display:flex; align-items:center; gap:10px; cursor:pointer;">
+            <input type="checkbox" id="motorbikeService" style="width:20px; height:20px;">
+            <span>เช่ามอเตอร์ไซค์ (300.- / วัน)</span>
+        </label>
+    </div>
+
+    <button class="btn-submit" id="submitBtn" onclick="submitBooking()">ยืนยันการแจ้งจอง</button>
+    <div id="loadingBox">⌛ กำลังส่งข้อมูล...</div>
+</div>
+
+<script>
+    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzKj6d7mAV-9SVvIKHA1SyWMJcUFMQ5241Mz5xWTLMtOaPRQgfQFfdaGOqOHRkrShd5/exec';
+    
+    // ตัวแปรเก็บจำนวนห้อง
+    const roomData = { standardQty: 0, jacuzziQty: 0, familyQty: 0, seaQty: 0 };
+
+    function changeQty(id, val) {
+        roomData[id] = Math.max(0, roomData[id] + val);
+        document.getElementById(id).innerText = roomData[id];
+    }
+
+    async function submitBooking() {
+        const name = document.getElementById('customerName').value;
+        const cin = document.getElementById('checkinDate').value;
+        if(!name || !cin) { alert("กรุณาระบุชื่อและวันที่เช็คอินด้วยนะครับ"); return; }
+
+        document.getElementById('submitBtn').style.display = 'none';
+        document.getElementById('loadingBox').style.display = 'block';
+
+        const psid = new URLSearchParams(window.location.search).get('psid');
+
+        const payload = {
+            action: "advancedBooking",
+            psid: psid,
+            customerName: name,
+            phone: document.getElementById('phone').value,
+            facebook: document.getElementById('facebookName').value,
+            checkinDate: cin,
+            checkoutDate: document.getElementById('checkoutDate').value,
+            standardRoom: roomData.standardQty,
+            jacuzziRoom: roomData.jacuzziQty,
+            familyRoom: roomData.familyQty,
+            seaRoom: roomData.seaQty,
+            motorbike: document.getElementById('motorbikeService').checked,
+            bookingStatus: 'Pending',
+            specialRequest: "จองผ่านธีม Gallery"
+        };
+
+        try {
+            await fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) });
+            alert("✅ ส่งข้อมูลสำเร็จ! ตรวจสอบแชท Facebook นะครับ");
+            location.reload();
+        } catch(e) {
+            alert("❌ เกิดข้อผิดพลาด กรุณาลองใหม่ครับ");
+            document.getElementById('submitBtn').style.display = 'block';
+            document.getElementById('loadingBox').style.display = 'none';
+        }
+    }
+</script>
+</body>
+</html>
