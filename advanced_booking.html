@@ -63,7 +63,7 @@
             </div>
             <div class="room-item">
                 <div class="video-box"><video autoplay muted loop playsinline poster="images/images/fam-1.jpg"><source src="images/images/fam-1.mp4" type="video/mp4"></video></div>
-                <div class="room-info"><span class="avail-tag" id="famAvail">โปรดเลือกวันที่...</span><div class="room-name">Family (พักได้ 4)</div>
+                <div class="room-info"><span class="avail-tag" id="famAvail">โปรดเลือกวันที่...</span><div class="room-name">Family (พักได้ 3)</div>
                 <div class="qty-wrap"><button class="btn-qty" onclick="changeQty('fam', -1)">-</button><span id="famQty" style="font-weight:bold; font-size:18px;">0</span><button class="btn-qty" onclick="changeQty('fam', 1)">+</button></div></div>
             </div>
             <div class="room-item">
@@ -107,48 +107,71 @@
         document.querySelectorAll('.avail-tag').forEach(el => el.innerText = "กำลังเช็ค...");
         const r = await fetch(`${APP_URL}?action=checkAvailability&cin=${cin}&cout=${cout}`);
         inv = await r.json();
-        document.getElementById('stdAvail').innerText = `ว่าง ${inv.std} ห้อง`;
-        document.getElementById('jacAvail').innerText = `ว่าง ${inv.jac} ห้อง`;
-        document.getElementById('famAvail').innerText = `ว่าง ${inv.fam} ห้อง`;
-        document.getElementById('seaAvail').innerText = `ว่าง ${inv.sea} ห้อง`;
+
+        const updateUI = (id, left, total) => {
+            const el = document.getElementById(id + 'Avail');
+            if (left === 0) {
+                el.innerHTML = `<span style="color: #dc2626; font-weight: bold; background: #fee2e2; padding: 3px 8px; border-radius: 5px;">❌ เต็มแล้ว</span>`;
+                document.getElementById(id + 'Qty').innerText = '0'; selections[id] = 0;
+            } else if (left === 1 && total > 1) {
+                el.innerHTML = `<span style="color: #ea580c; font-weight: bold; background: #ffedd5; padding: 3px 8px; border-radius: 5px;">🔥 เหลือ 1 ห้องสุดท้าย!</span>`;
+            } else {
+                el.innerHTML = `<span style="color: var(--gold);">ว่าง ${left} ห้อง</span>`;
+            }
+        };
+
+        updateUI('std', inv.std, 5); updateUI('jac', inv.jac, 2); 
+        updateUI('fam', inv.fam, 2); updateUI('sea', inv.sea, 1);
+        validateCapacity(); 
     }
 
     function changeQty(id, v) {
-        if(v > 0 && selections[id] >= inv[id]) { alert("ขออภัยค่ะ ห้องเต็มแล้ว"); return; }
+        if(v > 0 && selections[id] >= inv[id]) { alert("ขออภัยค่ะ ห้องประเภทนี้เต็มแล้วในวันที่คุณเลือก"); return; }
         selections[id] = Math.max(0, selections[id] + v);
         document.getElementById(id+'Qty').innerText = selections[id];
-        validateCapacity();
+        validateCapacity(); 
     }
 
-    // 🌟 ระบบตรวจสอบจำนวนคนเข้าพัก (Hard Validation)
     function validateCapacity() {
         const adults = parseInt(document.getElementById('adults').value) || 0;
         const kids = parseInt(document.getElementById('kidsOver4').value) || 0;
         const totalGuests = adults + kids;
-        const totalCap = (selections.std * 2) + (selections.jac * 2) + (selections.fam * 4) + (selections.sea * 2);
+        
+        // แก้ไขสูตรคำนวณ Family เป็น 3
+        const totalCap = (selections.std * 2) + (selections.jac * 2) + (selections.fam * 3) + (selections.sea * 2);
 
         const warning = document.getElementById('capWarning');
         const btn = document.getElementById('btnSubmit');
 
-        // ถ้าเลือกห้องแล้วแต่ความจุไม่พอ ให้แจ้งเตือนและล็อคปุ่ม
-        if (totalGuests > totalCap && totalCap > 0) {
+        if (totalCap === 0) {
+            warning.style.display = 'none';
+            btn.disabled = false; 
+        } else if (totalGuests > totalCap) {
+            warning.innerText = `⚠️ จำนวนห้องไม่พอค่ะ (ผู้เข้าพัก ${totalGuests} ท่าน / ห้องรับได้ ${totalCap} ท่าน)`;
             warning.style.display = 'block';
-            btn.disabled = true;
+            btn.disabled = true; 
+            btn.style.background = "#ccc";
         } else {
             warning.style.display = 'none';
-            btn.disabled = false;
+            btn.disabled = false; 
+            btn.style.background = "var(--navy)";
         }
     }
 
+    document.getElementById('adults').addEventListener('change', validateCapacity);
+    document.getElementById('kidsOver4').addEventListener('change', validateCapacity);
+
     async function submitBooking() {
         if (!document.getElementById('cin').value) { alert("กรุณาเลือกวันเช็คอินค่ะ"); return; }
-        const totalCap = (selections.std * 2) + (selections.jac * 2) + (selections.fam * 4) + (selections.sea * 2);
+        
+        // แก้ไขสูตรคำนวณ Family เป็น 3 ก่อนกดยืนยันด้วย
+        const totalCap = (selections.std * 2) + (selections.jac * 2) + (selections.fam * 3) + (selections.sea * 2);
         const guests = (parseInt(document.getElementById('adults').value) || 0) + (parseInt(document.getElementById('kidsOver4').value) || 0);
         
-        if (totalCap < guests) { alert("⚠️ จำนวนห้องที่เลือกไม่เพียงพอต่อจำนวนคนค่ะ กรุณาเลือกห้องเพิ่ม"); return; }
+        if (totalCap < guests) { alert("⚠️ จำนวนห้องที่เลือกไม่เพียงพอต่อจำนวนผู้เข้าพักค่ะ"); return; }
         if (totalCap === 0) { alert("⚠️ กรุณาเลือกห้องพักที่ต้องการอย่างน้อย 1 ห้องค่ะ"); return; }
 
-        document.getElementById('btnSubmit').innerText = "⌛ กำลังบันทึก...";
+        document.getElementById('btnSubmit').innerText = "⌛ กำลังบันทึกข้อมูล...";
         document.getElementById('btnSubmit').disabled = true;
 
         const payload = {
