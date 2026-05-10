@@ -1,1 +1,189 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SN Kohlarn - ระบบจองห้องพัก</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Sarabun', sans-serif; background: #f4f7f6; color: #333; padding: 20px; }
+.container { max-width: 1100px; margin: auto; }
+.header { background: linear-gradient(135deg,#1DB446,#158d35); color: white; padding: 30px; border-radius: 14px; margin-bottom: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+.header h1 { font-size: 32px; margin-bottom: 10px; }
+.header p { opacity: .95; }
+.booking-card { background: white; border-radius: 14px; padding: 25px; margin-bottom: 20px; box-shadow: 0 5px 15px rgba(0,0,0,.08); }
+.section-title { font-size: 22px; margin-bottom: 20px; color: #1DB446; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+.grid-2 { display: grid; grid-template-columns: repeat(auto-fit,minmax(300px,1fr)); gap: 20px; }
+.form-group { margin-bottom: 18px; }
+.form-group label { display: block; margin-bottom: 8px; font-weight: 600; }
+.form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 15px; transition: .3s; }
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: #1DB446; outline: none; box-shadow: 0 0 0 3px rgba(29,180,70,.1); }
+.room-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(280px,1fr)); gap: 18px; }
+.room-card { border: 1px solid #ddd; border-radius: 12px; overflow: hidden; transition: .3s; background: #fff; }
+.room-card:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,.08); }
+.room-image { height: 180px; background-size: cover; background-position: center; }
+.room-content { padding: 18px; }
+.room-title { font-size: 20px; margin-bottom: 8px; }
+.room-description { color: #666; line-height: 1.7; font-size: 14px; margin-bottom: 15px; }
+.room-feature-list { list-style: none; margin-bottom: 15px; }
+.room-feature-list li { padding: 5px 0; font-size: 14px; }
+.badge { display: inline-block; background: #e8f5e9; color: #158d35; padding: 5px 12px; border-radius: 100px; font-size: 12px; font-weight: 700; }
+.qty-control { display: flex; gap: 10px; align-items: center; margin-top: 12px; }
+.qty-control button { width: 36px; height: 36px; border: none; border-radius: 50%; background: #1DB446; color: white; cursor: pointer; font-size: 18px; }
+.qty-control input { width: 70px; text-align: center; }
+.summary-box { background: #f8fff9; border: 1px solid #c7efcf; border-radius: 12px; padding: 20px; margin-top: 20px; }
+.summary-box h3 { margin-bottom: 12px; color: #158d35; }
+.summary-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed #ddd; }
+.alert { padding: 15px; border-radius: 10px; margin-top: 15px; font-weight: bold; display: none; }
+.alert-danger { background: #fff0f0; color: #c62828; border: 1px solid #ef9a9a; }
+.alert-success { background: #effff3; color: #2e7d32; border: 1px solid #a5d6a7; }
+.alert-warning { background: #fff8e1; color: #f57f17; border: 1px solid #ffe082; }
+.button-group { display: flex; gap: 12px; flex-wrap: wrap; }
+.btn { border: none; border-radius: 10px; padding: 14px 22px; cursor: pointer; font-weight: 700; transition: .3s; }
+.btn-primary { background: #1DB446; color: white; }
+.btn-primary:hover { background: #158d35; }
+.btn-secondary { background: #ddd; }
+.timeline { position: relative; padding-left: 30px; }
+.timeline::before { content: ''; position: absolute; left: 8px; top: 0; width: 3px; height: 100%; background: #1DB446; }
+.timeline-item { position: relative; margin-bottom: 20px; }
+.timeline-item::before { content: ''; width: 18px; height: 18px; border-radius: 50%; background: #1DB446; position: absolute; left: -30px; top: 3px; }
+.policy-list li { margin-bottom: 12px; line-height: 1.7; }
+.footer { text-align: center; padding: 30px; color: #777; }
+.loading { display: none; text-align: center; padding: 20px; }
+.spinner { width: 50px; height: 50px; border: 4px solid #ddd; border-top: 4px solid #1DB446; border-radius: 50%; margin: auto; animation: spin 1s linear infinite; }
+@keyframes spin { 100% { transform: rotate(360deg); } }
+@media(max-width:768px) { .header h1 { font-size: 24px; } .booking-card { padding: 18px; } }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>🏝️ SN Kohlarn Booking System</h1>
+        <p>ระบบแจ้งรายละเอียดการเข้าพักและส่งข้อมูลเข้าสู่ระบบแอดมิน</p>
+    </div>
+
+    <div class="booking-card">
+        <div class="section-title">ข้อมูลผู้เข้าพัก</div>
+        <div class="grid-2">
+            <div>
+                <div class="form-group"><label>ชื่อผู้ติดต่อ</label><input type="text" id="customerName" placeholder="กรอกชื่อผู้จอง"></div>
+                <div class="form-group"><label>เบอร์โทรศัพท์</label><input type="tel" id="phone" placeholder="08x-xxx-xxxx"></div>
+                <div class="form-group"><label>LINE ID</label><input type="text" id="lineId" placeholder="ระบุ LINE ID"></div>
+                <div class="form-group"><label>Facebook</label><input type="text" id="facebookName" placeholder="ชื่อ Facebook"></div>
+            </div>
+            <div>
+                <div class="form-group"><label>วันที่ Check-in</label><input type="date" id="checkinDate"></div>
+                <div class="form-group"><label>วันที่ Check-out</label><input type="date" id="checkoutDate"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="booking-card">
+        <div class="section-title">จำนวนผู้เข้าพัก</div>
+        <div class="grid-2">
+            <div class="form-group"><label>ผู้ใหญ่</label><input type="number" id="adultCount" min="1" value="2" onchange="calculateCapacity()"></div>
+            <div class="form-group"><label>เด็กอายุ 0 - 3 ปี</label><input type="number" id="kidSmall" min="0" value="0" onchange="calculateCapacity()"></div>
+            <div class="form-group"><label>เด็กอายุ 4 - 6 ปี</label><input type="number" id="kidLarge" min="0" value="0" onchange="calculateCapacity()"></div>
+            <div class="form-group"><label>สัตว์เลี้ยง</label><select id="petStatus" onchange="calculateCapacity()"><option value="ไม่มี">ไม่มี</option><option value="มี">มี</option></select></div>
+        </div>
+        <div id="guestSummary" class="summary-box"></div>
+    </div>
+
+    <div class="booking-card">
+        <div class="section-title">เลือกห้องพัก</div>
+        <div class="room-grid">
+            <div class="room-card">
+                <div class="room-image" style="background-image:url('https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?q=80&w=1200');"></div>
+                <div class="room-content">
+                    <div class="badge">Standard</div><h3 class="room-title">Standard Room</h3>
+                    <p class="room-description">ห้องพักมาตรฐานสำหรับผู้เข้าพัก 2 ท่าน</p>
+                    <div class="qty-control">
+                        <button onclick="decreaseRoom('standardQty')">-</button>
+                        <input type="number" id="standardQty" value="0" min="0" readonly>
+                        <button onclick="increaseRoom('standardQty')">+</button>
+                    </div>
+                </div>
+            </div>
+            <div class="room-card">
+                <div class="room-image" style="background-image:url('https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?q=80&w=1200');"></div>
+                <div class="room-content">
+                    <div class="badge">Jacuzzi</div><h3 class="room-title">Jacuzzi Room</h3>
+                    <p class="room-description">ห้องพักพร้อมอ่าง Jacuzzi สำหรับ 2 ท่าน</p>
+                    <div class="qty-control">
+                        <button onclick="decreaseRoom('jacuzziQty')">-</button>
+                        <input type="number" id="jacuzziQty" value="0" min="0" readonly>
+                        <button onclick="increaseRoom('jacuzziQty')">+</button>
+                    </div>
+                </div>
+            </div>
+            <div class="room-card">
+                <div class="room-image" style="background-image:url('https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?q=80&w=1200');"></div>
+                <div class="room-content">
+                    <div class="badge">Family</div><h3 class="room-title">Family Room</h3>
+                    <p class="room-description">ห้องพักสำหรับครอบครัว รองรับ 3 ท่าน</p>
+                    <div class="qty-control">
+                        <button onclick="decreaseRoom('familyQty')">-</button>
+                        <input type="number" id="familyQty" value="0" min="0" readonly>
+                        <button onclick="increaseRoom('familyQty')">+</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="roomAlert" class="alert alert-danger"></div>
+    </div>
+
+    <div class="booking-card">
+        <div class="section-title">คำขอเพิ่มเติม</div>
+        <div class="form-group">
+            <textarea id="specialRequest" rows="4" placeholder="เช่น ต้องการห้องชั้นล่าง / ขอห้องใกล้กัน"></textarea>
+        </div>
+    </div>
+
+    <div class="booking-card">
+        <div id="validationAlert" class="alert alert-warning"></div>
+        <div id="successAlert" class="alert alert-success"></div>
+        <div class="button-group">
+            <button class="btn btn-primary" id="submitBtn" onclick="submitBooking()">ส่งข้อมูลการจอง</button>
+        </div>
+        <div class="loading" id="loadingBox">
+            <div class="spinner"></div><p>กำลังตรวจสอบห้องว่างและส่งข้อมูล...</p>
+        </div>
+    </div>
+</div>
+
+<script>
+// ⚠️ ตรงนี้สำคัญที่สุด! ⚠️ 
+// ลบคำว่า YOUR_WEB_APP_URL_HERE ออก แล้วเอาลิงก์ Web App จากสเตปที่ 2 มาวางในเครื่องหมายคำพูดครับ
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzKj6d7mAV-9SVvIKHA1SyWMJcUFMQ5241Mz5xWTLMtOaPRQgfQFfdaGOqOHRkrShd5/exec';
+
+const roomCapacity = { standard: 2, jacuzzi: 2, family: 3 };
+const bookingData = { customer: {}, guests: {}, rooms: {}, specialRequest: '' };
+
+function increaseRoom(id) { const input = document.getElementById(id); input.value = parseInt(input.value) + 1; calculateCapacity(); }
+function decreaseRoom(id) { const input = document.getElementById(id); if(parseInt(input.value) > 0) { input.value = parseInt(input.value) - 1; } calculateCapacity(); }
+
+function calculateCapacity() {
+    const adults = parseInt(document.getElementById('adultCount').value) || 0;
+    const kidLarge = parseInt(document.getElementById('kidLarge').value) || 0;
+    const standardQty = parseInt(document.getElementById('standardQty').value) || 0;
+    const jacuzziQty = parseInt(document.getElementById('jacuzziQty').value) || 0;
+    const familyQty = parseInt(document.getElementById('familyQty').value) || 0;
+
+    const effectiveGuest = adults + kidLarge;
+    const totalCapacity = (standardQty * roomCapacity.standard) + (jacuzziQty * roomCapacity.jacuzzi) + (familyQty * roomCapacity.family);
+    
+    const roomAlert = document.getElementById('roomAlert');
+    if(totalCapacity > 0 && totalCapacity < effectiveGuest) {
+        roomAlert.style.display = 'block';
+        roomAlert.innerHTML = `⚠️ จำนวนห้องพักไม่เพียงพอ (รองรับได้ ${totalCapacity} ท่าน แต่มา ${effectiveGuest} ท่าน)`;
+    } else {
+        roomAlert.style.display = 'none';
+    }
+
+    document.getElementById('guestSummary').innerHTML = `
+        <h3>สรุปการเข้าพัก</h3>
+        <div class="summary-item">
+
 
