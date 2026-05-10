@@ -3,349 +3,146 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> luxury จองที่พัก - SN Kohlarn</title>
-    <link href="https://fonts.googleapis.com/css2?family=Prata&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>Reservation - SN Kohlarn</title>
+    <link href="https://fonts.googleapis.com/css2?family=Prata&family=Sarabun:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        :root {
-            /* ธีมสีน้ำเงินเข้มและครีม */
-            --navy-deep: #1A365D;
-            --cream-bg: #FAF0E6; 
-            --white-bg: #FAF0E6;
-            --text-main: #1A365D;
-            --text-sub: #64748b;
-            --radius-main: 25px;
-            --radius-item: 15px;
-            /* เงาฟุ้งๆ (Soft Shadow) */
-            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        
-        body { 
-            font-family: 'Sarabun', sans-serif; 
-            background-color: var(--cream-bg); 
-            color: var(--text-main);
-            line-height: 1.6;
-            padding: 15px;
-        }
-
-        /* หรูหราตัวหนังสือหัวเรื่อง */
+        :root { --navy: #1A365D; --cream: #FAF0E6; --gold: #C5A059; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Sarabun', sans-serif; }
+        body { background-color: var(--cream); color: var(--navy); padding: 15px; }
         h1, .room-name, .btn-submit { font-family: 'Prata', serif; }
-
         .container { max-width: 800px; margin: 0 auto; }
-
-        /* Header หรูหราดีไซน์อัลบั้ม */
-        .header-banner {
-            background-color: var(--navy-deep);
-            color: var(--white-bg);
-            padding: 50px 20px;
-            border-radius: var(--radius-main);
-            text-align: center;
-            margin-bottom: 30px;
-            box-shadow: var(--shadow);
-            border: 2px solid var(--navy-deep);
-        }
-
-        .header-banner h1 { font-size: 32px; font-weight: 700; margin-bottom: 12px; }
-        .header-banner p { font-size: 14px; opacity: 0.9; font-weight: 300; }
-
-        /* Card Style - ขอบ Card เป็นเส้นสีน้ำเงินเข้ม */
-        .card {
-            background-color: var(--white-bg);
-            border-radius: var(--radius-main);
-            padding: 30px;
-            margin-bottom: 25px;
-            box-shadow: var(--shadow);
-            border: 2px solid var(--navy-deep);
-        }
-
-        .section-title {
-            font-size: 20px;
-            font-weight: 600;
-            color: var(--navy-deep);
-            margin-bottom: 25px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        /* Input Style หรูหราทันสมัย */
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .header { background: var(--navy); color: white; padding: 45px 20px; border-radius: 25px; text-align: center; margin-bottom: 25px; border: 2px solid var(--gold); }
+        .card { background: white; border-radius: 20px; padding: 25px; margin-bottom: 20px; border: 1.5px solid var(--navy); }
+        .section-title { font-size: 19px; font-weight: 600; margin-bottom: 20px; border-bottom: 1.5px solid var(--gold); padding-bottom: 8px; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         @media (max-width: 500px) { .form-grid { grid-template-columns: 1fr; } }
-
-        .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 8px; color: var(--text-main); }
-        .form-group input, .form-group select, .form-group textarea {
-            width: 100%;
-            padding: 14px 18px;
-            border: 1.5px solid var(--navy-deep);
-            border-radius: 12px;
-            font-size: 15px;
-            color: var(--text-main);
-            transition: all 0.3s;
-            background: #fff;
-        }
-
-        /* Room Selection ดีไซน์อัลบั้มพรีเมียม */
-        .room-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-        }
-
-        .room-item {
-            background: #fff;
-            border-radius: 18px;
-            overflow: hidden;
-            border: 2px solid var(--navy-deep);
-            transition: transform 0.3s;
-        }
-
-        .video-box {
-            width: 100%;
-            height: 160px;
-            background: #000;
-            position: relative;
-        }
-
+        input, select { width: 100%; padding: 13px; border: 1.5px solid var(--navy); border-radius: 12px; margin-top: 5px; }
+        .room-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
+        .room-item { border: 2px solid var(--navy); border-radius: 18px; overflow: hidden; background: white; }
+        .video-box { width: 100%; height: 160px; background: #000; }
         .video-box video { width: 100%; height: 100%; object-fit: cover; }
-
-        .room-info { padding: 20px; text-align: center; }
-        .room-name { font-size: 18px; font-weight: 600; margin-bottom: 15px; color: var(--navy-deep); }
-
-        /* ตัวนับจำนวนแบบหรูหรา */
-        .qty-wrap {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 15px;
-        }
-
-        .btn-qty {
-            width: 38px;
-            height: 38px;
-            border-radius: 50%;
-            border: 1.5px solid var(--navy-deep);
-            background: var(--white-bg);
-            color: var(--navy-deep);
-            font-weight: bold;
-            font-size: 20px;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        .qty-val { font-weight: 700; font-size: 22px; width: 30px; text-align: center; color: var(--navy-deep); }
-
-        /* บริการเสริม */
-        .service-item {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 15px;
-            background: var(--white-bg);
-            border-radius: 15px;
-            cursor: pointer;
-            border: 1.5px solid var(--navy-deep);
-        }
-
-        .service-item input { width: 22px; height: 22px; accent-color: var(--navy-deep); }
-        .service-item span { font-size: 16px; color: var(--navy-deep); }
-
-        /* ปุ่มยืนยันหรูหราแบบไล่เฉดสี */
-        .btn-submit {
-            width: 100%;
-            padding: 20px;
-            border-radius: var(--radius-main);
-            border: none;
-            background: linear-gradient(135deg, var(--navy-deep), #2A467D);
-            color: var(--white-bg);
-            font-size: 20px;
-            font-weight: 700;
-            cursor: pointer;
-            box-shadow: 0 10px 20px -10px rgba(26, 54, 93, 0.5);
-            transition: 0.3s;
-        }
-
-        .btn-submit:active { transform: scale(0.98); }
-
-        .loading-overlay {
-            display: none;
-            text-align: center;
-            padding: 25px;
-            font-weight: 600;
-            color: var(--navy-deep);
-        }
+        .room-info { padding: 18px; text-align: center; }
+        .avail-tag { font-size: 13px; font-weight: bold; color: var(--gold); margin-bottom: 8px; display: block; }
+        .qty-wrap { display: flex; align-items: center; justify-content: center; gap: 18px; margin-top: 12px; }
+        .btn-qty { width: 40px; height: 40px; border-radius: 50%; border: 1.5px solid var(--navy); background: white; cursor: pointer; font-size: 20px; color: var(--navy); }
+        .btn-submit { width: 100%; padding: 22px; border-radius: 18px; border: none; background: var(--navy); color: white; font-size: 20px; cursor: pointer; margin-top: 20px; box-shadow: 0 10px 20px rgba(26,54,93,0.3); }
+        #loading { display: none; text-align: center; padding: 20px; font-weight: bold; color: var(--navy); }
     </style>
 </head>
-<body>
-
+<body onload="initPage()">
 <div class="container">
-    <div class="header-banner">
-        <h1>SN KOHLARN</h1>
-        <p>อัจฉริยะระบบแจ้งข้อมูลการเข้าพัก</p>
-    </div>
+    <div class="header"><h1>SN KOHLARN</h1><p>LUXURY RESERVATION</p></div>
 
     <div class="card">
-        <div class="section-title">👤 ข้อมูลผู้ติดต่อ</div>
-        <div class="form-group">
-            <label>ชื่อ-นามสกุล</label>
-            <input type="text" id="customerName" placeholder="กรอกชื่อผู้จอง">
-        </div>
+        <div class="section-title">📅 1. วันที่และจำนวนผู้เข้าพัก</div>
         <div class="form-grid">
-            <div class="form-group">
-                <label>เบอร์โทรศัพท์</label>
-                <input type="tel" id="phone" placeholder="08x-xxx-xxxx">
-            </div>
-            <div class="form-group">
-                <label>ชื่อ Facebook</label>
-                <input type="text" id="facebookName" placeholder="ระบุชื่อเฟซบุ๊กเพื่อส่งสรุปข้อมูล">
-            </div>
+            <div><label>เช็คอิน</label><input type="date" id="cin" onchange="checkAvailability()"></div>
+            <div><label>เช็คเอาท์</label><input type="date" id="cout" onchange="checkAvailability()"></div>
+        </div>
+        <div class="form-grid" style="margin-top:15px">
+            <div><label>ผู้ใหญ่</label><input type="number" id="adults" value="2" min="1"></div>
+            <div><label>เด็ก (4-10 ปี)</label><input type="number" id="kidsOver4" value="0" min="0"></div>
+            <div><label>เด็กเล็ก (< 4 ปี / พักฟรี)</label><input type="number" id="kidsUnder4" value="0" min="0"></div>
+            <div><label>สัตว์เลี้ยง</label><select id="pets"><option>ไม่มี</option><option>มี</option></select></div>
         </div>
     </div>
 
     <div class="card">
-        <div class="section-title">📅 เลือกวันเข้าพัก</div>
-        <div class="form-grid">
-            <div class="form-group">
-                <label>เช็คอิน (Check-in)</label>
-                <input type="date" id="checkinDate">
-            </div>
-            <div class="form-group">
-                <label>เช็คเอาท์ (Check-out)</label>
-                <input type="date" id="checkoutDate">
-            </div>
-        </div>
-    </div>
-
-    <div class="card">
-        <div class="section-title">🛏️ เลือกห้องพัก</div>
+        <div class="section-title">🛏️ 2. เลือกห้องพัก (เช็คสถานะว่างจริง)</div>
         <div class="room-grid">
             <div class="room-item">
-                <div class="video-box">
-                    <video autoplay muted loop playsinline poster="images/images/std-1.jpg">
-                        <source src="images/images/std-1.mp4" type="video/mp4">
-                    </video>
-                </div>
-                <div class="room-info">
-                    <div class="room-name">Standard Room</div>
-                    <div class="qty-wrap">
-                        <button class="btn-qty" onclick="changeQty('standardQty', -1)">-</button>
-                        <span class="qty-val" id="standardQty">0</span>
-                        <button class="btn-qty" onclick="changeQty('standardQty', 1)">+</button>
-                    </div>
-                </div>
+                <div class="video-box"><video autoplay muted loop playsinline poster="images/images/std-1.jpg"><source src="images/images/std-1.mp4" type="video/mp4"></video></div>
+                <div class="room-info"><span class="avail-tag" id="stdAvail">โปรดเลือกวันที่...</span><div class="room-name">Standard</div>
+                <div class="qty-wrap"><button class="btn-qty" onclick="changeQty('std', -1)">-</button><span id="stdQty">0</span><button class="btn-qty" onclick="changeQty('std', 1)">+</button></div></div>
             </div>
             <div class="room-item">
-                <div class="video-box">
-                    <video autoplay muted loop playsinline poster="images/images/jac-1.jpg">
-                        <source src="images/images/jac-1.mp4" type="video/mp4">
-                    </video>
-                </div>
-                <div class="room-info">
-                    <div class="room-name">Jacuzzi Room</div>
-                    <div class="qty-wrap">
-                        <button class="btn-qty" onclick="changeQty('jacuzziQty', -1)">-</button>
-                        <span class="qty-val" id="jacuzziQty">0</span>
-                        <button class="btn-qty" onclick="changeQty('jacuzziQty', 1)">+</button>
-                    </div>
-                </div>
+                <div class="video-box"><video autoplay muted loop playsinline poster="images/images/jac-1.jpg"><source src="images/images/jac-1.mp4" type="video/mp4"></video></div>
+                <div class="room-info"><span class="avail-tag" id="jacAvail">โปรดเลือกวันที่...</span><div class="room-name">Jacuzzi</div>
+                <div class="qty-wrap"><button class="btn-qty" onclick="changeQty('jac', -1)">-</button><span id="jacQty">0</span><button class="btn-qty" onclick="changeQty('jac', 1)">+</button></div></div>
             </div>
             <div class="room-item">
-                <div class="video-box">
-                    <video autoplay muted loop playsinline poster="images/images/fam-1.jpg">
-                        <source src="images/images/fam-1.mp4" type="video/mp4">
-                    </video>
-                </div>
-                <div class="room-info">
-                    <div class="room-name">Family Room</div>
-                    <div class="qty-wrap">
-                        <button class="btn-qty" onclick="changeQty('familyQty', -1)">-</button>
-                        <span class="qty-val" id="familyQty">0</span>
-                        <button class="btn-qty" onclick="changeQty('familyQty', 1)">+</button>
-                    </div>
-                </div>
+                <div class="video-box"><video autoplay muted loop playsinline poster="images/images/fam-1.jpg"><source src="images/images/fam-1.mp4" type="video/mp4"></video></div>
+                <div class="room-info"><span class="avail-tag" id="famAvail">โปรดเลือกวันที่...</span><div class="room-name">Family</div>
+                <div class="qty-wrap"><button class="btn-qty" onclick="changeQty('fam', -1)">-</button><span id="famQty">0</span><button class="btn-qty" onclick="changeQty('fam', 1)">+</button></div></div>
             </div>
             <div class="room-item">
-                <div class="video-box">
-                    <video autoplay muted loop playsinline poster="images/images/sea-1.jpg">
-                        <source src="images/images/sea-1.mp4" type="video/mp4">
-                    </video>
-                </div>
-                <div class="room-info">
-                    <div class="room-name">Sea View Room</div>
-                    <div class="qty-wrap">
-                        <button class="btn-qty" onclick="changeQty('seaQty', -1)">-</button>
-                        <span class="qty-val" id="seaQty">0</span>
-                        <button class="btn-qty" onclick="changeQty('seaQty', 1)">+</button>
-                    </div>
-                </div>
+                <div class="video-box"><video autoplay muted loop playsinline poster="images/images/sea-1.jpg"><source src="images/images/sea-1.mp4" type="video/mp4"></video></div>
+                <div class="room-info"><span class="avail-tag" id="seaAvail">โปรดเลือกวันที่...</span><div class="room-name">Sea View</div>
+                <div class="qty-wrap"><button class="btn-qty" onclick="changeQty('sea', -1)">-</button><span id="seaQty">0</span><button class="btn-qty" onclick="changeQty('sea', 1)">+</button></div></div>
             </div>
         </div>
     </div>
 
     <div class="card">
-        <div class="section-title">🛵 บริการเพิ่มเติม</div>
-        <label class="service-item">
-            <input type="checkbox" id="motorbikeService">
-            <span>เช่ามอเตอร์ไซค์ (300.- / วัน)</span>
-        </label>
+        <div class="section-title">👤 3. ข้อมูลผู้ติดต่อ</div>
+        <div class="form-grid">
+            <div><label>ชื่อผู้ติดต่อ (ดึงอัตโนมัติ)</label><input type="text" id="name" placeholder="กำลังดึงข้อมูล..."></div>
+            <div><label>เบอร์โทรศัพท์</label><input type="tel" id="phone" placeholder="08x-xxx-xxxx"></div>
+        </div>
+        <div class="form-grid" style="margin-top:15px">
+            <div><label>เวลาเดินทางถึง</label><input type="time" id="arrival"></div>
+            <div><label>เดินทางโดย</label><select id="travel"><option>รถส่วนตัว</option><option>รถสาธารณะ</option></select></div>
+        </div>
+        <div style="margin-top:15px"><label><input type="checkbox" id="motorbike"> 🛵 เช่ามอเตอร์ไซค์ (300.-/วัน)</label></div>
     </div>
 
-    <div style="margin-bottom: 60px;">
-        <button class="btn-submit" id="submitBtn" onclick="submitBooking()">ยืนยันการแจ้งจอง</button>
-        <div class="loading-overlay" id="loadingBox">⌛ กำลังบันทึกข้อมูล...</div>
-    </div>
+    <button class="btn-submit" id="btnSubmit" onclick="submitBooking()">ยืนยันการแจ้งจอง</button>
+    <div id="loading">⌛ กำลังบันทึกข้อมูล...</div>
 </div>
 
 <script>
-    // URL Web App ตัวจริงของคุณทนาย
-    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzKj6d7mAV-9SVvIKHA1SyWMJcUFMQ5241Mz5xWTLMtOaPRQgfQFfdaGOqOHRkrShd5/exec';
+    const APP_URL = 'https://script.google.com/macros/s/AKfycbzKj6d7mAV-9SVvIKHA1SyWMJcUFMQ5241Mz5xWTLMtOaPRQgfQFfdaGOqOHRkrShd5/exec';
+    let selections = { std: 0, jac: 0, fam: 0, sea: 0 };
+    let inv = { std: 0, jac: 0, fam: 0, sea: 0 };
 
-    const roomData = { standardQty: 0, jacuzziQty: 0, familyQty: 0, seaQty: 0 };
+    async function initPage() {
+        const psid = new URLSearchParams(window.location.search).get('psid');
+        if(psid) {
+            const r = await fetch(`${APP_URL}?action=getFBProfile&psid=${psid}`);
+            const d = await r.json(); if(d.name) document.getElementById('name').value = d.name;
+        } else { document.getElementById('name').placeholder = "กรุณากรอกชื่อผู้ติดต่อ"; }
+    }
 
-    function changeQty(id, val) {
-        roomData[id] = Math.max(0, roomData[id] + val);
-        document.getElementById(id).innerText = roomData[id];
+    async function checkAvailability() {
+        const cin = document.getElementById('cin').value; const cout = document.getElementById('cout').value;
+        if(!cin || !cout) return;
+        document.getElementById('stdAvail').innerText = "เช็คว่าง...";
+        const r = await fetch(`${APP_URL}?action=checkAvailability&cin=${cin}&cout=${cout}`);
+        inv = await r.json();
+        document.getElementById('stdAvail').innerText = `ว่าง ${inv.std} ห้อง`;
+        document.getElementById('jacAvail').innerText = `ว่าง ${inv.jac} ห้อง`;
+        document.getElementById('famAvail').innerText = `ว่าง ${inv.fam} ห้อง`;
+        document.getElementById('seaAvail').innerText = `ว่าง ${inv.sea} ห้อง`;
+    }
+
+    function changeQty(id, v) {
+        if(v > 0 && selections[id] >= inv[id]) { alert("ขออภัยค่ะ ห้องเต็มแล้ว"); return; }
+        selections[id] = Math.max(0, selections[id] + v);
+        document.getElementById(id+'Qty').innerText = selections[id];
     }
 
     async function submitBooking() {
-        const name = document.getElementById('customerName').value;
-        const cin = document.getElementById('checkinDate').value;
-        if(!name || !cin) { alert("กรุณาระบุชื่อและวันที่เช็คอินด้วยนะคะ"); return; }
-
-        document.getElementById('submitBtn').style.display = 'none';
-        document.getElementById('loadingBox').style.display = 'block';
-
-        // ดึง Facebook PSID เพื่อใช้ส่งข้อความกลับ
-        const psid = new URLSearchParams(window.location.search).get('psid');
+        const name = document.getElementById('name').value;
+        if(!name || !document.getElementById('cin').value) { alert("กรุณาระบุชื่อและวันที่ค่ะ"); return; }
+        document.getElementById('btnSubmit').style.display = 'none';
+        document.getElementById('loading').style.display = 'block';
 
         const payload = {
-            action: "advancedBooking", //
-            psid: psid, // ส่งรหัสลับลูกค้ารายนี้กลับไปด้วยครับ
-            customerName: name,
-            phone: document.getElementById('phone').value,
-            facebook: document.getElementById('facebookName').value,
-            checkinDate: cin,
-            checkoutDate: document.getElementById('checkoutDate').value,
-            standardRoom: roomData.standardQty,
-            jacuzziRoom: roomData.jacuzziQty,
-            familyRoom: roomData.familyQty,
-            seaRoom: roomData.seaQty,
-            motorbike: document.getElementById('motorbikeService').checked,
-            bookingStatus: 'Pending',
-            specialRequest: "จองผ่านดีไซน์อัลบั้มสุดหรู"
+            action: "advancedBooking", psid: new URLSearchParams(window.location.search).get('psid'),
+            customerName: name, phone: document.getElementById('phone').value, facebook: name,
+            checkinDate: document.getElementById('cin').value, checkoutDate: document.getElementById('cout').value,
+            adults: document.getElementById('adults').value, kidsOver4: document.getElementById('kidsOver4').value,
+            kidsUnder4: document.getElementById('kidsUnder4').value, pets: document.getElementById('pets').value,
+            arrivalTime: document.getElementById('arrival').value, travelBy: document.getElementById('travel').value,
+            standardRoom: selections.std, jacuzziRoom: selections.jac, familyRoom: selections.fam, seaRoom: selections.sea,
+            motorbike: document.getElementById('motorbike').checked
         };
 
-        try {
-            await fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) });
-            alert("✅ ส่งข้อมูลสำเร็จ! ระบบกำลังส่งสรุปเข้าแชท Facebook ของคุณนะคะ");
-            location.reload();
-        } catch(e) {
-            alert("❌ เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้งค่ะ");
-            document.getElementById('submitBtn').style.display = 'block';
-            document.getElementById('loadingBox').style.display = 'none';
-        }
+        await fetch(APP_URL, { method: 'POST', body: JSON.stringify(payload) });
+        alert("✅ แจ้งจองเรียบร้อย! ตรวจสอบสรุปในแชทเฟซบุ๊กนะคะ"); location.reload();
     }
 </script>
+</body>
+</html>
 </body>
 </html>
