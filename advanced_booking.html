@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reservation - SN Kohlarn</title>
+    <title>Luxury Booking - SN Kohlarn</title>
     <link href="https://fonts.googleapis.com/css2?family=Prata&family=Sarabun:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         :root { --navy: #1A365D; --cream: #FAF0E6; --gold: #C5A059; }
@@ -16,7 +16,7 @@
         .section-title { font-size: 19px; font-weight: 600; margin-bottom: 20px; border-bottom: 1.5px solid var(--gold); padding-bottom: 8px; }
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         @media (max-width: 500px) { .form-grid { grid-template-columns: 1fr; } }
-        input, select { width: 100%; padding: 13px; border: 1.5px solid var(--navy); border-radius: 12px; margin-top: 5px; }
+        input, select { width: 100%; padding: 13px; border: 1.5px solid var(--navy); border-radius: 12px; margin-top: 5px; background: #fff; }
         .room-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
         .room-item { border: 2px solid var(--navy); border-radius: 18px; overflow: hidden; background: white; }
         .video-box { width: 100%; height: 160px; background: #000; }
@@ -24,14 +24,15 @@
         .room-info { padding: 18px; text-align: center; }
         .avail-tag { font-size: 13px; font-weight: bold; color: var(--gold); margin-bottom: 8px; display: block; }
         .qty-wrap { display: flex; align-items: center; justify-content: center; gap: 18px; margin-top: 12px; }
-        .btn-qty { width: 40px; height: 40px; border-radius: 50%; border: 1.5px solid var(--navy); background: white; cursor: pointer; font-size: 20px; color: var(--navy); }
+        .btn-qty { width: 40px; height: 40px; border-radius: 50%; border: 1.5px solid var(--navy); background: white; cursor: pointer; font-size: 20px; }
         .btn-submit { width: 100%; padding: 22px; border-radius: 18px; border: none; background: var(--navy); color: white; font-size: 20px; cursor: pointer; margin-top: 20px; box-shadow: 0 10px 20px rgba(26,54,93,0.3); }
-        #loading { display: none; text-align: center; padding: 20px; font-weight: bold; color: var(--navy); }
+        .btn-submit:disabled { background: #ccc; cursor: not-allowed; box-shadow: none; }
+        #capWarning { color: #dc2626; font-size: 14px; font-weight: bold; margin-top: 15px; text-align: center; display: none; background: #fee2e2; padding: 10px; border-radius: 10px; }
     </style>
 </head>
 <body onload="initPage()">
 <div class="container">
-    <div class="header"><h1>SN KOHLARN</h1><p>LUXURY RESERVATION</p></div>
+    <div class="header"><h1>SN KOHLARN</h1><p>RESERVATION SYSTEM</p></div>
 
     <div class="card">
         <div class="section-title">📅 1. วันที่และจำนวนผู้เข้าพัก</div>
@@ -40,54 +41,51 @@
             <div><label>เช็คเอาท์</label><input type="date" id="cout" onchange="checkAvailability()"></div>
         </div>
         <div class="form-grid" style="margin-top:15px">
-            <div><label>ผู้ใหญ่</label><input type="number" id="adults" value="2" min="1"></div>
-            <div><label>เด็ก (4-10 ปี)</label><input type="number" id="kidsOver4" value="0" min="0"></div>
-            <div><label>เด็กเล็ก (< 4 ปี / พักฟรี)</label><input type="number" id="kidsUnder4" value="0" min="0"></div>
-            <div><label>สัตว์เลี้ยง</label><select id="pets"><option>ไม่มี</option><option>มี</option></select></div>
+            <div><label>ผู้ใหญ่</label><input type="number" id="adults" value="2" min="1" onchange="validateCapacity()"></div>
+            <div><label>เด็ก (4-10 ปี)</label><input type="number" id="kidsOver4" value="0" min="0" onchange="validateCapacity()"></div>
+            <div><label>เด็กเล็ก (< 4 ปี / ฟรี)</label><input type="number" id="kidsUnder4" value="0" min="0"></div>
+            <div><label>สัตว์เลี้ยง</label><select id="pets"><option>ไม่มี</option><option>มี (แจ้งในแชท)</option></select></div>
         </div>
     </div>
 
     <div class="card">
-        <div class="section-title">🛏️ 2. เลือกห้องพัก (เช็คสถานะว่างจริง)</div>
+        <div class="section-title">🛏️ 2. เลือกห้องพัก</div>
         <div class="room-grid">
             <div class="room-item">
                 <div class="video-box"><video autoplay muted loop playsinline poster="images/images/std-1.jpg"><source src="images/images/std-1.mp4" type="video/mp4"></video></div>
-                <div class="room-info"><span class="avail-tag" id="stdAvail">โปรดเลือกวันที่...</span><div class="room-name">Standard</div>
-                <div class="qty-wrap"><button class="btn-qty" onclick="changeQty('std', -1)">-</button><span id="stdQty">0</span><button class="btn-qty" onclick="changeQty('std', 1)">+</button></div></div>
+                <div class="room-info"><span class="avail-tag" id="stdAvail">โปรดเลือกวันที่...</span><div class="room-name">Standard (พักได้ 2)</div>
+                <div class="qty-wrap"><button class="btn-qty" onclick="changeQty('std', -1)">-</button><span id="stdQty" style="font-weight:bold; font-size:18px;">0</span><button class="btn-qty" onclick="changeQty('std', 1)">+</button></div></div>
             </div>
             <div class="room-item">
                 <div class="video-box"><video autoplay muted loop playsinline poster="images/images/jac-1.jpg"><source src="images/images/jac-1.mp4" type="video/mp4"></video></div>
-                <div class="room-info"><span class="avail-tag" id="jacAvail">โปรดเลือกวันที่...</span><div class="room-name">Jacuzzi</div>
-                <div class="qty-wrap"><button class="btn-qty" onclick="changeQty('jac', -1)">-</button><span id="jacQty">0</span><button class="btn-qty" onclick="changeQty('jac', 1)">+</button></div></div>
+                <div class="room-info"><span class="avail-tag" id="jacAvail">โปรดเลือกวันที่...</span><div class="room-name">Jacuzzi (พักได้ 2)</div>
+                <div class="qty-wrap"><button class="btn-qty" onclick="changeQty('jac', -1)">-</button><span id="jacQty" style="font-weight:bold; font-size:18px;">0</span><button class="btn-qty" onclick="changeQty('jac', 1)">+</button></div></div>
             </div>
             <div class="room-item">
                 <div class="video-box"><video autoplay muted loop playsinline poster="images/images/fam-1.jpg"><source src="images/images/fam-1.mp4" type="video/mp4"></video></div>
-                <div class="room-info"><span class="avail-tag" id="famAvail">โปรดเลือกวันที่...</span><div class="room-name">Family</div>
-                <div class="qty-wrap"><button class="btn-qty" onclick="changeQty('fam', -1)">-</button><span id="famQty">0</span><button class="btn-qty" onclick="changeQty('fam', 1)">+</button></div></div>
+                <div class="room-info"><span class="avail-tag" id="famAvail">โปรดเลือกวันที่...</span><div class="room-name">Family (พักได้ 4)</div>
+                <div class="qty-wrap"><button class="btn-qty" onclick="changeQty('fam', -1)">-</button><span id="famQty" style="font-weight:bold; font-size:18px;">0</span><button class="btn-qty" onclick="changeQty('fam', 1)">+</button></div></div>
             </div>
             <div class="room-item">
                 <div class="video-box"><video autoplay muted loop playsinline poster="images/images/sea-1.jpg"><source src="images/images/sea-1.mp4" type="video/mp4"></video></div>
-                <div class="room-info"><span class="avail-tag" id="seaAvail">โปรดเลือกวันที่...</span><div class="room-name">Sea View</div>
-                <div class="qty-wrap"><button class="btn-qty" onclick="changeQty('sea', -1)">-</button><span id="seaQty">0</span><button class="btn-qty" onclick="changeQty('sea', 1)">+</button></div></div>
+                <div class="room-info"><span class="avail-tag" id="seaAvail">โปรดเลือกวันที่...</span><div class="room-name">Sea View (พักได้ 2)</div>
+                <div class="qty-wrap"><button class="btn-qty" onclick="changeQty('sea', -1)">-</button><span id="seaQty" style="font-weight:bold; font-size:18px;">0</span><button class="btn-qty" onclick="changeQty('sea', 1)">+</button></div></div>
             </div>
         </div>
+        <div id="capWarning">⚠️ จำนวนห้องที่เลือก ไม่เพียงพอต่อจำนวนผู้เข้าพักค่ะ</div>
     </div>
 
     <div class="card">
         <div class="section-title">👤 3. ข้อมูลผู้ติดต่อ</div>
         <div class="form-grid">
-            <div><label>ชื่อผู้ติดต่อ (ดึงอัตโนมัติ)</label><input type="text" id="name" placeholder="กำลังดึงข้อมูล..."></div>
+            <div><label>ชื่อผู้ติดต่อ</label><input type="text" id="name" placeholder="กำลังดึงชื่อ..."></div>
             <div><label>เบอร์โทรศัพท์</label><input type="tel" id="phone" placeholder="08x-xxx-xxxx"></div>
         </div>
-        <div class="form-grid" style="margin-top:15px">
-            <div><label>เวลาเดินทางถึง</label><input type="time" id="arrival"></div>
-            <div><label>เดินทางโดย</label><select id="travel"><option>รถส่วนตัว</option><option>รถสาธารณะ</option></select></div>
-        </div>
-        <div style="margin-top:15px"><label><input type="checkbox" id="motorbike"> 🛵 เช่ามอเตอร์ไซค์ (300.-/วัน)</label></div>
+        <div style="margin-top:15px"><label>เวลาถึงโดยประมาณ</label><input type="time" id="arrival"></div>
+        <div style="margin-top:15px"><label><input type="checkbox" id="motorbike"> 🛵 ต้องการเช่ามอเตอร์ไซค์ (300.-/วัน)</label></div>
     </div>
 
     <button class="btn-submit" id="btnSubmit" onclick="submitBooking()">ยืนยันการแจ้งจอง</button>
-    <div id="loading">⌛ กำลังบันทึกข้อมูล...</div>
 </div>
 
 <script>
@@ -100,13 +98,13 @@
         if(psid) {
             const r = await fetch(`${APP_URL}?action=getFBProfile&psid=${psid}`);
             const d = await r.json(); if(d.name) document.getElementById('name').value = d.name;
-        } else { document.getElementById('name').placeholder = "กรุณากรอกชื่อผู้ติดต่อ"; }
+        }
     }
 
     async function checkAvailability() {
         const cin = document.getElementById('cin').value; const cout = document.getElementById('cout').value;
         if(!cin || !cout) return;
-        document.getElementById('stdAvail').innerText = "เช็คว่าง...";
+        document.querySelectorAll('.avail-tag').forEach(el => el.innerText = "กำลังเช็ค...");
         const r = await fetch(`${APP_URL}?action=checkAvailability&cin=${cin}&cout=${cout}`);
         inv = await r.json();
         document.getElementById('stdAvail').innerText = `ว่าง ${inv.std} ห้อง`;
@@ -119,30 +117,54 @@
         if(v > 0 && selections[id] >= inv[id]) { alert("ขออภัยค่ะ ห้องเต็มแล้ว"); return; }
         selections[id] = Math.max(0, selections[id] + v);
         document.getElementById(id+'Qty').innerText = selections[id];
+        validateCapacity();
+    }
+
+    // 🌟 ระบบตรวจสอบจำนวนคนเข้าพัก (Hard Validation)
+    function validateCapacity() {
+        const adults = parseInt(document.getElementById('adults').value) || 0;
+        const kids = parseInt(document.getElementById('kidsOver4').value) || 0;
+        const totalGuests = adults + kids;
+        const totalCap = (selections.std * 2) + (selections.jac * 2) + (selections.fam * 4) + (selections.sea * 2);
+
+        const warning = document.getElementById('capWarning');
+        const btn = document.getElementById('btnSubmit');
+
+        // ถ้าเลือกห้องแล้วแต่ความจุไม่พอ ให้แจ้งเตือนและล็อคปุ่ม
+        if (totalGuests > totalCap && totalCap > 0) {
+            warning.style.display = 'block';
+            btn.disabled = true;
+        } else {
+            warning.style.display = 'none';
+            btn.disabled = false;
+        }
     }
 
     async function submitBooking() {
-        const name = document.getElementById('name').value;
-        if(!name || !document.getElementById('cin').value) { alert("กรุณาระบุชื่อและวันที่ค่ะ"); return; }
-        document.getElementById('btnSubmit').style.display = 'none';
-        document.getElementById('loading').style.display = 'block';
+        if (!document.getElementById('cin').value) { alert("กรุณาเลือกวันเช็คอินค่ะ"); return; }
+        const totalCap = (selections.std * 2) + (selections.jac * 2) + (selections.fam * 4) + (selections.sea * 2);
+        const guests = (parseInt(document.getElementById('adults').value) || 0) + (parseInt(document.getElementById('kidsOver4').value) || 0);
+        
+        if (totalCap < guests) { alert("⚠️ จำนวนห้องที่เลือกไม่เพียงพอต่อจำนวนคนค่ะ กรุณาเลือกห้องเพิ่ม"); return; }
+        if (totalCap === 0) { alert("⚠️ กรุณาเลือกห้องพักที่ต้องการอย่างน้อย 1 ห้องค่ะ"); return; }
+
+        document.getElementById('btnSubmit').innerText = "⌛ กำลังบันทึก...";
+        document.getElementById('btnSubmit').disabled = true;
 
         const payload = {
             action: "advancedBooking", psid: new URLSearchParams(window.location.search).get('psid'),
-            customerName: name, phone: document.getElementById('phone').value, facebook: name,
-            checkinDate: document.getElementById('cin').value, checkoutDate: document.getElementById('cout').value,
-            adults: document.getElementById('adults').value, kidsOver4: document.getElementById('kidsOver4').value,
-            kidsUnder4: document.getElementById('kidsUnder4').value, pets: document.getElementById('pets').value,
-            arrivalTime: document.getElementById('arrival').value, travelBy: document.getElementById('travel').value,
+            customerName: document.getElementById('name').value, phone: document.getElementById('phone').value,
+            facebook: document.getElementById('name').value, checkinDate: document.getElementById('cin').value,
+            checkoutDate: document.getElementById('cout').value, adults: document.getElementById('adults').value,
+            kidsOver4: document.getElementById('kidsOver4').value, kidsUnder4: document.getElementById('kidsUnder4').value,
+            pets: document.getElementById('pets').value, arrivalTime: document.getElementById('arrival').value,
             standardRoom: selections.std, jacuzziRoom: selections.jac, familyRoom: selections.fam, seaRoom: selections.sea,
-            motorbike: document.getElementById('motorbike').checked
+            motorbike: document.getElementById('motorbike').checked, bookingStatus: 'Pending'
         };
 
         await fetch(APP_URL, { method: 'POST', body: JSON.stringify(payload) });
-        alert("✅ แจ้งจองเรียบร้อย! ตรวจสอบสรุปในแชทเฟซบุ๊กนะคะ"); location.reload();
+        alert("✅ แจ้งจองเรียบร้อย! ระบบส่งสรุปให้ในแชทแล้วค่ะ"); location.reload();
     }
 </script>
-</body>
-</html>
 </body>
 </html>
