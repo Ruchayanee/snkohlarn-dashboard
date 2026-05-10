@@ -156,7 +156,7 @@ body { font-family: 'Sarabun', sans-serif; background: #f4f7f6; color: #333; pad
 <script>
 // ⚠️ ตรงนี้สำคัญที่สุด! ⚠️ 
 // ลบคำว่า YOUR_WEB_APP_URL_HERE ออก แล้วเอาลิงก์ Web App จากสเตปที่ 2 มาวางในเครื่องหมายคำพูดครับ
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzKj6d7mAV-9SVvIKHA1SyWMJcUFMQ5241Mz5xWTLMtOaPRQgfQFfdaGOqOHRkrShd5/exec';
+const GOOGLE_SCRIPT_URL = 'YOUR_WEB_APP_URL_HERE';
 
 const roomCapacity = { standard: 2, jacuzzi: 2, family: 3 };
 const bookingData = { customer: {}, guests: {}, rooms: {}, specialRequest: '' };
@@ -184,6 +184,124 @@ function calculateCapacity() {
 
     document.getElementById('guestSummary').innerHTML = `
         <h3>สรุปการเข้าพัก</h3>
-        <div class="summary-item">
+        <div class="summary-item"><span>ผู้ใหญ่: ${adults} ท่าน | เด็กโต: ${kidLarge} ท่าน</span></div>
+        <div class="summary-item"><span>จำนวนห้องที่เลือก: ${standardQty + jacuzziQty + familyQty} ห้อง</span></div>
+    `;
+}
 
+function validateBooking() {
+    const alertBox = document.getElementById('validationAlert');
+    alertBox.style.display = 'none';
+    
+    if(document.getElementById('customerName').value.trim() === '') { alertBox.innerHTML = 'กรุณากรอกชื่อผู้ติดต่อ'; alertBox.style.display = 'block'; return false; }
+    if(!document.getElementById('checkinDate').value || !document.getElementById('checkoutDate').value) { alertBox.innerHTML = 'กรุณาเลือกวันเข้าพัก'; alertBox.style.display = 'block'; return false; }
+    
+    const totalRooms = parseInt(document.getElementById('standardQty').value) + parseInt(document.getElementById('jacuzziQty').value) + parseInt(document.getElementById('familyQty').value);
+    if(totalRooms <= 0) { alertBox.innerHTML = 'กรุณาเลือกห้องพักอย่างน้อย 1 ห้อง'; alertBox.style.display = 'block'; return false; }
+    
+    return true;
+}
 
+function collectBookingData() {
+    bookingData.customer = { name: document.getElementById('customerName').value, phone: document.getElementById('phone').value, lineId: document.getElementById('lineId').value, facebook: document.getElementById('facebookName').value };
+    bookingData.guests = { adults: document.getElementById('adultCount').value, kidsSmall: document.getElementById('kidSmall').value, kidsLarge: document.getElementById('kidLarge').value, pet: document.getElementById('petStatus').value };
+    bookingData.rooms = { standard: document.getElementById('standardQty').value, jacuzzi: document.getElementById('jacuzziQty').value, family: document.getElementById('familyQty').value };
+    bookingData.specialRequest = document.getElementById('specialRequest').value;
+    bookingData.checkinDate = document.getElementById('checkinDate').value;
+    bookingData.checkoutDate = document.getElementById('checkoutDate').value;
+}
+
+async function checkAvailability(checkin, checkout, requestedRooms) {
+    try {
+        const response = await fetch(`${GOOGLE_SCRIPT_URL}?action=getBookedRoomsDict`);
+        const bookedRooms = await response.json();
+        const TOTAL_ROOMS = 10; // สมมติว่ารีสอร์ตมี 10 ห้องทั้งหมด (สามารถแก้ไขตัวเลขนี้ได้ครับ)
+        let isAvailable = true;
+        let cur = new Date(checkin);
+        while (cur < new Date(checkout)) {
+            let dateStr = cur.toISOString().split('T')[0];
+            let bookedOnDate = bookedRooms[dateStr] ? bookedRooms[dateStr].length : 0;
+            if ((TOTAL_ROOMS - bookedOnDate) < requestedRooms) { isAvailable = false; break; }
+            cur.setDate(cur.getDate() + 1);
+        }
+        return isAvailable;
+    } catch(e) { return true; } // ถ้าเช็คไม่ได้ให้ปล่อยผ่านไปก่อนให้แอดมินเช็คเอง
+}
+
+async function submitBooking() {
+    if(!validateBooking()) return;
+
+    document.getElementById('loadingBox').style.display = 'block';
+    document.getElementById('submitBtn').style.display = 'none';
+    
+    const checkin = document.getElementById('checkinDate').value;
+    const checkout = document.getElementById('checkoutDate').value;
+    const totalRooms = parseInt(document.getElementById('standardQty').value) + parseInt(document.getElementById('jacuzziQty').value) + parseInt(document.getElementById('familyQty').value);
+
+    // 1. เช็คห้องว่างก่อน
+    const available = await checkAvailability(checkin, checkout, totalRooms);
+    if (!available) {
+        document.getElementById('loadingBox').style.display = 'none';
+        document.getElementById('submitBtn').style.display = 'block';
+        const alertBox = document.getElementById('roomAlert');
+        alertBox.style.display = 'block';
+        alertBox.innerHTML = "⚠️ ขออภัยค่ะ ห้องพักในวันที่ท่านเลือกเต็มแล้ว กรุณาเลือกวันอื่นนะคะ";
+        return;
+    }
+
+    collectBookingData();
+
+    // 2. ดึง PSID จาก URL (สำคัญมากเพื่อให้เด้งกลับเข้าแชท Facebook)
+    const urlParams = new URLSearchParams(window.location.search);
+    const psid = urlParams.get('psid');
+
+    const payload = {
+        action: "advancedBooking",
+        psid: psid,
+        customerName: bookingData.customer.name,
+        phone: bookingData.customer.phone,
+        lineId: bookingData.customer.lineId,
+        facebook: bookingData.customer.facebook,
+        checkinDate: bookingData.checkinDate,
+        checkoutDate: bookingData.checkoutDate,
+        adults: bookingData.guests.adults,
+        kidsSmall: bookingData.guests.kidsSmall,
+        kidsLarge: bookingData.guests.kidsLarge,
+        pet: bookingData.guests.pet,
+        standardRoom: bookingData.rooms.standard,
+        jacuzziRoom: bookingData.rooms.jacuzzi,
+        familyRoom: bookingData.rooms.family,
+        specialRequest: bookingData.specialRequest,
+        bookingStatus: 'Pending'
+    };
+
+    // 3. ส่งข้อมูลไปที่ Google Sheets
+    try {
+        const response = await fetch(GOOGLE_SCRIPT_URL, {
+            method: 'POST',
+            body: JSON.stringify(payload)
+        });
+        const result = await response.json();
+        
+        document.getElementById('loadingBox').style.display = 'none';
+        if(result.status === 'success') {
+            document.getElementById('successAlert').style.display = 'block';
+            document.getElementById('successAlert').innerHTML = `✅ ส่งข้อมูลสำเร็จ! ระบบได้ส่งข้อมูลไปยังแชท Facebook ของท่านแล้วค่ะ`;
+        }
+    } catch(error) {
+        document.getElementById('loadingBox').style.display = 'none';
+        document.getElementById('submitBtn').style.display = 'block';
+        alert("เกิดข้อผิดพลาดในการเชื่อมต่อ กรุณาลองใหม่อีกครั้ง");
+    }
+}
+
+window.onload = function() {
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('checkinDate').min = today;
+    document.getElementById('checkoutDate').min = today;
+    document.getElementById('checkinDate').addEventListener('change', function() { document.getElementById('checkoutDate').min = this.value; });
+    calculateCapacity();
+};
+</script>
+</body>
+</html>
