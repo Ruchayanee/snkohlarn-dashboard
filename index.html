@@ -5,11 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SN Koh Larn - Super App</title>
     
-    <!-- เพิ่มโลโก้ตรงนี้ครับ -->
     <link rel="apple-touch-icon" href="https://i.postimg.cc/K8NJswRQ/SN-LOGOAPP.jpg">
     <link rel="icon" type="image/jpeg" href="https://i.postimg.cc/K8NJswRQ/SN-LOGOAPP.jpg">
-    <!-- จบส่วนที่เพิ่ม -->
-
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
         body {
@@ -23,6 +20,7 @@
             margin: 0; 
             text-align: center;
             padding: 20px;
+            position: relative; /* เพิ่มสำหรับจัดตำแหน่งกระดิ่ง */
         }
         .title { color: #a68b6d; font-size: 36px; font-weight: bold; letter-spacing: 2px; margin-bottom: 5px; }
         .subtitle { color: #888; font-size: 16px; margin-bottom: 40px; }
@@ -36,9 +34,38 @@
         .btn-app:active { transform: scale(0.95); }
         .btn-book { background-color: #059669; }
         .btn-dash { background-color: #1e293b; }
+
+        /* 🔔 สไตล์สำหรับกระดิ่งแจ้งเตือน */
+        .bell-container {
+            position: absolute;
+            top: 25px;
+            right: 25px;
+            font-size: 30px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: transform 0.2s;
+        }
+        .bell-container:active { transform: scale(0.9); }
+        .bell-badge {
+            position: absolute;
+            top: -5px;
+            right: -8px;
+            background-color: #ff3b30;
+            color: white;
+            border-radius: 50%;
+            padding: 3px 8px;
+            font-size: 14px;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            display: none; /* ซ่อนไว้ก่อน ถ้ามีสลิปค่อยโชว์ */
+        }
     </style>
 </head>
 <body>
+
+    <a href="dashboard.html" class="bell-container">
+        🔔<span class="bell-badge" id="slipBadge">0</span>
+    </a>
 
     <img src="https://i.postimg.cc/zDw9HWXS/IMG-5036.jpg" alt="SN Kohlarn Logo" style="width: 130px; margin: 0 auto 20px auto; display: block; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
     <div class="title">SN KOH LARN</div>
@@ -46,6 +73,39 @@
 
     <a href="dashboard.html" class="btn-app btn-dash">📊 ระบบบัญชี และ สต๊อก</a>
     <a href="booking.html" class="btn-app btn-book">📝 ระบบการจองห้องพัก</a>
+
+    <script>
+        // 🚨 สำคัญ: นำลิงก์ Web App URL ของไฟล์ "pending order" มาวางในเครื่องหมายคำพูดด้านล่างนี้ครับ
+        const PENDING_API_URL = "นำลิงก์_WEB_APP_URL_มาวางตรงนี้"; 
+
+        function checkPendingSlips() {
+            if(PENDING_API_URL === "นำลิงก์_WEB_APP_URL_มาวางตรงนี้") return;
+
+            fetch(PENDING_API_URL + "?action=getPending")
+                .then(response => response.json())
+                .then(result => {
+                    if (result.status === "success" && result.data) {
+                        // นับเฉพาะรายการที่สถานะเป็น "รอการตรวจสอบ" (ข้อมูลช่องที่ 6 หรือ index 5)
+                        const pendingCount = result.data.filter(row => row[5] === "รอการตรวจสอบ").length;
+                        
+                        const badge = document.getElementById("slipBadge");
+                        if (pendingCount > 0) {
+                            badge.innerText = pendingCount;
+                            badge.style.display = "block"; // โชว์ตัวเลขสีแดง
+                        } else {
+                            badge.style.display = "none"; // ซ่อนถ้าไม่มีสลิปค้าง
+                        }
+                    }
+                })
+                .catch(err => console.log("Error fetching slips:", err));
+        }
+
+        // ดึงข้อมูลครั้งแรกตอนเปิดแอป
+        checkPendingSlips();
+        
+        // ให้ระบบรีเฟรชเช็คสลิปใหม่ทุกๆ 15 วินาที
+        setInterval(checkPendingSlips, 15000); 
+    </script>
 
 </body>
 </html>
