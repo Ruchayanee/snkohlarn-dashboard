@@ -76,10 +76,10 @@
 
     <script>
         // 🚨 สำคัญ: นำลิงก์ Web App URL ของไฟล์ "pending order" มาวางในเครื่องหมายคำพูดด้านล่างนี้ครับ
-        const PENDING_API_URL = "นำลิงก์_WEB_APP_URL_มาวางตรงนี้"; 
+        const PENDING_API_URL = "https://script.google.com/macros/s/AKfycbyLFO7dgjgdeDY5ETh7B_mV-bJG8T_tHnw-a41sOTfw9EKCoknUv2MJ2CP9yVJtL9CbfA/exec"; 
 
         function checkPendingSlips() {
-            if(PENDING_API_URL === "นำลิงก์_WEB_APP_URL_มาวางตรงนี้") return;
+            if(PENDING_API_URL === "https://script.google.com/macros/s/AKfycbyLFO7dgjgdeDY5ETh7B_mV-bJG8T_tHnw-a41sOTfw9EKCoknUv2MJ2CP9yVJtL9CbfA/exec") return;
 
             fetch(PENDING_API_URL + "?action=getPending")
                 .then(response => response.json())
