@@ -24,16 +24,16 @@
         }
         .subtitle { 
             color: #777; 
-            font-size: 22px; /* ขยายขนาดตัวหนังสือให้ใหญ่ขึ้น */
-            margin-top: -55px; /* ปรับให้ชิดโลโก้ขึ้นไปอีกมาก */
-            margin-bottom: 12px; /* ระยะห่างก่อนถึงปุ่ม */
+            font-size: 22px; 
+            margin-top: -55px; /* ชิดโลโก้ขึ้นไป */
+            margin-bottom: 12px; 
             letter-spacing: 0.5px;
-            font-weight: 600; /* เพิ่มความหนาให้ดูชัดเจน */
+            font-weight: 600; 
         }
         .btn-app {
             display: flex; align-items: center; justify-content: center; gap: 12px;
             width: 100%; max-width: 380px; padding: 24px; margin-bottom: 14px; 
-            font-size: 22px; /* ขยายขนาดตัวหนังสือในปุ่ม */
+            font-size: 22px; 
             font-weight: bold; color: white; text-decoration: none;
             border-radius: 22px; box-shadow: 0 10px 20px rgba(0,0,0,0.1);
             transition: 0.3s;
@@ -52,7 +52,6 @@
             text-decoration: none;
             transition: transform 0.2s;
         }
-        .bell-container:active { transform: scale(0.9); }
         .bell-badge {
             position: absolute;
             top: -5px;
@@ -70,19 +69,21 @@
 </head>
 <body>
 
-    <!-- กระดิ่งแจ้งเตือน -->
+    <!-- ปุ่มกระดิ่ง (ทางลัดตรวจสอบการโอน) -->
     <a href="dashboard.html?tab=verify" class="bell-container">
         🔔<span class="bell-badge" id="slipBadge">0</span>
     </a>
 
-    <!-- โลโก้ขนาดใหญ่ 320px -->
+    <!-- โลโก้ SN Kohlarn -->
     <img src="https://i.postimg.cc/zDw9HWXS/IMG-5036.jpg" alt="SN Kohlarn Logo" style="width: 320px; max-width: 95vw; margin: 0 auto 0 auto; display: block; mix-blend-mode: multiply;">
     
-    <!-- ข้อความ Super App ปรับให้ใหญ่และชิดขึ้น -->
     <div class="subtitle">Super App Management System</div>
 
+    <!-- เมนูหลัก -->
     <a href="dashboard.html" class="btn-app btn-dash">📊 ระบบบัญชี และ สต๊อก</a>
     <a href="booking.html" class="btn-app btn-book">📝 ระบบการจองห้องพัก</a>
+    
+    <!-- ปุ่มตรวจสอบการโอน (ต้องส่งค่า ?tab=verify ไปด้วย) -->
     <a href="dashboard.html?tab=verify" class="btn-app btn-verify">🔔 ตรวจสอบการโอนเงิน</a>
 
     <script>
@@ -90,7 +91,6 @@
 
         async function checkPendingSlips() {
             if(!PENDING_API_URL) return;
-
             try {
                 const response = await fetch(PENDING_API_URL + "?action=getPending");
                 const result = await response.json();
@@ -104,14 +104,11 @@
                         badge.style.display = "none";
                     }
                 }
-            } catch (err) {
-                console.log("Error fetching slips:", err);
-            }
+            } catch (err) { console.log(err); }
         }
 
         checkPendingSlips();
         setInterval(checkPendingSlips, 15000); 
     </script>
-
 </body>
 </html>
