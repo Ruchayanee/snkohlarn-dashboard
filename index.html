@@ -7,7 +7,7 @@
     
     <link rel="apple-touch-icon" href="https://i.postimg.cc/K8NJswRQ/SN-LOGOAPP.jpg">
     <link rel="icon" type="image/jpeg" href="https://i.postimg.cc/K8NJswRQ/SN-LOGOAPP.jpg">
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Kanit', sans-serif; 
@@ -16,31 +16,38 @@
             flex-direction: column; 
             justify-content: center; 
             align-items: center; 
-            height: 100vh; 
+            min-height: 100vh; 
             margin: 0; 
             text-align: center;
             padding: 20px;
-            position: relative; /* เพิ่มสำหรับจัดตำแหน่งกระดิ่ง */
+            position: relative;
         }
-        .title { color: #a68b6d; font-size: 36px; font-weight: bold; letter-spacing: 2px; margin-bottom: 5px; }
-        .subtitle { color: #888; font-size: 16px; margin-bottom: 40px; }
+        .subtitle { 
+            color: #777; 
+            font-size: 22px; /* ขยายขนาดตัวหนังสือให้ใหญ่ขึ้น */
+            margin-top: -55px; /* ปรับให้ชิดโลโก้ขึ้นไปอีกมาก */
+            margin-bottom: 12px; /* ระยะห่างก่อนถึงปุ่ม */
+            letter-spacing: 0.5px;
+            font-weight: 600; /* เพิ่มความหนาให้ดูชัดเจน */
+        }
         .btn-app {
-            display: flex; align-items: center; justify-content: center; gap: 10px;
-            width: 100%; max-width: 350px; padding: 25px; margin-bottom: 20px;
-            font-size: 20px; font-weight: bold; color: white; text-decoration: none;
-            border-radius: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            display: flex; align-items: center; justify-content: center; gap: 12px;
+            width: 100%; max-width: 380px; padding: 24px; margin-bottom: 14px; 
+            font-size: 22px; /* ขยายขนาดตัวหนังสือในปุ่ม */
+            font-weight: bold; color: white; text-decoration: none;
+            border-radius: 22px; box-shadow: 0 10px 20px rgba(0,0,0,0.1);
             transition: 0.3s;
         }
         .btn-app:active { transform: scale(0.95); }
         .btn-book { background-color: #059669; }
+        .btn-verify { background-color: #f39c12; } 
         .btn-dash { background-color: #1e293b; }
 
-        /* 🔔 สไตล์สำหรับกระดิ่งแจ้งเตือน */
         .bell-container {
             position: absolute;
             top: 25px;
             right: 25px;
-            font-size: 30px;
+            font-size: 32px;
             cursor: pointer;
             text-decoration: none;
             transition: transform 0.2s;
@@ -53,57 +60,56 @@
             background-color: #ff3b30;
             color: white;
             border-radius: 50%;
-            padding: 3px 8px;
-            font-size: 14px;
+            padding: 4px 10px;
+            font-size: 16px;
             font-weight: bold;
             box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-            display: none; /* ซ่อนไว้ก่อน ถ้ามีสลิปค่อยโชว์ */
+            display: none;
         }
     </style>
 </head>
 <body>
 
-    <a href="dashboard.html" class="bell-container">
+    <!-- กระดิ่งแจ้งเตือน -->
+    <a href="dashboard.html?tab=verify" class="bell-container">
         🔔<span class="bell-badge" id="slipBadge">0</span>
     </a>
 
-    <img src="https://i.postimg.cc/zDw9HWXS/IMG-5036.jpg" alt="SN Kohlarn Logo" style="width: 130px; margin: 0 auto 20px auto; display: block; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
-    <div class="title">SN KOH LARN</div>
+    <!-- โลโก้ขนาดใหญ่ 320px -->
+    <img src="https://i.postimg.cc/zDw9HWXS/IMG-5036.jpg" alt="SN Kohlarn Logo" style="width: 320px; max-width: 95vw; margin: 0 auto 0 auto; display: block; mix-blend-mode: multiply;">
+    
+    <!-- ข้อความ Super App ปรับให้ใหญ่และชิดขึ้น -->
     <div class="subtitle">Super App Management System</div>
 
     <a href="dashboard.html" class="btn-app btn-dash">📊 ระบบบัญชี และ สต๊อก</a>
     <a href="booking.html" class="btn-app btn-book">📝 ระบบการจองห้องพัก</a>
+    <a href="dashboard.html?tab=verify" class="btn-app btn-verify">🔔 ตรวจสอบการโอนเงิน</a>
 
     <script>
-        // 🚨 สำคัญ: นำลิงก์ Web App URL ของไฟล์ "pending order" มาวางในเครื่องหมายคำพูดด้านล่างนี้ครับ
         const PENDING_API_URL = "https://script.google.com/macros/s/AKfycbyLFO7dgjgdeDY5ETh7B_mV-bJG8T_tHnw-a41sOTfw9EKCoknUv2MJ2CP9yVJtL9CbfA/exec"; 
 
-        function checkPendingSlips() {
-            if(PENDING_API_URL === "https://script.google.com/macros/s/AKfycbyLFO7dgjgdeDY5ETh7B_mV-bJG8T_tHnw-a41sOTfw9EKCoknUv2MJ2CP9yVJtL9CbfA/exec") return;
+        async function checkPendingSlips() {
+            if(!PENDING_API_URL) return;
 
-            fetch(PENDING_API_URL + "?action=getPending")
-                .then(response => response.json())
-                .then(result => {
-                    if (result.status === "success" && result.data) {
-                        // นับเฉพาะรายการที่สถานะเป็น "รอการตรวจสอบ" (ข้อมูลช่องที่ 6 หรือ index 5)
-                        const pendingCount = result.data.filter(row => row[5] === "รอการตรวจสอบ").length;
-                        
-                        const badge = document.getElementById("slipBadge");
-                        if (pendingCount > 0) {
-                            badge.innerText = pendingCount;
-                            badge.style.display = "block"; // โชว์ตัวเลขสีแดง
-                        } else {
-                            badge.style.display = "none"; // ซ่อนถ้าไม่มีสลิปค้าง
-                        }
+            try {
+                const response = await fetch(PENDING_API_URL + "?action=getPending");
+                const result = await response.json();
+                if (result.status === "success" && result.data) {
+                    const pendingCount = result.data.filter(row => row[5] === "รอการตรวจสอบ").length;
+                    const badge = document.getElementById("slipBadge");
+                    if (pendingCount > 0) {
+                        badge.innerText = pendingCount;
+                        badge.style.display = "block";
+                    } else {
+                        badge.style.display = "none";
                     }
-                })
-                .catch(err => console.log("Error fetching slips:", err));
+                }
+            } catch (err) {
+                console.log("Error fetching slips:", err);
+            }
         }
 
-        // ดึงข้อมูลครั้งแรกตอนเปิดแอป
         checkPendingSlips();
-        
-        // ให้ระบบรีเฟรชเช็คสลิปใหม่ทุกๆ 15 วินาที
         setInterval(checkPendingSlips, 15000); 
     </script>
 
