@@ -9,7 +9,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;700&display=swap');
-        body { font-family: 'Sarabun', sans-serif; background-color: #f1f5f9; }
+        body { font-family: 'Sarabun', sans-serif; background-color: #f1f5f slate; }
         .resort-map { position: relative; width: 100%; max-width: 500px; aspect-ratio: 4 / 5; margin: 0 auto; background-color: #fff; border: 2px solid #e2e8f0; border-radius: 20px; overflow: hidden; }
         .room-overlay { position: absolute; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; font-weight: bold; transition: all 0.3s ease; border-radius: 12px; border: 2px solid rgba(255,255,255,0.3); }
         .room-number { font-size: 1.2rem; }
@@ -198,6 +198,29 @@
 
     <script>
         const BACKEND_URL = "https://script.google.com/macros/s/AKfycbyLFO7dgjgdeDY5ETh7B_mV-bJG8T_tHnw-a41sOTfw9EKCoknUv2MJ2CP9yVJtL9CbfA/exec";
+        const FINANCE_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSFeS1r3x0m5TlzHS8O19Qy0uuY9aGXJlEogF1lZkEdlgPewwdCLefvSNmch6MBm83CvUYTEOBMvK2T/pub?gid=109167594&single=true&output=csv';
+        const STOCK_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQk1DLhmM8DEn1BEc8DWFUWjHAxYvGBXNKuEPZQKZw_pMBA3eQc_w1pS8QIea9fyOKGOCYUQygjyLzf/pub?gid=0&single=true&output=csv';
+
+        let allDataByMonth = {}; 
+        let currentChart = null;
+
+        window.onload = () => {
+            // โหลดข้อมูลบัญชี
+            Papa.parse(FINANCE_CSV_URL, {
+                download: true, header: true, skipEmptyLines: true,
+                complete: function(results) { processData(results.data); }
+            });
+            
+            // โหลดข้อมูลสต๊อก
+            loadStockData();
+
+            // 🌟 เพิ่มส่วนตรวจสอบ URL Parameter เพื่อรองรับการกดปุ่มจากหน้า Index
+            const urlParams = new URLSearchParams(window.location.search);
+            const tab = urlParams.get('tab');
+            if (tab === 'verify') {
+                switchTab('verify');
+            }
+        };
 
         function switchTab(tabName) {
             const btnFinance = document.getElementById('btn-finance');
@@ -235,14 +258,8 @@
                 loadMoreBtn.style.display = 'block';
             }
 
-            fetch(`${BACKEND_URL}?action=getPending&limit=${limit}`, {
-                method: 'GET',
-                redirect: 'follow' 
-            })
-            .then(res => {
-                if (!res.ok) throw new Error('Network response was not ok');
-                return res.json();
-            })
+            fetch(`${BACKEND_URL}?action=getPending&limit=${limit}`)
+            .then(res => res.json())
             .then(res => {
                 if (res.status !== "success") {
                     tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-rose-500">เกิดข้อผิดพลาด: ${res.message}</td></tr>`;
@@ -256,8 +273,6 @@
                     tbody.innerHTML = '<tr><td colspan="5" class="p-8 text-center text-slate-400">ไม่มีรายการแจ้งโอนใหม่ 🟢</td></tr>';
                     return;
                 }
-
-                rawData.sort((a, b) => new Date(b[0]) - new Date(a[0]));
 
                 rawData.forEach((row, index) => {
                     const item = {
@@ -286,7 +301,7 @@
                 });
             })
             .catch(err => {
-                tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-rose-500">การเชื่อมต่อขัดข้อง: ตรวจสอบ URL หรือลองล้างแคชเบราว์เซอร์<br><span class="text-xs text-slate-400">${err}</span></td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-rose-500">การเชื่อมต่อขัดข้อง<br><span class="text-xs text-slate-400">${err}</span></td></tr>`;
             });
         }
 
@@ -295,20 +310,6 @@
             sessionStorage.setItem('pendingBooking', JSON.stringify(bookingPackage));
             window.location.href = 'booking.html'; 
         }
-
-        const FINANCE_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSFeS1r3x0m5TlzHS8O19Qy0uuY9aGXJlEogF1lZkEdlgPewwdCLefvSNmch6MBm83CvUYTEOBMvK2T/pub?gid=109167594&single=true&output=csv';
-        const STOCK_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQk1DLhmM8DEn1BEc8DWFUWjHAxYvGBXNKuEPZQKZw_pMBA3eQc_w1pS8QIea9fyOKGOCYUQygjyLzf/pub?gid=0&single=true&output=csv';
-
-        let allDataByMonth = {}; 
-        let currentChart = null;
-
-        window.onload = () => {
-            Papa.parse(FINANCE_CSV_URL, {
-                download: true, header: true, skipEmptyLines: true,
-                complete: function(results) { processData(results.data); }
-            });
-            loadStockData();
-        };
 
         function loadStockData() {
             Papa.parse(STOCK_CSV_URL, {
@@ -420,7 +421,10 @@
             document.getElementById('daily-total').innerText = data.income.toLocaleString() + " ฿";
             const elStatus = document.getElementById('daily-status');
             elStatus.innerText = data.rooms.length === 10 ? "เต็ม" : `พัก ${data.rooms.length} ห้อง`;
-            for(let i=1; i<=10; i++) { document.getElementById(`room-${i}`).className = `room-overlay ${data.rooms.includes(i) ? 'occupied' : 'vacant'}`; }
+            for(let i=1; i<=10; i++) {
+                const roomEl = document.getElementById(`room-${i}`);
+                if (roomEl) roomEl.className = `room-overlay ${data.rooms.includes(i) ? 'occupied' : 'vacant'}`;
+            }
         }
 
         function renderChart(m, dailyData) {
