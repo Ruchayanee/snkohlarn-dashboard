@@ -9,7 +9,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;700&display=swap');
-        body { font-family: 'Sarabun', sans-serif; background-color: #f1f5f slate; }
+        body { font-family: 'Sarabun', sans-serif; background-color: #f1f5f9; }
         .resort-map { position: relative; width: 100%; max-width: 500px; aspect-ratio: 4 / 5; margin: 0 auto; background-color: #fff; border: 2px solid #e2e8f0; border-radius: 20px; overflow: hidden; }
         .room-overlay { position: absolute; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; font-weight: bold; transition: all 0.3s ease; border-radius: 12px; border: 2px solid rgba(255,255,255,0.3); }
         .room-number { font-size: 1.2rem; }
@@ -214,7 +214,7 @@
             // โหลดข้อมูลสต๊อก
             loadStockData();
 
-            // 🌟 เพิ่มส่วนตรวจสอบ URL Parameter เพื่อรองรับการกดปุ่มจากหน้า Index
+            // 🌟 ตรวจสอบ URL Parameter เพื่อสลับหน้า Tab ทันที
             const urlParams = new URLSearchParams(window.location.search);
             const tab = urlParams.get('tab');
             if (tab === 'verify') {
@@ -239,14 +239,14 @@
             } else if (tabName === 'stock') {
                 btnStock.className = "tab-btn tab-active px-6 py-3 rounded-2xl font-bold flex items-center gap-2";
                 viewStock.classList.remove('hidden');
-            } else {
+            } else if (tabName === 'verify') {
                 btnVerify.className = "tab-btn tab-active px-6 py-3 rounded-2xl font-bold flex items-center gap-2";
                 viewVerify.classList.remove('hidden');
                 loadPendingOrders();
             }
         }
 
-        function loadPendingOrders(limit = 30) {
+        async function loadPendingOrders(limit = 30) {
             const tbody = document.getElementById('verify-table-body');
             const loadMoreBtn = document.getElementById('load-more-container');
             
@@ -258,51 +258,63 @@
                 loadMoreBtn.style.display = 'block';
             }
 
-            fetch(`${BACKEND_URL}?action=getPending&limit=${limit}`)
-            .then(res => res.json())
-            .then(res => {
-                if (res.status !== "success") {
-                    tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-rose-500">เกิดข้อผิดพลาด: ${res.message}</td></tr>`;
-                    return;
-                }
-
-                const rawData = res.data;
-                tbody.innerHTML = '';
-
-                if (!rawData || rawData.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="5" class="p-8 text-center text-slate-400">ไม่มีรายการแจ้งโอนใหม่ 🟢</td></tr>';
-                    return;
-                }
-
-                rawData.forEach((row, index) => {
-                    const item = {
-                        date: row[0],
-                        lineName: row[1],
-                        custName: row[2],
-                        phone: row[3] ? row[3].toString().replace(/'/g, '') : '', 
-                        slipUrl: row[4],
-                        status: row[5],
-                        rowId: index + 2
-                    };
-
-                    let actionButton = '';
-                    if (item.status === 'อนุมัติแล้ว') {
-                        actionButton = '<span class="text-emerald-600 font-bold text-xs">✅ อนุมัติแล้ว</span>';
-                    } else if (item.status === 'ยกเลิก') {
-                        actionButton = '<span class="text-rose-500 font-bold text-xs">❌ ยกเลิกแล้ว</span>';
-                    } else {
-                        actionButton = `<button onclick="goToBooking('${item.custName}', '${item.phone}', '${item.lineName}', '${item.slipUrl}', '${item.rowId}')" class="bg-blue-600 text-white px-3 py-2 rounded-xl text-[11px] font-bold hover:bg-blue-700 shadow-md w-full">📝 จัดการการจอง</button>`;
+            try {
+                // ปรับให้ใช้ fetch แบบเดียวกับหน้าแรกเพื่อป้องกัน Error HTML Response
+                const response = await fetch(`${BACKEND_URL}?action=getPending`);
+                
+                // ตรวจสอบว่าเป็น HTML หรือไม่
+                const contentType = response.headers.get("content-type");
+                if (contentType && contentType.indexOf("application/json") !== -1) {
+                    const res = await response.json();
+                    
+                    if (res.status !== "success") {
+                        tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-rose-500">เกิดข้อผิดพลาด: ${res.message}</td></tr>`;
+                        return;
                     }
 
-                    const tr = document.createElement('tr');
-                    tr.className = "border-b border-slate-100 hover:bg-slate-50";
-                    tr.innerHTML = `<td class="p-4 text-xs text-slate-500">${new Date(item.date).toLocaleString('th-TH')}</td><td class="p-4 font-bold text-sm text-slate-700">${item.custName}<br><span class="text-[10px] text-slate-400 font-normal">Line: ${item.lineName}</span></td><td class="p-4 text-sm text-slate-600">${item.phone}</td><td class="p-4 text-center"><a href="${item.slipUrl}" target="_blank" class="text-blue-500 underline text-xs font-bold">เปิดสลิป</a></td><td class="p-4 text-center" style="width: 120px;">${actionButton}</td>`;
-                    tbody.appendChild(tr);
-                });
-            })
-            .catch(err => {
-                tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-rose-500">การเชื่อมต่อขัดข้อง<br><span class="text-xs text-slate-400">${err}</span></td></tr>`;
-            });
+                    const rawData = res.data;
+                    tbody.innerHTML = '';
+
+                    if (!rawData || rawData.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="5" class="p-8 text-center text-slate-400">ไม่มีรายการแจ้งโอนใหม่ 🟢</td></tr>';
+                        return;
+                    }
+
+                    // กรองข้อมูลตาม limit ถ้ามี
+                    const displayData = limit === 'all' ? rawData : rawData.slice(0, limit);
+
+                    displayData.forEach((row, index) => {
+                        const item = {
+                            date: row[0],
+                            lineName: row[1],
+                            custName: row[2],
+                            phone: row[3] ? row[3].toString().replace(/'/g, '') : '', 
+                            slipUrl: row[4],
+                            status: row[5],
+                            rowId: index + 2
+                        };
+
+                        let actionButton = '';
+                        if (item.status === 'อนุมัติแล้ว') {
+                            actionButton = '<span class="text-emerald-600 font-bold text-xs">✅ อนุมัติแล้ว</span>';
+                        } else if (item.status === 'ยกเลิก') {
+                            actionButton = '<span class="text-rose-500 font-bold text-xs">❌ ยกเลิกแล้ว</span>';
+                        } else {
+                            actionButton = `<button onclick="goToBooking('${item.custName}', '${item.phone}', '${item.lineName}', '${item.slipUrl}', '${item.rowId}')" class="bg-blue-600 text-white px-3 py-2 rounded-xl text-[11px] font-bold hover:bg-blue-700 shadow-md w-full">📝 จัดการการจอง</button>`;
+                        }
+
+                        const tr = document.createElement('tr');
+                        tr.className = "border-b border-slate-100 hover:bg-slate-50";
+                        tr.innerHTML = `<td class="p-4 text-xs text-slate-500">${new Date(item.date).toLocaleString('th-TH')}</td><td class="p-4 font-bold text-sm text-slate-700">${item.custName}<br><span class="text-[10px] text-slate-400 font-normal">Line: ${item.lineName}</span></td><td class="p-4 text-sm text-slate-600">${item.phone}</td><td class="p-4 text-center"><a href="${item.slipUrl}" target="_blank" class="text-blue-500 underline text-xs font-bold">เปิดสลิป</a></td><td class="p-4 text-center" style="width: 120px;">${actionButton}</td>`;
+                        tbody.appendChild(tr);
+                    });
+                } else {
+                    // กรณีที่ได้รับ HTML กลับมาแทน JSON
+                    tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-rose-500">การเชื่อมต่อขัดข้อง (Backend Error)<br><span class="text-xs text-slate-400">กรุณาตรวจสอบการตั้งค่า Google Apps Script</span></td></tr>`;
+                }
+            } catch (err) {
+                tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-rose-500">ไม่สามารถเชื่อมต่อฐานข้อมูลได้<br><span class="text-xs text-slate-400">${err}</span></td></tr>`;
+            }
         }
 
         function goToBooking(name, phone, line, slip, rowId) {
