@@ -141,6 +141,7 @@
 
 <script>
     const APP_URL = 'https://script.google.com/macros/s/AKfycbzKj6d7mAV-9SVvIKHA1SyWMJcUFMQ5241Mz5xWTLMtOaPRQgfQFfdaGOqOHRkrShd5/exec';
+    const ROOM_NUMBERS = { std: ['1', '2', '3', '4', '5'], jac: ['6', '7'], fam: ['8', '9'], sea: ['10'] };
     let selections = { std: 0, jac: 0, fam: 0, sea: 0 };
     let inv = { std: 0, jac: 0, fam: 0, sea: 0 };
 
@@ -188,6 +189,35 @@
         return d.toISOString().split('T')[0];
     }
 
+    function formatDateLocal(date) {
+        return date.getFullYear() + "-" + String(date.getMonth() + 1).padStart(2, '0') + "-" + String(date.getDate()).padStart(2, '0');
+    }
+
+    function countNights(cin, cout) {
+        return Math.max(1, Math.ceil((new Date(cout) - new Date(cin)) / 86400000));
+    }
+
+    function calculateAvailabilityFromBookedRooms(bookedRoomsByDate, cin, cout) {
+        const nights = countNights(cin, cout);
+        const checkInDate = new Date(cin);
+        const lockedRoomsForStay = new Set();
+
+        for (let n = 0; n < nights; n++) {
+            const currentNight = new Date(checkInDate);
+            currentNight.setDate(currentNight.getDate() + n);
+            const dateStr = formatDateLocal(currentNight);
+            const bookedTonight = bookedRoomsByDate[dateStr] || [];
+            bookedTonight.forEach(roomNo => lockedRoomsForStay.add(String(roomNo)));
+        }
+
+        return {
+            std: ROOM_NUMBERS.std.filter(room => !lockedRoomsForStay.has(room)).length,
+            jac: ROOM_NUMBERS.jac.filter(room => !lockedRoomsForStay.has(room)).length,
+            fam: ROOM_NUMBERS.fam.filter(room => !lockedRoomsForStay.has(room)).length,
+            sea: ROOM_NUMBERS.sea.filter(room => !lockedRoomsForStay.has(room)).length
+        };
+    }
+
     function resetWelcomeDates() {
         ['welcomeCin', 'welcomeCout', 'cin', 'cout'].forEach(id => document.getElementById(id).value = '');
         selections = { std: 0, jac: 0, fam: 0, sea: 0 };
@@ -228,19 +258,18 @@
         document.querySelectorAll('.avail-tag').forEach(el => el.innerText = "กำลังเช็ค...");
 
         try {
-            const r = await fetch(`${APP_URL}?action=checkAvailability&cin=${cin}&cout=${cout}`);
-            const data = await r.json();
-            inv = {
-                std: Number(data.std || 0),
-                jac: Number(data.jac || 0),
-                fam: Number(data.fam || 0),
-                sea: Number(data.sea || 0)
-            };
+            const response = await fetch(APP_URL, {
+                method: "POST",
+                body: JSON.stringify({ action: 'getBookedRoomsDict', data: { cin: cin, cout: cout } }),
+                headers: { "Content-Type": "text/plain;charset=utf-8" }
+            });
+            const bookedRoomsByDate = await response.json();
+            inv = calculateAvailabilityFromBookedRooms(bookedRoomsByDate || {}, cin, cout);
             Object.keys(selections).forEach(key => {
                 if (selections[key] > inv[key]) selections[key] = inv[key];
             });
             renderAvailability();
-            if (status) status.innerText = 'ห้องว่างสำหรับวันที่เลือก';
+            if (status) status.innerText = `ห้องว่างสำหรับ ${countNights(cin, cout)} คืนที่เลือก`;
         } catch (err) {
             console.log(err);
             if (status) status.innerText = 'ไม่สามารถเช็กห้องว่างได้ กรุณาลองใหม่อีกครั้ง';
