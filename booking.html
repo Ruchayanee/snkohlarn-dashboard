@@ -182,7 +182,67 @@ function removeRoomRow(btn){ btn.parentElement.remove(); }
 function updateNightCount(){ const cin=document.getElementById('checkIn').value; const cout=document.getElementById('checkOut').value; const list=document.getElementById('mixedList'); if(cin&&cout&&roomMode==='mixed'){ const nights=Math.max(1,Math.ceil((new Date(cout)-new Date(cin))/86400000)); list.innerHTML=''; for(let i=1;i<=nights;i++){ list.innerHTML+=`<div class="night-block" data-night="${i}" style="background:#faf8f6; padding:15px; border-radius:12px; border:1px dashed var(--light-brown); margin-bottom:15px;"><h4 style="margin:0 0 10px 0; color:#a68b6d; font-size:15px; border-bottom:1px solid #e0d9d5; padding-bottom:5px;">🌙 คืนที่ ${i}</h4><div class="night-rows-container"><div class="room-row mixed-room-row" style="align-items:flex-start; flex-wrap:wrap; background:#fff; padding:15px; border-radius:12px; border:1px solid #e0d9d5; position:relative;"><div style="flex:1.5; min-width:120px;"><label style="font-size:11px; color:#666;">ประเภทห้อง</label><select class="mixed-select" onchange="handleRoomTypeChange(this)"><option value="std">Standard</option><option value="fam">Family</option><option value="sea">Deluxe Twin Bed</option><option value="jac">Jacuzzi</option></select></div><div style="flex:1; min-width:80px;"><label style="font-size:11px; color:#e67e22;">ราคา/คืน</label><input type="number" class="mixed-price" value="1900"></div><div style="flex:1; min-width:60px;"><label style="font-size:11px; color:#666;">จำนวน</label><input type="number" class="mixed-qty" value="0" readonly style="background:#f8f9fa; cursor:not-allowed;"></div><div style="flex:100%; margin-top:8px;"><label style="font-size:11px; color:#1DB446; font-weight:bold;">👉 เลือกเบอร์ห้อง</label><div class="checkbox-container"></div></div><button class="btn-remove" onclick="this.parentElement.remove()" style="display:none;">✕ ลบ</button></div></div><button class="btn-add" onclick="addMixedRoomRow(this)" style="margin-top:10px; background-color:#8ba597; width:100%; padding:8px;">+ เพิ่มห้องในคืนที่ ${i}</button></div>`; } document.querySelectorAll('.mixed-select').forEach(sel=>handleRoomTypeChange(sel)); } else if(roomMode==='mixed'){ list.innerHTML=`<p style="text-align:center; color:#e74c3c; font-size:13px; margin:10px 0;">⚠️ เลือกวันที่ก่อนครับ</p>`; } }
 function generate(){ const cin=document.getElementById('checkIn').value; const cout=document.getElementById('checkOut').value; if(!cin||!cout){ alert('กรุณาระบุวันที่เข้าพัก'); return; } const channel=document.getElementById('bookingChannel').value; const name=document.getElementById('custName').value||'-'; const source=document.getElementById('contactSource').value||'-'; const lineName=document.getElementById('lineName').value.trim(); const nights=Math.max(1,Math.ceil((new Date(cout)-new Date(cin))/86400000)); let roomText=''; let totalRoomPrice=0; let totalRoomsCount=0; let cardRoomDisplay=[]; let dashboardRooms=new Set(); let dailyRoomsArray=[]; let checkInDateObj=new Date(cin); if(roomMode==='single'){ document.querySelectorAll('#roomRowsContainer .room-row').forEach(row=>{ const t=row.querySelector('.mainRoomType').value; const customPrice=parseInt(row.querySelector('input[type="number"]').value)||ROOM_DATA[t].price; const checkedCbs=row.querySelectorAll('.room-cb:checked'); const count=checkedCbs.length; if(count>0){ totalRoomsCount+=count; let rNos=Array.from(checkedCbs).map(cb=>cb.value); let rNoStr=rNos.join(', '); cardRoomDisplay.push(`${ROOM_DATA[t].short} (${rNoStr})`); rNos.forEach(r=>dashboardRooms.add(r)); for(let n=0;n<nights;n++){ let currentNight=new Date(checkInDateObj); currentNight.setDate(currentNight.getDate()+n); let dateStr=currentNight.getFullYear()+"-"+String(currentNight.getMonth()+1).padStart(2,'0')+"-"+String(currentNight.getDate()).padStart(2,'0'); totalRoomPrice+=(customPrice*count); roomText+=`- คืน${n+1}: ${ROOM_DATA[t].name} (${rNoStr})\n`; rNos.forEach(r=>dailyRoomsArray.push({date:dateStr,room:r})); } } }); } else { let maxRoomsInAnyNight=0; document.querySelectorAll('.night-block').forEach(block=>{ const n=parseInt(block.getAttribute('data-night')); let currentNight=new Date(checkInDateObj); currentNight.setDate(currentNight.getDate()+(n-1)); let dateStr=currentNight.getFullYear()+"-"+String(currentNight.getMonth()+1).padStart(2,'0')+"-"+String(currentNight.getDate()).padStart(2,'0'); let roomsThisNight=0; block.querySelectorAll('.mixed-room-row').forEach(row=>{ const typeVal=row.querySelector('select').value; const customPrice=parseInt(row.querySelector('input[type="number"]').value)||0; const checkedCbs=row.querySelectorAll('.room-cb:checked'); const qty=checkedCbs.length; if(qty>0){ roomsThisNight+=qty; let rNos=Array.from(checkedCbs).map(cb=>cb.value); let rNoStr=rNos.join(', '); cardRoomDisplay.push(`คืน${n}:${ROOM_DATA[typeVal].short}(${rNoStr})`); rNos.forEach(r=>dashboardRooms.add(r)); totalRoomPrice+=(customPrice*qty); rNos.forEach(r=>dailyRoomsArray.push({date:dateStr,room:r})); } }); if(roomsThisNight>maxRoomsInAnyNight) maxRoomsInAnyNight=roomsThisNight; }); totalRoomsCount=maxRoomsInAnyNight; } if(totalRoomsCount===0){ alert('⚠️ ยังไม่ได้เลือกเบอร์ห้องครับ'); return; } const adult=parseInt(document.getElementById('addAdult').value)||0; const kBig=parseInt(document.getElementById('addKidBig').value)||0; const kSmall=parseInt(document.getElementById('addKidSmall').value)||0; const pet=parseInt(document.getElementById('addPet').value)||0; const motor=parseInt(document.getElementById('addMotor').value)||0; const discount=parseInt(document.getElementById('discountVal').value)||0; const customExtraName=document.getElementById('customExtraName').value.trim(); const customExtraPrice=parseInt(document.getElementById('customExtraPrice').value)||0; let extraText=''; let totalExtraPrice=(adult*700)+(kBig*600)+(kSmall*400)+(pet*500)+(motor*300)+customExtraPrice; if(adult>0) extraText+=`ผู้ใหญ่(${adult}), `; if(pet>0) extraText+=`สัตว์เลี้ยง(${pet}), `; if(motor>0) extraText+=`เช่ามอไซค์(${motor}), `; if(customExtraPrice>0) extraText+=`${customExtraName}(${customExtraPrice}), `; if(discount>0) extraText+=`ส่วนลด(-${discount}), `; let userDeposit=document.getElementById('manualDeposit').value; const deposit=userDeposit!==''?parseInt(userDeposit):(totalRoomsCount*1000); const netPay=totalRoomPrice+totalExtraPrice-discount; currentPayload={ channel,custName:name,lineName,contact:source,checkInRaw:cin,checkOutRaw:cout,checkInText:cin,checkOutText:cout,nights,cardRoomDisplay:cardRoomDisplay.join(', '),sheetRoomDisplay:Array.from(dashboardRooms).join(', '),dailyRooms:dailyRoomsArray,roomText,totalRoomPrice,extraText:extraText.replace(/, $/,''),totalExtraPrice,deposit,netPay,benefitMotor:document.getElementById('benefitMotor').value,benefitBreakfast:document.getElementById('benefitBreakfast').value }; let resMode=channel==='walkin'?'🚶‍♂️ [Walk-in]':'📱 [Online : ส่ง LINE]'; document.getElementById('summaryResult').innerText=`ตรวจสอบ: คุณ ${name}\n${resMode}\nยอดรวม: ${netPay.toLocaleString()} บาท`; document.getElementById('summaryResult').style.display='block'; document.getElementById('sendLineBtn').style.display='block'; window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'}); }
 function submitToBackend(){ if(currentPayload.channel==='online'&&!currentPayload.lineName){ alert('⚠️ กรอกชื่อ LINE ด้วยครับ'); return; } const btn=document.getElementById('sendLineBtn'); btn.disabled=true; btn.innerText='⏳ กำลังบันทึก...'; callAPI('processBooking',currentPayload).then(response=>{ if(response==='WALKIN_SUCCESS'||response==='SUCCESS'||response.status==='success'||response.result==='success'){ alert('✅ บันทึกข้อมูลสำเร็จ!'); btn.innerText='🚀 บันทึกแล้ว'; const pending=sessionStorage.getItem('pendingBooking'); if(pending){ const data=JSON.parse(pending); if(data.rowId) fetch(`${BACKEND_URL}?action=approve&rowId=${data.rowId}&admin=System_Auto`).catch(e=>console.log(e)); } clearPendingData(); fetchBookedRooms(); } else { let errorMsg=response.message||response.error||JSON.stringify(response); alert('❌ หลังบ้านฟ้องว่า: '+errorMsg); btn.disabled=false; btn.innerText='🚀 ยืนยันบันทึกบัญชี อีกครั้ง'; } }).catch(err=>{ alert('❌ การเชื่อมต่อขัดข้อง: '+err.message); btn.disabled=false; btn.innerText='🚀 ยืนยันบันทึกบัญชี'; }); }
-function loadBookings(){ document.getElementById('loadingManage').style.display='block'; document.getElementById('bookingListContainer').innerHTML=''; callAPI('getActiveBookings').then(data=>{ document.getElementById('loadingManage').style.display='none'; if(!data||data.length===0){ document.getElementById('bookingListContainer').innerHTML='<p style="text-align:center; color:#888;">ไม่พบข้อมูลการจอง</p>'; return; } document.getElementById('bookingListContainer').innerHTML=data.map(item=>`<div class="booking-card"><h4>${item.name||'-'}</h4><p>ห้อง: ${item.rooms||item.room||'-'}</p><p>วันที่: ${item.checkIn||'-'} - ${item.checkOut||'-'}</p></div>`).join(''); }).catch(()=>{ document.getElementById('loadingManage').style.display='none'; document.getElementById('bookingListContainer').innerHTML='<p style="color:red;">โหลดข้อมูลไม่สำเร็จ</p>'; }); }
+function escapeHtml(value) {
+    return String(value == null ? '' : value).replace(/[&<>"']/g, char => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[char]));
+}
+function bookingActionArg(value) {
+    return encodeURIComponent(String(value == null ? '' : value));
+}
+function loadBookings(){
+    const loading = document.getElementById('loadingManage');
+    const container = document.getElementById('bookingListContainer');
+    loading.style.display = 'block';
+    container.innerHTML = '';
+    callAPI('getActiveBookings').then(data => {
+        loading.style.display = 'none';
+        if(!data || data.length === 0){
+            container.innerHTML = '<p style="text-align:center; color:#888;">ไม่พบข้อมูลการจอง</p>';
+            return;
+        }
+        container.innerHTML = data.map(item => {
+            const rooms = Array.isArray(item.rooms) ? item.rooms.join(' | ') : (item.rooms || item.room || '-');
+            const total = item.total == null ? '' : `<p><b>ยอดสุทธิ:</b> ฿${Number(item.total).toLocaleString()}</p>`;
+            const groupKey = bookingActionArg(item.groupKey);
+            const name = bookingActionArg(item.name || '-');
+            const contact = bookingActionArg(item.contact || '');
+            return `<div class="booking-card">
+                <h4>${escapeHtml(item.name || '-')}</h4>
+                <p><b>ห้อง:</b> ${escapeHtml(rooms)}</p>
+                ${total}
+                <div style="display:flex; gap:10px; margin-top:10px;">
+                    <button class="btn-edit-card" onclick="editBooking(decodeURIComponent('${groupKey}'), decodeURIComponent('${name}'), decodeURIComponent('${contact}'))">✏️ แก้ไข</button>
+                    <button class="btn-delete-card" onclick="cancelBooking(decodeURIComponent('${groupKey}'), decodeURIComponent('${name}'))">🗑️ ยกเลิก</button>
+                </div>
+            </div>`;
+        }).join('');
+    }).catch(() => {
+        loading.style.display = 'none';
+        container.innerHTML = '<p style="color:red;">โหลดข้อมูลไม่สำเร็จ</p>';
+    });
+}
+function editBooking(groupKey, custName, contact) {
+    if(!confirm(`⚠️ แก้ไขข้อมูล ${custName}?\n\nระบบจะลบบิลเดิม แล้วให้เลือกวันที่และห้องใหม่อีกครั้ง`)) return;
+    document.getElementById('custName').value = custName;
+    document.getElementById('bookingChannel').value = contact.includes('Walk-in:') ? 'walkin' : 'online';
+    document.getElementById('contactSource').value = contact.replace('Walk-in: ', '').trim();
+    toggleWalkinMode();
+    switchMode('booking');
+    callAPI('cancelBookingRecords', { groupKey }).then(() => {
+        alert('เลือกวันที่และห้องใหม่ได้เลยครับ');
+        fetchBookedRooms();
+    }).catch(err => alert('ลบบิลเดิมไม่สำเร็จ: ' + err.message));
+}
+function cancelBooking(groupKey, custName) {
+    if(!confirm(`⚠️ ยืนยันยกเลิกบิล ${custName}?`)) return;
+    callAPI('cancelBookingRecords', { groupKey }).then(() => {
+        alert('✅ ยกเลิกบิลสำเร็จ');
+        fetch(`${BACKEND_URL}?action=cancelByName&name=${encodeURIComponent(custName)}`)
+            .catch(err => console.log('แจ้ง Dashboard ขัดข้อง แต่ยกเลิกบิลแล้ว', err));
+        loadBookings();
+    }).catch(err => alert('ยกเลิกบิลไม่สำเร็จ: ' + err.message));
+}
 </script>
 </body>
 </html>
