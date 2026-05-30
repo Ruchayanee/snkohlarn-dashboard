@@ -207,12 +207,14 @@ function loadBookings(){
             const groupKey = bookingActionArg(item.groupKey);
             const name = bookingActionArg(item.name || '-');
             const contact = bookingActionArg(item.contact || '');
+            const lineName = bookingActionArg(item.lineName || item.line || '');
             return `<div class="booking-card">
                 <h4>${escapeHtml(item.name || '-')}</h4>
                 <p><b>ห้อง:</b> ${escapeHtml(rooms)}</p>
+                <p><b>LINE:</b> ${escapeHtml(item.lineName || item.line || '-')}</p>
                 ${total}
                 <div style="display:flex; gap:10px; margin-top:10px;">
-                    <button class="btn-edit-card" onclick="editBooking(decodeURIComponent('${groupKey}'), decodeURIComponent('${name}'), decodeURIComponent('${contact}'))">✏️ แก้ไข</button>
+                    <button class="btn-edit-card" onclick="editBooking(decodeURIComponent('${groupKey}'), decodeURIComponent('${name}'), decodeURIComponent('${contact}'), decodeURIComponent('${lineName}'))">✏️ แก้ไข</button>
                     <button class="btn-delete-card" onclick="cancelBooking(decodeURIComponent('${groupKey}'), decodeURIComponent('${name}'))">🗑️ ยกเลิก</button>
                 </div>
             </div>`;
@@ -222,12 +224,14 @@ function loadBookings(){
         container.innerHTML = '<p style="color:red;">โหลดข้อมูลไม่สำเร็จ</p>';
     });
 }
-function editBooking(groupKey, custName, contact) {
+function editBooking(groupKey, custName, contact, lineName) {
     if(!confirm(`⚠️ แก้ไขข้อมูล ${custName}?\n\nระบบจะลบบิลเดิม แล้วให้เลือกวันที่และห้องใหม่อีกครั้ง`)) return;
+    const isWalkin = contact.includes('Walk-in:');
     document.getElementById('custName').value = custName;
-    document.getElementById('bookingChannel').value = contact.includes('Walk-in:') ? 'walkin' : 'online';
+    document.getElementById('bookingChannel').value = isWalkin ? 'walkin' : 'online';
     document.getElementById('contactSource').value = contact.replace('Walk-in: ', '').trim();
     toggleWalkinMode();
+    document.getElementById('lineName').value = isWalkin ? '' : lineName;
     switchMode('booking');
     callAPI('cancelBookingRecords', { groupKey }).then(() => {
         alert('เลือกวันที่และห้องใหม่ได้เลยครับ');
