@@ -68,6 +68,7 @@ const MANAGEMENT_AI_URL = 'https://script.google.com/macros/s/AKfycbxgQ_XsyiuSUO
 let adminPin = sessionStorage.getItem('snManagementAdminPin') || '';
 let busy = false;
 let bridgeReady = false;
+let bridgeWindow = null;
 let requestSequence = 0;
 const pendingRequests = new Map();
 const bridge = document.createElement('iframe');
@@ -79,6 +80,7 @@ document.body.appendChild(bridge);
 window.addEventListener('message', event => {
     const message = event.data || {};
     if(message.type === 'SN_MANAGEMENT_AI_READY') {
+        bridgeWindow = event.source;
         bridgeReady = true;
         document.getElementById('dataStatus').textContent = 'พร้อมถาม AI';
         return;
@@ -98,7 +100,7 @@ function askBackend(payload) {
             reject(new Error('บริการ AI ไม่ตอบกลับ กรุณาลองใหม่'));
         }, 45000);
         pendingRequests.set(requestId, { resolve, timer });
-        bridge.contentWindow.postMessage({ type:'SN_MANAGEMENT_AI_REQUEST', requestId, payload }, '*');
+        (bridgeWindow || bridge.contentWindow).postMessage({ type:'SN_MANAGEMENT_AI_REQUEST', requestId, payload }, '*');
     });
 }
 bridge.addEventListener('load', () => {
