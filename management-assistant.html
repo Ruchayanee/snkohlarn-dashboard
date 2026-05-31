@@ -5,15 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ผู้ช่วยบริหาร SN Koh Larn</title>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <style>
-        :root { --purple:#6d28d9; --purple-soft:#f3e8ff; --slate:#334155; --muted:#64748b; --bg:#f8f5f2; --white:#fff; }
+        :root { --purple:#6d28d9; --slate:#334155; --muted:#64748b; --bg:#f8f5f2; --white:#fff; }
         * { box-sizing:border-box; }
         body { margin:0; padding:16px; background:var(--bg); color:var(--slate); font-family:'Kanit',sans-serif; }
         .app { width:min(760px,100%); margin:0 auto; min-height:calc(100vh - 32px); background:var(--white); border-radius:24px; box-shadow:0 16px 40px rgba(71,45,33,.12); overflow:hidden; display:flex; flex-direction:column; }
         header { padding:20px; color:#fff; background:linear-gradient(135deg,#4c1d95,#7e22ce); }
-        .top { display:flex; align-items:center; justify-content:space-between; gap:12px; }
-        .back { color:#fff; text-decoration:none; background:rgba(255,255,255,.16); padding:8px 12px; border-radius:10px; font-size:13px; }
+        .top { display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; }
+        .back,.logout { color:#fff; text-decoration:none; background:rgba(255,255,255,.16); padding:8px 12px; border:0; border-radius:10px; font:inherit; font-size:13px; cursor:pointer; }
         h1 { margin:16px 0 2px; font-size:25px; }
         header p { margin:0; color:#e9d5ff; font-size:13px; }
         .status { margin-top:14px; display:flex; gap:8px; flex-wrap:wrap; font-size:11px; }
@@ -28,6 +27,7 @@
         form { display:flex; gap:8px; padding:14px; border-top:1px solid #e2e8f0; background:#fff; }
         input { flex:1; min-width:0; padding:13px; border:1px solid #cbd5e1; border-radius:12px; font:inherit; }
         .send { border:0; border-radius:12px; padding:0 17px; background:var(--purple); color:#fff; font:inherit; font-weight:600; cursor:pointer; }
+        .send:disabled { opacity:.55; cursor:wait; }
         .notice { padding:8px 14px 14px; color:#92400e; background:#fffbeb; font-size:11px; border-top:1px solid #fde68a; }
         @media (max-width:520px) { body{padding:0}.app{min-height:100vh;border-radius:0}#chat{max-height:none}.message{max-width:94%} }
     </style>
@@ -37,196 +37,100 @@
     <header>
         <div class="top">
             <a class="back" href="index.html">← กลับหน้าแรก</a>
-            <span class="pill">สำหรับ Admin / ผู้บริหาร</span>
+            <button class="logout" type="button" onclick="clearPin()">ออกจากระบบ</button>
         </div>
         <h1>✨ ผู้ช่วยบริหาร SN Koh Larn</h1>
-        <p>ถามข้อมูลรายได้ ค่าใช้จ่าย และแนวโน้มราคาได้จากข้อมูลย้อนหลัง</p>
+        <p>ถาม AI เพื่อวิเคราะห์รายได้ ค่าใช้จ่าย แนวโน้ม และข้อเสนอราคาห้อง</p>
         <div class="status">
-            <span class="pill" id="dataStatus">กำลังโหลดข้อมูล...</span>
-            <span class="pill">รุ่นเริ่มต้น: วิเคราะห์ในระบบ</span>
+            <span class="pill" id="dataStatus">พร้อมเชื่อมต่อ AI</span>
+            <span class="pill">สำหรับ Admin / ผู้บริหาร</span>
+            <span class="pill">ส่งเฉพาะข้อมูลสรุป</span>
         </div>
     </header>
 
     <div class="quick">
-        <button type="button" onclick="askQuick('สรุปรายได้เดือนนี้')">💰 สรุปเดือนนี้</button>
-        <button type="button" onclick="askQuick('ส่วนแบ่ง 30% เดือนนี้')">🧮 ส่วนแบ่ง 30%</button>
-        <button type="button" onclick="askQuick('วิเคราะห์เดือนหน้าและแนะนำราคาห้อง')">📈 แนะนำราคาเดือนหน้า</button>
-        <button type="button" onclick="askQuick('วันหยุดเดือนหน้า')">📅 วันหยุดเดือนหน้า</button>
+        <button type="button" onclick="askQuick('สรุปรายได้ ค่าใช้จ่าย และส่วนแบ่ง 30% ของเดือนนี้')">💰 สรุปเดือนนี้</button>
+        <button type="button" onclick="askQuick('วิเคราะห์แนวโน้มจากข้อมูลย้อนหลังและสรุปสิ่งที่ผู้บริหารควรจับตา')">📊 วิเคราะห์แนวโน้ม</button>
+        <button type="button" onclick="askQuick('ดูวันหยุดเดือนหน้า และแนะนำราคาห้องสำหรับวันธรรมดา ศุกร์-เสาร์ และวันหยุดยาว พร้อมอธิบายเหตุผล')">📈 แนะนำราคาเดือนหน้า</button>
+        <button type="button" onclick="askQuick('เดือนหน้ามีวันหยุดอะไรบ้าง และควรวางแผนราคาอย่างไร')">📅 วันหยุดเดือนหน้า</button>
     </div>
 
     <section id="chat" aria-live="polite"></section>
     <form id="chatForm">
-        <input id="question" autocomplete="off" placeholder="เช่น เดือนนี้มีค่าไฟ 18,500 บาท ส่วนแบ่ง 30% เหลือเท่าไหร่">
-        <button class="send" type="submit">ส่ง</button>
+        <input id="question" autocomplete="off" placeholder="เช่น เดือนนี้มีค่าไฟ 18,500 บาท รายได้ 30% คือเท่าไหร่">
+        <button class="send" id="sendButton" type="submit">ส่ง</button>
     </form>
-    <div class="notice">หมายเหตุ: รุ่นนี้ช่วยอ่านและวิเคราะห์ข้อมูลเท่านั้น ยังไม่สั่งแก้ราคา ยกเลิก Booking หรือเปลี่ยนข้อมูลอัตโนมัติ</div>
+    <div class="notice">AI อ่านเฉพาะข้อมูลสรุป ไม่มีชื่อ เบอร์โทร หรือ LINE ลูกค้า และจะไม่แก้ไขราคา Booking หรือข้อมูลใดอัตโนมัติ</div>
 </main>
 
 <script>
-const FINANCE_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSFeS1r3x0m5TlzHS8O19Qy0uuY9aGXJlEogF1lZkEdlgPewwdCLefvSNmch6MBm83CvUYTEOBMvK2T/pub?gid=109167594&single=true&output=csv';
-const ROOM_RATES = { Standard:1900, Family:2900, 'Deluxe Twin Bed':2900, Jacuzzi:3500 };
-const THAI_HOLIDAYS_2026 = {
-    '2026-01-01':'วันขึ้นปีใหม่', '2026-03-03':'วันมาฆบูชา', '2026-04-06':'วันจักรี',
-    '2026-04-13':'วันสงกรานต์', '2026-04-14':'วันสงกรานต์', '2026-04-15':'วันสงกรานต์',
-    '2026-05-01':'วันแรงงานแห่งชาติ', '2026-05-04':'วันฉัตรมงคล', '2026-05-31':'วันวิสาขบูชา',
-    '2026-06-03':'วันเฉลิมพระชนมพรรษาสมเด็จพระนางเจ้าฯ พระบรมราชินี',
-    '2026-07-28':'วันเฉลิมพระชนมพรรษาพระบาทสมเด็จพระเจ้าอยู่หัว',
-    '2026-07-29':'วันอาสาฬหบูชา', '2026-07-30':'วันเข้าพรรษา',
-    '2026-08-12':'วันแม่แห่งชาติ', '2026-10-13':'วันนวมินทรมหาราช',
-    '2026-10-23':'วันปิยมหาราช', '2026-12-05':'วันพ่อแห่งชาติ',
-    '2026-12-10':'วันรัฐธรรมนูญ', '2026-12-31':'วันสิ้นปี'
-};
-const MONTHS = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
-let financeRows = [];
-let loadedAt = null;
+const MANAGEMENT_AI_URL = 'https://script.google.com/macros/s/AKfycbxgQ_XsyiuSUO5VnVDBV4iWmB29g0rmpMZmZhpb5hBS7ZrE3G9lJ0_p0zbMxPkLbKqK/exec';
+let adminPin = sessionStorage.getItem('snManagementAdminPin') || '';
+let busy = false;
 
-function money(value) { return Number(value || 0).toLocaleString('th-TH', { maximumFractionDigits:2 }) + ' บาท'; }
-function numberFrom(value) { return parseFloat(String(value || '').replace(/,/g,'')) || 0; }
-function isoDate(date) {
-    return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
-}
-function monthKey(date) { return isoDate(date).slice(0,7); }
-function monthLabel(key) { const [y,m] = key.split('-'); return `${MONTHS[Number(m)-1]} ${Number(y)+543}`; }
-function nextMonth(date = new Date()) { return new Date(date.getFullYear(), date.getMonth()+1, 1); }
-function parseStayDate(value) {
-    const text = String(value || '').trim();
-    if(!text) return null;
-    if(text.includes('/')) {
-        const [d,m,y] = text.split('/').map(Number);
-        return new Date(y > 2400 ? y-543 : y, m-1, d);
-    }
-    const date = new Date(text);
-    return isNaN(date) ? null : date;
-}
-function extractAmount(text, words) {
-    const value = String(text || '');
-    if(!words.some(word => value.includes(word))) return 0;
-    const match = value.match(/\d+[\d,.]*/);
-    return match ? numberFrom(match[0]) : 0;
-}
-function roomType(room) {
-    const no = Number(room);
-    if(no >= 1 && no <= 5) return 'Standard';
-    if(no === 6 || no === 7) return 'Jacuzzi';
-    if(no === 8 || no === 9) return 'Family';
-    if(no === 10) return 'Deluxe Twin Bed';
-    return '';
-}
-function monthSummary(key) {
-    const dailyRooms = {};
-    let income = 0, electricity = 0, labor = 0, bookings = 0;
-    financeRows.forEach(row => {
-        const date = parseStayDate(row['วันที่เข้าพัก']);
-        if(!date || monthKey(date) !== key) return;
-        const price = numberFrom(row['ราคาขายจริง']);
-        income += price;
-        electricity += extractAmount(row['หมายเหตุ'], ['ค่าไฟ']);
-        labor += extractAmount(row['หมายเหตุ'], ['คนงาน','ทิป']);
-        if(price > 0) bookings++;
-        const room = Number(row['เลขห้อง']);
-        const day = isoDate(date);
-        if(room) (dailyRooms[day] ||= new Set()).add(room);
-    });
-    const roomNights = Object.values(dailyRooms).reduce((sum, rooms) => sum + rooms.size, 0);
-    const net = income - electricity - labor;
-    return { key, income, electricity, labor, net, share:net*.3, bookings, roomNights };
-}
-function nextMonthSignals() {
-    const target = nextMonth();
-    const key = monthKey(target);
-    const days = new Date(target.getFullYear(), target.getMonth()+1, 0).getDate();
-    let weekends = 0;
-    const holidays = [];
-    for(let day=1; day<=days; day++) {
-        const date = new Date(target.getFullYear(), target.getMonth(), day);
-        if(date.getDay() === 0 || date.getDay() === 6) weekends++;
-        const holiday = THAI_HOLIDAYS_2026[isoDate(date)];
-        if(holiday) holidays.push(`${day} ${MONTHS[target.getMonth()]}: ${holiday}`);
-    }
-    const historical = financeRows.map(row => {
-        const date = parseStayDate(row['วันที่เข้าพัก']);
-        return { date, room:Number(row['เลขห้อง']), price:numberFrom(row['ราคาขายจริง']) };
-    }).filter(item => item.date && item.date < target);
-    const latest = historical.map(item => item.date).sort((a,b) => b-a)[0];
-    const from = latest ? new Date(latest.getTime() - 90*86400000) : new Date(0);
-    const recent = historical.filter(item => item.date >= from);
-    const recentDays = new Set(recent.map(item => isoDate(item.date))).size || 1;
-    const occupancy = Math.min(1, recent.length / (recentDays * 10));
-    const demandBoost = occupancy >= .7 ? .15 : occupancy >= .5 ? .10 : .05;
-    return { key, weekends, holidays, occupancy, demandBoost };
-}
-function recommendationText() {
-    const signal = nextMonthSignals();
-    const holidayBoost = signal.holidays.length ? .10 : .05;
-    const rows = Object.entries(ROOM_RATES).map(([type, base]) => {
-        const weekday = Math.ceil((base * (1 + signal.demandBoost)) / 100) * 100;
-        const weekend = Math.ceil((weekday * 1.12) / 100) * 100;
-        const holiday = Math.ceil((weekday * (1 + holidayBoost + .12)) / 100) * 100;
-        return `• ${type}: วันธรรมดา ${money(weekday)} | ศุกร์-เสาร์ ${money(weekend)} | วันหยุด ${money(holiday)}`;
-    }).join('\n');
-    return `คำแนะนำราคา ${monthLabel(signal.key)}
-${rows}
-
-เหตุผลประกอบ:
-• แนวโน้มเข้าพักจากข้อมูลย้อนหลังล่าสุดประมาณ ${(signal.occupancy*100).toFixed(0)}%
-• เดือนหน้ามีวันเสาร์-อาทิตย์ ${signal.weekends} วัน
-• วันหยุดที่พบ ${signal.holidays.length} วัน${signal.holidays.length ? `: ${signal.holidays.join(', ')}` : ''}
-
-ราคาเป็นคำแนะนำเบื้องต้น กรุณาตรวจจำนวนห้องว่างและอนุมัติก่อนนำไปใช้จริง`;
-}
-function holidaysText() {
-    const signal = nextMonthSignals();
-    return signal.holidays.length
-        ? `วันหยุดเดือน ${monthLabel(signal.key)}\n${signal.holidays.map(item => `• ${item}`).join('\n')}\n\nเดือนนี้มีวันเสาร์-อาทิตย์ ${signal.weekends} วัน ควรวางแผนราคาช่วงปลายสัปดาห์แยกจากวันธรรมดา`
-        : `ไม่พบวันหยุดพิเศษในรายการเดือน ${monthLabel(signal.key)}\nแต่มีวันเสาร์-อาทิตย์ ${signal.weekends} วัน ควรวางแผนราคาช่วงปลายสัปดาห์แยกจากวันธรรมดา`;
-}
-function currentSummary(customElectricity = null) {
-    const key = monthKey(new Date());
-    const data = monthSummary(key);
-    const electricity = customElectricity == null ? data.electricity : customElectricity;
-    const net = data.income - electricity - data.labor;
-    return `สรุป ${monthLabel(key)}
-• รายได้รวม: ${money(data.income)}
-• ค่าไฟ: ${money(electricity)}${customElectricity == null ? '' : ' (ตามตัวเลขที่ระบุ)'}
-• ค่าคนงาน/ทิป: ${money(data.labor)}
-• รายได้สุทธิหลังหักรายการข้างต้น: ${money(net)}
-• ส่วนแบ่ง 30%: ${money(net*.3)}
-• จำนวนห้องเข้าพักสะสม: ${data.roomNights} ห้อง-คืน`;
-}
-function answer(question) {
-    const text = question.trim();
-    if(!financeRows.length) return 'ข้อมูลยังโหลดไม่เสร็จ กรุณารอสักครู่แล้วลองใหม่อีกครั้ง';
-    const amounts = [...text.matchAll(/\d[\d,]*(?:\.\d+)?/g)].map(match => numberFrom(match[0]));
-    if(text.includes('วันหยุด') && text.includes('เดือนหน้า')) return holidaysText();
-    if((text.includes('แนะนำราคา') || text.includes('ตั้งราคา') || text.includes('วิเคราะห์เดือนหน้า'))) return recommendationText();
-    if(text.includes('ค่าไฟ') && text.includes('30%') && amounts.length) return currentSummary(amounts[0]);
-    if(text.includes('กี่เปอร์เซ็นต์') && amounts.length >= 2) return `${money(amounts[0])} คิดเป็น ${((amounts[0]/amounts[1])*100).toFixed(2)}% ของ ${money(amounts[1])}`;
-    if(text.includes('30%') && amounts.length) return `30% ของ ${money(amounts[0])} เท่ากับ ${money(amounts[0]*.3)}`;
-    if(text.includes('สรุป') || text.includes('รายได้') || text.includes('ส่วนแบ่ง')) return currentSummary();
-    return `ตอนนี้ฉันช่วยตอบได้ 4 กลุ่มคำถาม:
-• สรุปรายได้เดือนนี้
-• ส่วนแบ่ง 30% เดือนนี้
-• ค่าไฟ 18,500 บาท ส่วนแบ่ง 30% เหลือเท่าไหร่
-• วิเคราะห์เดือนหน้าและแนะนำราคาห้อง`;
-}
-function addMessage(text, type='bot') {
+function addMessage(text, type='bot', sourceText='') {
     const box = document.createElement('div');
     box.className = `message ${type}`;
     box.textContent = text;
-    if(type === 'bot' && loadedAt) {
+    if(type === 'bot' && sourceText) {
         const source = document.createElement('div');
         source.className = 'source';
-        source.textContent = `อ้างอิงข้อมูลที่โหลดล่าสุด ${loadedAt.toLocaleString('th-TH')}`;
+        source.textContent = sourceText;
         box.appendChild(source);
     }
     const chat = document.getElementById('chat');
     chat.appendChild(box);
     chat.scrollTop = chat.scrollHeight;
+    return box;
 }
-function ask(question) {
-    if(!question.trim()) return;
-    addMessage(question, 'user');
-    setTimeout(() => addMessage(answer(question)), 180);
+function ensurePin() {
+    if(adminPin) return adminPin;
+    const value = prompt('กรอก PIN สำหรับ Admin / ผู้บริหาร');
+    if(!value) return '';
+    adminPin = value.trim();
+    sessionStorage.setItem('snManagementAdminPin', adminPin);
+    return adminPin;
+}
+function clearPin() {
+    adminPin = '';
+    sessionStorage.removeItem('snManagementAdminPin');
+    document.getElementById('dataStatus').textContent = 'ออกจากระบบแล้ว';
+    addMessage('ออกจากระบบเรียบร้อย กรุณากรอก PIN อีกครั้งเมื่อถามคำถามถัดไป');
+}
+function setBusy(value) {
+    busy = value;
+    document.getElementById('sendButton').disabled = value;
+    document.getElementById('dataStatus').textContent = value ? 'AI กำลังวิเคราะห์...' : 'พร้อมถาม AI';
+}
+async function ask(question) {
+    const text = question.trim();
+    if(!text || busy) return;
+    const pin = ensurePin();
+    if(!pin) return;
+    addMessage(text, 'user');
+    setBusy(true);
+    const pending = addMessage('กำลังอ่านข้อมูลสรุปและวิเคราะห์ กรุณารอสักครู่...');
+    try {
+        const response = await fetch(MANAGEMENT_AI_URL, {
+            method:'POST',
+            headers:{ 'Content-Type':'text/plain;charset=utf-8' },
+            body:JSON.stringify({ action:'askManagementAI', pin, question:text })
+        });
+        const data = await response.json();
+        pending.remove();
+        if(data.status === 'unauthorized') {
+            clearPin();
+            addMessage('PIN ไม่ถูกต้อง กรุณาลองใหม่อีกครั้ง');
+            return;
+        }
+        if(data.status !== 'success') throw new Error(data.message || 'AI ตอบกลับไม่สำเร็จ');
+        addMessage(data.answer, 'bot', data.updatedAt ? `อ้างอิงข้อมูลสรุปล่าสุด ${data.updatedAt}` : '');
+    } catch(error) {
+        pending.remove();
+        addMessage(`เชื่อมต่อ AI ไม่สำเร็จ: ${error.message}`);
+    } finally {
+        setBusy(false);
+    }
 }
 function askQuick(question) { ask(question); }
 document.getElementById('chatForm').addEventListener('submit', event => {
@@ -235,16 +139,7 @@ document.getElementById('chatForm').addEventListener('submit', event => {
     ask(input.value);
     input.value = '';
 });
-addMessage('สวัสดีครับ ฉันคือผู้ช่วยบริหารรุ่นเริ่มต้น\nถามสรุปรายได้ คำนวณส่วนแบ่ง 30% หรือขอคำแนะนำราคาห้องเดือนหน้าได้เลย');
-Papa.parse(FINANCE_CSV_URL, {
-    download:true, header:true, skipEmptyLines:true,
-    complete: result => {
-        financeRows = result.data;
-        loadedAt = new Date();
-        document.getElementById('dataStatus').textContent = `พร้อมใช้: ${financeRows.length.toLocaleString()} รายการ`;
-    },
-    error: () => document.getElementById('dataStatus').textContent = 'โหลดข้อมูลไม่สำเร็จ'
-});
+addMessage('สวัสดีครับ ฉันคือผู้ช่วยบริหาร AI\nถามสรุปรายได้ วิเคราะห์แนวโน้ม ดูวันหยุดเดือนหน้า หรือขอคำแนะนำราคาห้องได้เลย');
 </script>
 </body>
 </html>
