@@ -165,7 +165,7 @@
 <script>
 const BACKEND_URL = "https://script.google.com/macros/s/AKfycbyLFO7dgjgdeDY5ETh7B_mV-bJG8T_tHnw-a41sOTfw9EKCoknUv2MJ2CP9yVJtL9CbfA/exec";
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzKj6d7mAV-9SVvIKHA1SyWMJcUFMQ5241Mz5xWTLMtOaPRQgfQFfdaGOqOHRkrShd5/exec";
-const FINANCE_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSFeS1r3x0m5TlzHS8O19Qy0uuY9aGXJlEogF1lZkEdlgPewwdCLefvSNmch6MBm83CvUYTEOBMvK2T/pub?gid=109167594&single=true&output=csv";
+const FINANCE_CSV_URL = "";
 const ROOM_NUMBERS = { 'std': ['1', '2', '3', '4', '5'], 'jac': ['6', '7'], 'fam': ['8', '9'], 'sea': ['10'] };
 const ROOM_DATA = { 'std': { name: 'Standard', price: 1900, short: 'Std' }, 'fam': { name: 'Family', price: 2900, short: 'Fam' }, 'sea': { name: 'Deluxe Twin Bed', price: 2900, short: 'Deluxe Twin' }, 'jac': { name: 'Jacuzzi', price: 3500, short: 'Jac' } };
 let currentMode = 'booking'; let roomMode = 'single'; let currentPayload = null; let globalBookedRooms = {};
@@ -235,7 +235,7 @@ function loadBookings(){
     const container = document.getElementById('bookingListContainer');
     loading.style.display = 'block';
     container.innerHTML = '';
-    callAPI('getActiveBookings').then(enrichBookingLineNames).then(data => {
+    callAPI('getActiveBookings').then(data => {
         loading.style.display = 'none';
         if(!data || data.length === 0){
             container.innerHTML = '<p style="text-align:center; color:#888;">ไม่พบข้อมูลการจอง</p>';
