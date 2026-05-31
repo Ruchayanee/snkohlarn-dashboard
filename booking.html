@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ระบบการจอง SN Koh Larn</title>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <style>
         :root { --primary-brown: #a68b6d; --light-brown: #d7ccc8; --bg-color: #f8f5f2; --text-dark: #4e443f; --white: #ffffff; --accent-green: #6d8a7a; --orange: #e67e22; }
         body { font-family: 'Kanit', sans-serif; background-color: var(--bg-color); color: var(--text-dark); margin: 0; padding: 15px; }
@@ -164,9 +165,11 @@
 <script>
 const BACKEND_URL = "https://script.google.com/macros/s/AKfycbyLFO7dgjgdeDY5ETh7B_mV-bJG8T_tHnw-a41sOTfw9EKCoknUv2MJ2CP9yVJtL9CbfA/exec";
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzKj6d7mAV-9SVvIKHA1SyWMJcUFMQ5241Mz5xWTLMtOaPRQgfQFfdaGOqOHRkrShd5/exec";
+const FINANCE_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSFeS1r3x0m5TlzHS8O19Qy0uuY9aGXJlEogF1lZkEdlgPewwdCLefvSNmch6MBm83CvUYTEOBMvK2T/pub?gid=109167594&single=true&output=csv";
 const ROOM_NUMBERS = { 'std': ['1', '2', '3', '4', '5'], 'jac': ['6', '7'], 'fam': ['8', '9'], 'sea': ['10'] };
 const ROOM_DATA = { 'std': { name: 'Standard', price: 1900, short: 'Std' }, 'fam': { name: 'Family', price: 2900, short: 'Fam' }, 'sea': { name: 'Deluxe Twin Bed', price: 2900, short: 'Deluxe Twin' }, 'jac': { name: 'Jacuzzi', price: 3500, short: 'Jac' } };
 let currentMode = 'booking'; let roomMode = 'single'; let currentPayload = null; let globalBookedRooms = {};
+let lineNameLookupPromise = null;
 async function callAPI(action, payload = {}) { const response = await fetch(WEB_APP_URL, { method: "POST", body: JSON.stringify({ action, data: payload }), headers: { "Content-Type": "text/plain;charset=utf-8" } }); return await response.json(); }
 window.onload = function() { document.querySelectorAll('.mainRoomType').forEach(sel => handleRoomTypeChange(sel)); const pendingBooking = sessionStorage.getItem('pendingBooking'); if (pendingBooking) { const data = JSON.parse(pendingBooking); if(data.name || data.custName) document.getElementById('custName').value = data.name || data.custName; if(data.phone || data.contactSource) document.getElementById('contactSource').value = data.phone || data.contactSource; if(data.line || data.lineName) document.getElementById('lineName').value = data.line || data.lineName; const slipUrl = data.slip || data.slipUrl; if (slipUrl) document.getElementById('pendingSlipArea').innerHTML = `<div class="slip-preview-container" id="slipBox"><div style="flex:1;"><p style="margin:0; font-weight:bold; color:#d35400; font-size:14px;">📢 ข้อมูลรอการจอง (โอนสลิปแล้ว)</p><p style="margin:5px 0; font-size:11px; color:#666;">ส่งมาจาก Line: <b>${data.line || data.lineName || '-'}</b></p><button onclick="clearPendingData()" style="background:#e74c3c; color:white; border:none; padding:4px 8px; border-radius:5px; font-size:10px; cursor:pointer; margin-top:5px;">ล้างข้อมูลที่ค้างไว้</button></div><div><a href="${slipUrl}" target="_blank" style="background:#fff; border:2px solid #3498db; color:#3498db; padding:10px 15px; border-radius:12px; font-size:13px; font-weight:bold; text-decoration:none; display:inline-flex;">🖼️ คลิกเพื่อดูสลิป</a></div></div>`; } };
 function clearPendingData(){ sessionStorage.removeItem('pendingBooking'); const box=document.getElementById('pendingSlipArea'); if(box) box.innerHTML=''; }
@@ -190,12 +193,49 @@ function escapeHtml(value) {
 function bookingActionArg(value) {
     return encodeURIComponent(String(value == null ? '' : value));
 }
+function normalizeBookingLookup(value) {
+    return String(value == null ? '' : value).replace(/^Walk-in:\s*/i, '').trim().replace(/\s+/g, ' ').toLowerCase();
+}
+function loadLineNameLookup() {
+    if(lineNameLookupPromise) return lineNameLookupPromise;
+    lineNameLookupPromise = new Promise(resolve => {
+        Papa.parse(FINANCE_CSV_URL, {
+            download: true,
+            header: true,
+            skipEmptyLines: true,
+            complete: results => {
+                const byNameAndContact = new Map();
+                const byName = new Map();
+                results.data.forEach(row => {
+                    const name = normalizeBookingLookup(row['ชื่อลูกค้า']);
+                    const contact = normalizeBookingLookup(row['ช่องทางการจอง']);
+                    const lineName = String(row['ชื่อ LINE ลูกค้า (สำคัญมาก)'] || '').trim();
+                    if(!name || !lineName) return;
+                    byName.set(name, lineName);
+                    if(contact) byNameAndContact.set(`${name}|${contact}`, lineName);
+                });
+                resolve({ byNameAndContact, byName });
+            },
+            error: () => resolve({ byNameAndContact: new Map(), byName: new Map() })
+        });
+    });
+    return lineNameLookupPromise;
+}
+function enrichBookingLineNames(bookings) {
+    return loadLineNameLookup().then(lookup => bookings.map(item => {
+        if(item.lineName || item.line) return item;
+        const name = normalizeBookingLookup(item.name);
+        const contact = normalizeBookingLookup(item.contact);
+        const lineName = lookup.byNameAndContact.get(`${name}|${contact}`) || lookup.byName.get(name) || '';
+        return lineName ? { ...item, lineName } : item;
+    }));
+}
 function loadBookings(){
     const loading = document.getElementById('loadingManage');
     const container = document.getElementById('bookingListContainer');
     loading.style.display = 'block';
     container.innerHTML = '';
-    callAPI('getActiveBookings').then(data => {
+    callAPI('getActiveBookings').then(enrichBookingLineNames).then(data => {
         loading.style.display = 'none';
         if(!data || data.length === 0){
             container.innerHTML = '<p style="text-align:center; color:#888;">ไม่พบข้อมูลการจอง</p>';
