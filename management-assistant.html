@@ -67,6 +67,43 @@
 const MANAGEMENT_AI_URL = 'https://script.google.com/macros/s/AKfycbxgQ_XsyiuSUO5VnVDBV4iWmB29g0rmpMZmZhpb5hBS7ZrE3G9lJ0_p0zbMxPkLbKqK/exec';
 let adminPin = sessionStorage.getItem('snManagementAdminPin') || '';
 let busy = false;
+let bridgeReady = false;
+let requestSequence = 0;
+const pendingRequests = new Map();
+const bridge = document.createElement('iframe');
+bridge.hidden = true;
+bridge.src = `${MANAGEMENT_AI_URL}?bridge=1`;
+bridge.title = 'SN Koh Larn Management AI Bridge';
+document.body.appendChild(bridge);
+
+window.addEventListener('message', event => {
+    const message = event.data || {};
+    if(message.type === 'SN_MANAGEMENT_AI_READY') {
+        bridgeReady = true;
+        document.getElementById('dataStatus').textContent = 'พร้อมถาม AI';
+        return;
+    }
+    if(message.type !== 'SN_MANAGEMENT_AI_RESPONSE') return;
+    const pending = pendingRequests.get(message.requestId);
+    if(!pending) return;
+    clearTimeout(pending.timer);
+    pendingRequests.delete(message.requestId);
+    pending.resolve(message.data);
+});
+function askBackend(payload) {
+    return new Promise((resolve, reject) => {
+        const requestId = `sn-${Date.now()}-${++requestSequence}`;
+        const timer = setTimeout(() => {
+            pendingRequests.delete(requestId);
+            reject(new Error('บริการ AI ไม่ตอบกลับ กรุณาลองใหม่'));
+        }, 45000);
+        pendingRequests.set(requestId, { resolve, timer });
+        bridge.contentWindow.postMessage({ type:'SN_MANAGEMENT_AI_REQUEST', requestId, payload }, '*');
+    });
+}
+bridge.addEventListener('load', () => {
+    bridge.contentWindow.postMessage({ type:'SN_MANAGEMENT_AI_PING' }, '*');
+});
 
 function addMessage(text, type='bot', sourceText='') {
     const box = document.createElement('div');
@@ -111,12 +148,8 @@ async function ask(question) {
     setBusy(true);
     const pending = addMessage('กำลังอ่านข้อมูลสรุปและวิเคราะห์ กรุณารอสักครู่...');
     try {
-        const response = await fetch(MANAGEMENT_AI_URL, {
-            method:'POST',
-            headers:{ 'Content-Type':'text/plain;charset=utf-8' },
-            body:JSON.stringify({ action:'askManagementAI', pin, question:text })
-        });
-        const data = await response.json();
+        if(!bridgeReady) throw new Error('สะพานเชื่อมต่อ AI ยังไม่พร้อม กรุณารอสักครู่แล้วลองใหม่');
+        const data = await askBackend({ action:'askManagementAI', pin, question:text });
         pending.remove();
         if(data.status === 'unauthorized') {
             clearPin();
