@@ -198,6 +198,7 @@
 
     <script>
         const BACKEND_URL = "https://script.google.com/macros/s/AKfycbyLFO7dgjgdeDY5ETh7B_mV-bJG8T_tHnw-a41sOTfw9EKCoknUv2MJ2CP9yVJtL9CbfA/exec";
+        const BOOKING_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzKj6d7mAV-9SVvIKHA1SyWMJcUFMQ5241Mz5xWTLMtOaPRQgfQFfdaGOqOHRkrShd5/exec";
         const FINANCE_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSFeS1r3x0m5TlzHS8O19Qy0uuY9aGXJlEogF1lZkEdlgPewwdCLefvSNmch6MBm83CvUYTEOBMvK2T/pub?gid=109167594&single=true&output=csv';
         const STOCK_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQk1DLhmM8DEn1BEc8DWFUWjHAxYvGBXNKuEPZQKZw_pMBA3eQc_w1pS8QIea9fyOKGOCYUQygjyLzf/pub?gid=0&single=true&output=csv';
 
@@ -296,7 +297,13 @@
 
                         let actionButton = '';
                         if (item.status === 'อนุมัติแล้ว') {
-                            actionButton = '<span class="text-emerald-600 font-bold text-xs">✅ อนุมัติแล้ว</span>';
+                            const lineName = encodeURIComponent(item.lineName || '');
+                            const custName = encodeURIComponent(item.custName || '');
+                            actionButton = `<div class="space-y-2">
+                                <span class="block text-emerald-600 font-bold text-xs">✅ อนุมัติแล้ว</span>
+                                <button onclick="openBookingManager()" class="bg-amber-500 text-white px-3 py-2 rounded-xl text-[11px] font-bold hover:bg-amber-600 shadow-md w-full">✏️ แก้ไขบุ๊กกิ้ง</button>
+                                <button onclick="resendBookingCard(decodeURIComponent('${lineName}'), decodeURIComponent('${custName}'), this)" class="bg-emerald-600 text-white px-3 py-2 rounded-xl text-[11px] font-bold hover:bg-emerald-700 shadow-md w-full">🔁 ส่งการ์ดใหม่</button>
+                            </div>`;
                         } else if (item.status === 'ยกเลิก') {
                             actionButton = '<span class="text-rose-500 font-bold text-xs">❌ ยกเลิกแล้ว</span>';
                         } else {
@@ -321,6 +328,39 @@
             const bookingPackage = { name: name, phone: phone, line: line, slip: slip, rowId: rowId };
             sessionStorage.setItem('pendingBooking', JSON.stringify(bookingPackage));
             window.location.href = 'booking.html'; 
+        }
+
+        function openBookingManager() {
+            window.location.href = 'booking.html?mode=manage';
+        }
+
+        async function resendBookingCard(lineName, custName, button) {
+            if (!lineName) {
+                alert('ไม่พบชื่อ LINE ของลูกค้ารายการนี้');
+                return;
+            }
+            if (!confirm(`ส่งการ์ดยืนยันการจองใหม่ให้ LINE: ${lineName} ใช่หรือไม่?`)) return;
+            const originalText = button.innerText;
+            button.disabled = true;
+            button.innerText = '⏳ กำลังส่ง...';
+            try {
+                const response = await fetch(BOOKING_WEB_APP_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({ action: 'resendBookingCard', data: { lineName, custName } })
+                });
+                const result = await response.json();
+                if (result === 'SUCCESS') {
+                    alert('✅ ส่งการ์ดยืนยันใหม่สำเร็จแล้ว');
+                } else {
+                    alert('❌ ส่งการ์ดไม่สำเร็จ: ' + result);
+                }
+            } catch (error) {
+                alert('❌ เชื่อมต่อระบบส่งการ์ดไม่สำเร็จ: ' + error.message);
+            } finally {
+                button.disabled = false;
+                button.innerText = originalText;
+            }
         }
 
         function loadStockData() {
