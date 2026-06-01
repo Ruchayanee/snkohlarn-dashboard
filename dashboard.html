@@ -297,10 +297,11 @@
                         let actionButton = '';
                         if (item.status === 'อนุมัติแล้ว') {
                             const lineName = encodeURIComponent(item.lineName || '');
+                            const custName = encodeURIComponent(item.custName || '');
                             const phone = encodeURIComponent(item.phone || '');
                             actionButton = `<div class="space-y-2">
                                 <span class="block text-emerald-600 font-bold text-xs">✅ อนุมัติแล้ว</span>
-                                <button onclick="reopenApprovedBooking(decodeURIComponent('${phone}'), decodeURIComponent('${lineName}'))" class="bg-amber-500 text-white px-3 py-2 rounded-xl text-[11px] font-bold hover:bg-amber-600 shadow-md w-full">✏️ แก้ไขบุ๊กกิ้ง</button>
+                                <button onclick="reopenApprovedBooking(decodeURIComponent('${custName}'), decodeURIComponent('${phone}'), decodeURIComponent('${lineName}'))" class="bg-amber-500 text-white px-3 py-2 rounded-xl text-[11px] font-bold hover:bg-amber-600 shadow-md w-full">✏️ แก้ไขบุ๊กกิ้ง</button>
                             </div>`;
                         } else if (item.status === 'ยกเลิก') {
                             actionButton = '<span class="text-rose-500 font-bold text-xs">❌ ยกเลิกแล้ว</span>';
@@ -328,8 +329,8 @@
             window.location.href = 'booking.html'; 
         }
 
-        function reopenApprovedBooking(phone, line) {
-            sessionStorage.setItem('pendingBooking', JSON.stringify({ phone, line }));
+        function reopenApprovedBooking(name, phone, line) {
+            sessionStorage.setItem('pendingBooking', JSON.stringify({ name, phone, line }));
             window.location.href = 'booking.html';
         }
 
