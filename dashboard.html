@@ -62,6 +62,11 @@
                     <label class="font-bold text-slate-600">ดูข้อมูลเดือน:</label>
                     <select id="month-selector" onchange="changeMonth()" class="p-2 border-2 border-slate-200 rounded-xl font-bold text-slate-700 bg-slate-50 outline-none"></select>
                 </div>
+                <div class="mt-5 flex flex-wrap justify-center gap-3">
+                    <button id="finance-mode-all" onclick="setFinanceMode('all')" class="bg-slate-900 text-white px-5 py-2 rounded-2xl text-sm font-bold shadow-md">ภาพรวมทั้งหมด</button>
+                    <button id="finance-mode-executive" onclick="setFinanceMode('executive')" class="bg-slate-100 text-slate-600 px-5 py-2 rounded-2xl text-sm font-bold hover:bg-slate-200">โหมดผู้บริหาร</button>
+                    <button id="finance-mode-detail" onclick="setFinanceMode('detail')" class="bg-slate-100 text-slate-600 px-5 py-2 rounded-2xl text-sm font-bold hover:bg-slate-200">โหมดรายละเอียด</button>
+                </div>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
@@ -81,6 +86,122 @@
                     <p class="text-emerald-100 text-xs font-bold uppercase">4. ส่วนแบ่ง 30% (สุทธิ)</p>
                     <p id="share-amount" class="text-3xl font-bold mt-1">0 ฿</p>
                 </div>
+            </div>
+
+            <div id="executive-panel" class="mb-10 bg-slate-900 text-white p-6 md:p-8 rounded-[2rem] shadow-xl">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-6">
+                    <div>
+                        <p class="text-slate-400 text-xs font-bold uppercase tracking-widest">Executive Summary</p>
+                        <h2 class="text-2xl font-bold">สรุปผู้บริหารประจำเดือน</h2>
+                    </div>
+                    <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+                        <p id="summary-status" class="bg-white/10 px-4 py-2 rounded-2xl text-sm font-bold text-slate-200">รอโหลดข้อมูล</p>
+                        <button onclick="copyExecutiveSummary()" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-2xl text-xs font-bold shadow-md transition-all">
+                            คัดลอกสรุปผู้บริหาร
+                        </button>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="bg-white/10 p-5 rounded-3xl">
+                        <p class="text-slate-300 text-xs font-bold">กำไรหลังหักค่าใช้จ่าย</p>
+                        <p id="summary-net-profit" class="text-2xl font-bold mt-1 text-emerald-300">0 ฿</p>
+                    </div>
+                    <div class="bg-white/10 p-5 rounded-3xl">
+                        <p class="text-slate-300 text-xs font-bold">ส่วนแบ่ง 30%</p>
+                        <p id="summary-owner-share" class="text-2xl font-bold mt-1 text-amber-300">0 ฿</p>
+                    </div>
+                    <div class="bg-white/10 p-5 rounded-3xl">
+                        <p class="text-slate-300 text-xs font-bold">ยอดคงเหลือ 70%</p>
+                        <p id="summary-business-share" class="text-2xl font-bold mt-1 text-blue-300">0 ฿</p>
+                    </div>
+                    <div class="bg-white/10 p-5 rounded-3xl">
+                        <p class="text-slate-300 text-xs font-bold">อัตราเข้าพักโดยประมาณ</p>
+                        <p id="summary-occupancy" class="text-2xl font-bold mt-1 text-rose-300">0%</p>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
+                    <div class="bg-white/10 p-5 rounded-3xl">
+                        <p class="text-slate-300 text-xs font-bold">จำนวนห้อง-คืน</p>
+                        <p id="summary-room-nights" class="text-2xl font-bold mt-1 text-white">0</p>
+                    </div>
+                    <div class="bg-white/10 p-5 rounded-3xl">
+                        <p class="text-slate-300 text-xs font-bold">รายได้เฉลี่ยต่อห้อง-คืน</p>
+                        <p id="summary-income-per-night" class="text-2xl font-bold mt-1 text-emerald-300">0 ฿</p>
+                    </div>
+                    <div class="bg-white/10 p-5 rounded-3xl">
+                        <p class="text-slate-300 text-xs font-bold">ค่าไฟต่อห้อง-คืน</p>
+                        <p id="summary-electric-per-night" class="text-2xl font-bold mt-1 text-amber-300">0 ฿</p>
+                    </div>
+                    <div class="bg-white/10 p-5 rounded-3xl">
+                        <p class="text-slate-300 text-xs font-bold">ค่าใช้จ่ายต่อห้อง-คืน</p>
+                        <p id="summary-expense-per-night" class="text-2xl font-bold mt-1 text-rose-300">0 ฿</p>
+                    </div>
+                </div>
+                <p id="summary-note" class="mt-5 text-sm text-slate-300 leading-relaxed">เมื่อเลือกเดือน ระบบจะสรุปภาพรวมให้ทันที</p>
+                <p id="copy-summary-status" class="mt-3 text-xs text-blue-300 font-bold hidden">คัดลอกสรุปแล้ว</p>
+                <div class="mt-5 grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    <div class="bg-white/10 border border-white/10 rounded-3xl p-5">
+                        <p class="font-bold text-sm mb-3 text-slate-100">สัญญาณเตือนผู้บริหาร</p>
+                        <div id="summary-alerts" class="space-y-2 text-sm text-slate-200">
+                            <p>รอโหลดข้อมูล</p>
+                        </div>
+                    </div>
+                    <div class="bg-white/10 border border-white/10 rounded-3xl p-5">
+                        <p class="font-bold text-sm mb-3 text-slate-100">คำแนะนำเบื้องต้น</p>
+                        <div id="summary-recommendations" class="space-y-2 text-sm text-slate-200">
+                            <p>รอโหลดข้อมูล</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-4 bg-white/10 border border-white/10 rounded-3xl p-5">
+                    <p class="font-bold text-sm mb-4 text-slate-100">แนะนำราคาขั้นต้น</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div class="bg-black/20 rounded-2xl p-4">
+                            <p class="text-slate-300 text-xs font-bold">วันธรรมดา</p>
+                            <p id="price-weekday" class="text-2xl font-bold text-emerald-300 mt-1">0 ฿</p>
+                        </div>
+                        <div class="bg-black/20 rounded-2xl p-4">
+                            <p class="text-slate-300 text-xs font-bold">ศุกร์-เสาร์</p>
+                            <p id="price-weekend" class="text-2xl font-bold text-amber-300 mt-1">0 ฿</p>
+                        </div>
+                        <div class="bg-black/20 rounded-2xl p-4">
+                            <p class="text-slate-300 text-xs font-bold">วันหยุดยาว</p>
+                            <p id="price-holiday" class="text-2xl font-bold text-rose-300 mt-1">0 ฿</p>
+                        </div>
+                    </div>
+                    <p id="price-reason" class="mt-4 text-sm text-slate-300 leading-relaxed">รอโหลดข้อมูล</p>
+                </div>
+                <div class="mt-4 bg-white/10 border border-white/10 rounded-3xl p-5">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+                        <p class="font-bold text-sm text-slate-100">แนะนำราคาตามประเภทห้อง</p>
+                        <button onclick="copyPriceGuide()" class="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-2xl text-xs font-bold shadow-md transition-all">
+                            คัดลอกราคาที่แนะนำ
+                        </button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse text-sm">
+                            <thead>
+                                <tr class="text-slate-300 border-b border-white/10">
+                                    <th class="py-3 pr-4 font-bold">ประเภทห้อง</th>
+                                    <th class="py-3 px-4 font-bold">วันธรรมดา</th>
+                                    <th class="py-3 px-4 font-bold">ศุกร์-เสาร์</th>
+                                    <th class="py-3 pl-4 font-bold">วันหยุดยาว</th>
+                                </tr>
+                            </thead>
+                            <tbody id="room-type-price-body" class="text-slate-100">
+                                <tr><td colspan="4" class="py-4 text-slate-300">รอโหลดข้อมูล</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <p id="copy-price-status" class="mt-3 text-xs text-emerald-300 font-bold hidden">คัดลอกแล้ว</p>
+                    <p class="mt-4 text-xs text-slate-400">อ้างอิงสัดส่วนราคาจากระบบจอง: Standard, Family, Deluxe Twin Bed และ Jacuzzi</p>
+                </div>
+            </div>
+
+            <div id="operations-panel">
+            <div class="mb-10 bg-indigo-50 border border-indigo-100 p-5 rounded-3xl text-sm text-indigo-900">
+                <p class="font-bold mb-2">วิธีเพิ่มค่าใช้จ่ายใน Google Sheet</p>
+                <p>เพิ่มรายการในช่อง <span class="font-bold">หมายเหตุ</span> ได้ เช่น <span class="font-bold">ค่าไฟ 5200</span>, <span class="font-bold">คนงาน 3000</span>, <span class="font-bold">ทิป 500</span> หรือใส่รวมกันเป็น <span class="font-bold">ค่าไฟ 5200 คนงาน 3000 ทิป 500</span></p>
             </div>
 
             <div class="mb-12 bg-slate-50 p-6 rounded-3xl border border-slate-200">
@@ -127,6 +248,7 @@
                 </div>
                 <p class="text-slate-400 text-xs mb-1">ยอดที่ต้องโอน (หลังหักค่าใช้จ่าย):</p>
                 <p id="qr-amount" class="text-4xl font-bold text-emerald-400">0 ฿</p>
+            </div>
             </div>
         </div>
 
@@ -203,6 +325,8 @@
 
         let allDataByMonth = {}; 
         let currentChart = null;
+        let latestExecutiveSummaryText = "";
+        let latestPriceGuideText = "";
 
         window.onload = () => {
             // โหลดข้อมูลบัญชี
@@ -244,6 +368,26 @@
                 viewVerify.classList.remove('hidden');
                 loadPendingOrders();
             }
+        }
+
+        function setFinanceMode(mode) {
+            const executivePanel = document.getElementById('executive-panel');
+            const operationsPanel = document.getElementById('operations-panel');
+            const buttons = {
+                all: document.getElementById('finance-mode-all'),
+                executive: document.getElementById('finance-mode-executive'),
+                detail: document.getElementById('finance-mode-detail')
+            };
+
+            executivePanel.classList.toggle('hidden', mode === 'detail');
+            operationsPanel.classList.toggle('hidden', mode === 'executive');
+
+            Object.entries(buttons).forEach(([key, btn]) => {
+                const isActive = key === mode;
+                btn.className = isActive
+                    ? "bg-slate-900 text-white px-5 py-2 rounded-2xl text-sm font-bold shadow-md"
+                    : "bg-slate-100 text-slate-600 px-5 py-2 rounded-2xl text-sm font-bold hover:bg-slate-200";
+            });
         }
 
         async function loadPendingOrders(limit = 30) {
@@ -368,11 +512,15 @@
         function extractAmount(text, keywords) {
             if (!text) return 0;
             const str = text.toString();
-            let isFound = false;
-            keywords.forEach(kw => { if(str.includes(kw)) isFound = true; });
-            if (!isFound) return 0;
-            const match = str.match(/\d+[\d,.]*/);
-            return match ? parseFloat(match[0].replace(/,/g, '')) : 0;
+            return keywords.reduce((sum, kw) => {
+                const escapedKeyword = kw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                const regex = new RegExp(`${escapedKeyword}\\s*[:=]?\\s*(\\d[\\d,.]*)`, 'g');
+                let match;
+                while ((match = regex.exec(str)) !== null) {
+                    sum += parseFloat(match[1].replace(/,/g, '')) || 0;
+                }
+                return sum;
+            }, 0);
         }
 
         function processData(rows) {
@@ -425,16 +573,214 @@
             const m = document.getElementById('month-selector').value;
             const d = allDataByMonth[m];
             if(!d) return;
-            let shareAmount = (d.totalIncome - d.totalElec - d.totalExp) * 0.3;
+            const netProfit = d.totalIncome - d.totalElec - d.totalExp;
+            let shareAmount = netProfit * 0.3;
+            const businessShare = netProfit * 0.7;
             document.getElementById('total-income').innerText = d.totalIncome.toLocaleString() + " ฿";
             document.getElementById('total-electricity').innerText = "- " + d.totalElec.toLocaleString() + " ฿";
             document.getElementById('total-expenses').innerText = "- " + d.totalExp.toLocaleString() + " ฿";
             document.getElementById('share-amount').innerText = shareAmount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + " ฿";
             document.getElementById('qr-amount').innerText = shareAmount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + " ฿";
+            updateExecutiveSummary(m, d, netProfit, shareAmount, businessShare);
             const sortedDates = Object.keys(d.dailyData).sort();
             document.getElementById('date-select').value = sortedDates[sortedDates.length - 1] || "";
             updateDailyView();
             renderChart(m, d.dailyData);
+        }
+
+        function updateExecutiveSummary(monthKey, data, netProfit, ownerShare, businessShare) {
+            const [year, month] = monthKey.split('-').map(Number);
+            const daysInMonth = new Date(year, month, 0).getDate();
+            const roomNights = Object.values(data.dailyData).reduce((sum, day) => sum + day.rooms.length, 0);
+            const occupancyRate = daysInMonth ? (roomNights / (daysInMonth * 10)) * 100 : 0;
+            const expenseTotal = data.totalElec + data.totalExp;
+            const expenseRate = data.totalIncome ? (expenseTotal / data.totalIncome) * 100 : 0;
+            const incomePerRoomNight = roomNights ? data.totalIncome / roomNights : 0;
+            const electricPerRoomNight = roomNights ? data.totalElec / roomNights : 0;
+            const expensePerRoomNight = roomNights ? expenseTotal / roomNights : 0;
+            const formatMoney = value => value.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + " ฿";
+
+            document.getElementById('summary-net-profit').innerText = formatMoney(netProfit);
+            document.getElementById('summary-owner-share').innerText = formatMoney(ownerShare);
+            document.getElementById('summary-business-share').innerText = formatMoney(businessShare);
+            document.getElementById('summary-occupancy').innerText = occupancyRate.toFixed(1) + "%";
+            document.getElementById('summary-room-nights').innerText = roomNights.toLocaleString();
+            document.getElementById('summary-income-per-night').innerText = formatMoney(incomePerRoomNight);
+            document.getElementById('summary-electric-per-night').innerText = formatMoney(electricPerRoomNight);
+            document.getElementById('summary-expense-per-night').innerText = formatMoney(expensePerRoomNight);
+            const alerts = buildExecutiveAlerts(data, netProfit, occupancyRate, expenseRate, roomNights, electricPerRoomNight, incomePerRoomNight);
+            const recommendations = buildExecutiveRecommendations(data, netProfit, occupancyRate, expenseRate, roomNights, electricPerRoomNight, incomePerRoomNight);
+            const priceGuide = buildPriceGuide(incomePerRoomNight, expensePerRoomNight, occupancyRate);
+            const monthLabel = formatMonthLabel(monthKey);
+            document.getElementById('summary-status').innerText = alerts.level;
+            document.getElementById('summary-note').innerText = `เดือนนี้มีรายได้ ${formatMoney(data.totalIncome)} ค่าใช้จ่ายรวม ${formatMoney(expenseTotal)} คิดเป็น ${expenseRate.toFixed(1)}% ของรายได้ และมีห้องถูกจองประมาณ ${roomNights} ห้อง-คืน`;
+            document.getElementById('summary-alerts').innerHTML = alerts.items.map(item => `<p>${item}</p>`).join('');
+            document.getElementById('summary-recommendations').innerHTML = recommendations.map(item => `<p>${item}</p>`).join('');
+            document.getElementById('price-weekday').innerText = formatMoney(priceGuide.weekday);
+            document.getElementById('price-weekend').innerText = formatMoney(priceGuide.weekend);
+            document.getElementById('price-holiday').innerText = formatMoney(priceGuide.holiday);
+            document.getElementById('price-reason').innerText = priceGuide.reason;
+            renderRoomTypePriceGuide(priceGuide, formatMoney);
+            latestExecutiveSummaryText = [
+                `สรุปผู้บริหาร SN Koh Larn (${monthLabel})`,
+                `สถานะ: ${alerts.level}`,
+                `รายได้รวม: ${formatMoney(data.totalIncome)}`,
+                `ค่าไฟ: ${formatMoney(data.totalElec)}`,
+                `ค่าคนงาน/ทิป: ${formatMoney(data.totalExp)}`,
+                `กำไรหลังหักค่าใช้จ่าย: ${formatMoney(netProfit)}`,
+                `ส่วนแบ่ง 30%: ${formatMoney(ownerShare)}`,
+                `ยอดคงเหลือ 70%: ${formatMoney(businessShare)}`,
+                `อัตราเข้าพัก: ${occupancyRate.toFixed(1)}%`,
+                `จำนวนห้อง-คืน: ${roomNights.toLocaleString()}`,
+                `รายได้เฉลี่ยต่อห้อง-คืน: ${formatMoney(incomePerRoomNight)}`,
+                `ค่าไฟต่อห้อง-คืน: ${formatMoney(electricPerRoomNight)}`,
+                `ค่าใช้จ่ายต่อห้อง-คืน: ${formatMoney(expensePerRoomNight)}`,
+                "",
+                "สัญญาณเตือน:",
+                ...alerts.items.map(item => `- ${item}`),
+                "",
+                "คำแนะนำ:",
+                ...recommendations.map(item => `- ${item}`),
+                "",
+                `ราคาแนะนำกลาง: วันธรรมดา ${formatMoney(priceGuide.weekday)} | ศุกร์-เสาร์ ${formatMoney(priceGuide.weekend)} | วันหยุดยาว ${formatMoney(priceGuide.holiday)}`
+            ].join("\n");
+        }
+
+        function formatMonthLabel(monthKey) {
+            const [year, month] = monthKey.split('-');
+            const mNames = ["","ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย.","ต.ค.","พ.ย.","ธ.ค."];
+            return `${mNames[parseInt(month)]} ${year}`;
+        }
+
+        function buildExecutiveAlerts(data, netProfit, occupancyRate, expenseRate, roomNights, electricPerRoomNight, incomePerRoomNight) {
+            const alerts = [];
+            if (data.totalIncome <= 0) alerts.push("ยังไม่มีรายได้ในเดือนนี้ ควรตรวจว่าข้อมูลจองถูกบันทึกครบหรือยัง");
+            if (netProfit < 0) alerts.push("กำไรหลังหักค่าใช้จ่ายติดลบ ควรตรวจรายการค่าใช้จ่ายและราคาขายจริง");
+            if (expenseRate > 35) alerts.push(`ค่าใช้จ่ายรวมสูง ${expenseRate.toFixed(1)}% ของรายได้ ควรดูค่าไฟ/คนงานเป็นพิเศษ`);
+            if (incomePerRoomNight > 0 && incomePerRoomNight < 1200) alerts.push(`รายได้เฉลี่ยต่อห้อง-คืนค่อนข้างต่ำประมาณ ${incomePerRoomNight.toFixed(0)} บาท ควรทบทวนราคาขาย`);
+            if (electricPerRoomNight > 250) alerts.push(`ค่าไฟต่อห้อง-คืนสูงประมาณ ${electricPerRoomNight.toFixed(0)} บาท ควรตรวจการใช้ไฟรายห้อง`);
+            if (occupancyRate < 35 && data.totalIncome > 0) alerts.push(`อัตราเข้าพักค่อนข้างต่ำ ${occupancyRate.toFixed(1)}% ควรเร่งโปรโมตหรือปรับราคา`);
+            if (roomNights < 20 && data.totalIncome > 0) alerts.push("จำนวนห้อง-คืนยังน้อย ควรเช็กวันว่างและทำแพ็กเกจกระตุ้นยอด");
+            if (alerts.length === 0) alerts.push("ยังไม่พบจุดเสี่ยงสำคัญ ภาพรวมเดือนนี้อยู่ในเกณฑ์ดี");
+
+            let level = "ภาพรวมปกติ";
+            if (netProfit < 0 || expenseRate > 35) level = "ต้องตรวจด่วน";
+            else if (occupancyRate < 35 || roomNights < 20) level = "ควรเฝ้าดู";
+
+            return { level, items: alerts };
+        }
+
+        function buildExecutiveRecommendations(data, netProfit, occupancyRate, expenseRate, roomNights, electricPerRoomNight, incomePerRoomNight) {
+            const recommendations = [];
+            if (data.totalIncome <= 0) {
+                recommendations.push("เริ่มจากตรวจว่า Google Sheet เดือนนี้มีรายการจองและราคาขายจริงครบหรือยัง");
+                recommendations.push("ถ้ายังไม่มีจอง ควรทำโปรโมชันเปิดเดือนหรือโพสต์ห้องว่างทันที");
+                return recommendations;
+            }
+            if (netProfit < 0 || expenseRate > 35) {
+                recommendations.push("คุมค่าใช้จ่ายก่อน โดยแยกดูค่าไฟ คนงาน และทิปว่ารายการไหนสูงผิดปกติ");
+                recommendations.push("ถ้าค่าไฟสูง ให้เทียบกับจำนวนห้อง-คืนเพื่อดูว่าใช้ไฟต่อห้องแพงเกินไปหรือไม่");
+            }
+            if (electricPerRoomNight > 250) {
+                recommendations.push("ค่าไฟต่อห้อง-คืนสูง ควรตรวจแอร์ เครื่องทำน้ำอุ่น และการเปิดไฟหลังลูกค้าเช็กเอาต์");
+            }
+            if (incomePerRoomNight > 0 && incomePerRoomNight < 1200) {
+                recommendations.push("รายได้เฉลี่ยต่อห้อง-คืนต่ำ ควรแยกดูว่าห้องไหนขายถูกเกินไปและปรับราคาในวันศุกร์-เสาร์");
+            }
+            if (occupancyRate < 35 || roomNights < 20) {
+                recommendations.push("เร่งขายวันว่างด้วยโปรวันธรรมดา หรือแพ็กเกจพักหลายคืน");
+                recommendations.push("เช็กวันศุกร์-เสาร์ที่ยังว่าง ถ้ายังเหลือเยอะควรลดราคาหรือเพิ่มของแถม");
+            }
+            if (occupancyRate >= 70 && expenseRate <= 25 && netProfit > 0) {
+                recommendations.push("ภาพรวมดี สามารถรักษาราคาเดิมหรือทดลองขึ้นราคาวันศุกร์-เสาร์เล็กน้อย");
+                recommendations.push("เก็บข้อมูลราคาที่ขายได้จริงไว้เป็นฐานให้ AI แนะนำราคาในเดือนถัดไป");
+            }
+            if (recommendations.length === 0) {
+                recommendations.push("ภาพรวมยังอยู่ในระดับกลาง ควรติดตามยอดจองรายสัปดาห์และเติมข้อมูลค่าใช้จ่ายให้ครบ");
+            }
+            return recommendations;
+        }
+
+        function buildPriceGuide(incomePerRoomNight, expensePerRoomNight, occupancyRate) {
+            let basePrice = incomePerRoomNight || 1500;
+            const minimumPrice = Math.max(1200, expensePerRoomNight * 2.2);
+
+            if (occupancyRate >= 75) basePrice *= 1.12;
+            else if (occupancyRate >= 55) basePrice *= 1.05;
+            else if (occupancyRate < 35) basePrice *= 0.95;
+
+            basePrice = Math.max(basePrice, minimumPrice);
+            const roundPrice = value => Math.round(value / 100) * 100;
+            const weekday = roundPrice(basePrice);
+            const weekend = roundPrice(basePrice * 1.18);
+            const holiday = roundPrice(basePrice * 1.35);
+
+            let reason = "คำนวณจากราคาขายเฉลี่ย ต้นทุนต่อห้อง-คืน และอัตราเข้าพักของเดือนที่เลือก";
+            if (occupancyRate >= 75) reason = "อัตราเข้าพักสูง ระบบจึงแนะนำให้ขยับราคาขึ้น โดยเฉพาะศุกร์-เสาร์และวันหยุดยาว";
+            else if (occupancyRate < 35) reason = "อัตราเข้าพักยังต่ำ ระบบจึงแนะนำราคาที่ไม่ดันสูงเกินไปเพื่อช่วยเร่งยอดจอง";
+
+            return { weekday, weekend, holiday, reason };
+        }
+
+        function renderRoomTypePriceGuide(priceGuide, formatMoney) {
+            const roomTypes = [
+                { name: "Standard", ratio: 1 },
+                { name: "Family", ratio: 2900 / 1900 },
+                { name: "Deluxe Twin Bed", ratio: 2900 / 1900 },
+                { name: "Jacuzzi", ratio: 3500 / 1900 }
+            ];
+            const roundPrice = value => Math.round(value / 100) * 100;
+            const rows = roomTypes.map(room => {
+                const weekday = roundPrice(priceGuide.weekday * room.ratio);
+                const weekend = roundPrice(priceGuide.weekend * room.ratio);
+                const holiday = roundPrice(priceGuide.holiday * room.ratio);
+                return `<tr class="border-b border-white/10">
+                    <td class="py-3 pr-4 font-bold">${room.name}</td>
+                    <td class="py-3 px-4 text-emerald-300 font-bold">${formatMoney(weekday)}</td>
+                    <td class="py-3 px-4 text-amber-300 font-bold">${formatMoney(weekend)}</td>
+                    <td class="py-3 pl-4 text-rose-300 font-bold">${formatMoney(holiday)}</td>
+                </tr>`;
+            });
+            document.getElementById('room-type-price-body').innerHTML = rows.join('');
+            latestPriceGuideText = [
+                "แนะนำราคาห้อง SN Koh Larn",
+                ...roomTypes.map(room => {
+                    const weekday = roundPrice(priceGuide.weekday * room.ratio);
+                    const weekend = roundPrice(priceGuide.weekend * room.ratio);
+                    const holiday = roundPrice(priceGuide.holiday * room.ratio);
+                    return `${room.name}: วันธรรมดา ${weekday.toLocaleString()} บาท | ศุกร์-เสาร์ ${weekend.toLocaleString()} บาท | วันหยุดยาว ${holiday.toLocaleString()} บาท`;
+                })
+            ].join("\n");
+        }
+
+        function copyExecutiveSummary() {
+            copyTextWithStatus(latestExecutiveSummaryText, 'copy-summary-status', "ยังไม่มีข้อมูลสรุปผู้บริหารครับ");
+        }
+
+        function copyPriceGuide() {
+            copyTextWithStatus(latestPriceGuideText, 'copy-price-status', "ยังไม่มีข้อมูลราคาที่แนะนำครับ");
+        }
+
+        function copyTextWithStatus(text, statusId, emptyMessage) {
+            if (!text) {
+                alert(emptyMessage);
+                return;
+            }
+            navigator.clipboard.writeText(text).then(() => {
+                const status = document.getElementById(statusId);
+                status.classList.remove('hidden');
+                setTimeout(() => status.classList.add('hidden'), 2000);
+            }).catch(() => {
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                const status = document.getElementById(statusId);
+                status.classList.remove('hidden');
+                setTimeout(() => status.classList.add('hidden'), 2000);
+            });
         }
 
         function updateDailyView() {
