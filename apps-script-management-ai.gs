@@ -215,9 +215,15 @@ function formatSheetDate_(value) {
 
 function extractAmount_(text, words) {
   const value = String(text || '');
-  if (!words.some(function(word) { return value.indexOf(word) !== -1; })) return 0;
-  const match = value.match(/\d+[\d,.]*/);
-  return match ? number_(match[0]) : 0;
+  return words.reduce(function(total, word) {
+    const escaped = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regex = new RegExp(escaped + '\\s*[:=]?\\s*(\\d[\\d,.]*)', 'g');
+    let match;
+    while ((match = regex.exec(value)) !== null) {
+      total += number_(match[1]);
+    }
+    return total;
+  }, 0);
 }
 
 function extractGeminiText_(data) {
