@@ -204,6 +204,49 @@
                 <p>เพิ่มรายการในช่อง <span class="font-bold">หมายเหตุ</span> ได้ เช่น <span class="font-bold">ค่าไฟ 5200</span>, <span class="font-bold">คนงาน 3000</span>, <span class="font-bold">ทิป 500</span> หรือใส่รวมกันเป็น <span class="font-bold">ค่าไฟ 5200 คนงาน 3000 ทิป 500</span></p>
             </div>
 
+            <div class="mb-10 bg-white border border-slate-200 rounded-3xl p-6 shadow-sm">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-5">
+                    <div>
+                        <p class="text-slate-400 text-xs font-bold uppercase">Expense Helper</p>
+                        <h2 class="text-xl font-bold text-slate-700">ตัวช่วยสร้างข้อความค่าใช้จ่าย</h2>
+                    </div>
+                    <button onclick="copyExpenseNote()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-2xl text-xs font-bold shadow-md transition-all">
+                        คัดลอกไปใส่ Google Sheet
+                    </button>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 mb-2">วันที่ใช้บันทึก</label>
+                        <input type="date" id="expense-date" class="w-full p-3 border border-slate-200 rounded-2xl bg-slate-50 text-slate-700" onchange="buildExpenseNote()">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 mb-2">หมวดค่าใช้จ่าย</label>
+                        <select id="expense-category" class="w-full p-3 border border-slate-200 rounded-2xl bg-slate-50 text-slate-700" onchange="buildExpenseNote()">
+                            <option value="ค่าไฟ">ค่าไฟ</option>
+                            <option value="คนงาน">คนงาน</option>
+                            <option value="ทิป">ทิป</option>
+                            <option value="ค่าน้ำ">ค่าน้ำ</option>
+                            <option value="ซักผ้า">ซักผ้า</option>
+                            <option value="ซ่อมบำรุง">ซ่อมบำรุง</option>
+                            <option value="ของใช้">ของใช้</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 mb-2">ยอดเงิน</label>
+                        <input type="number" id="expense-amount" class="w-full p-3 border border-slate-200 rounded-2xl bg-slate-50 text-slate-700" placeholder="เช่น 5200" oninput="buildExpenseNote()">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 mb-2">รายละเอียดเพิ่ม</label>
+                        <input type="text" id="expense-extra" class="w-full p-3 border border-slate-200 rounded-2xl bg-slate-50 text-slate-700" placeholder="ไม่บังคับ" oninput="buildExpenseNote()">
+                    </div>
+                </div>
+                <div class="mt-5 bg-slate-50 border border-slate-200 rounded-2xl p-4">
+                    <p class="text-xs font-bold text-slate-500 mb-2">ข้อความสำหรับช่องหมายเหตุ</p>
+                    <p id="expense-note-preview" class="text-lg font-bold text-indigo-700">ค่าไฟ 0</p>
+                    <p id="copy-expense-status" class="mt-2 text-xs text-emerald-600 font-bold hidden">คัดลอกแล้ว</p>
+                </div>
+            </div>
+
             <div class="mb-12 bg-slate-50 p-6 rounded-3xl border border-slate-200">
                 <h2 class="text-lg font-bold mb-4 text-slate-700">📈 ผลประกอบการรายวัน</h2>
                 <canvas id="monthlyChart" height="100"></canvas>
@@ -327,6 +370,7 @@
         let currentChart = null;
         let latestExecutiveSummaryText = "";
         let latestPriceGuideText = "";
+        let latestExpenseNoteText = "";
 
         window.onload = () => {
             // โหลดข้อมูลบัญชี
@@ -337,6 +381,7 @@
             
             // โหลดข้อมูลสต๊อก
             loadStockData();
+            setupExpenseHelper();
 
             // 🌟 ตรวจสอบ URL Parameter เพื่อสลับหน้า Tab ทันที
             const urlParams = new URLSearchParams(window.location.search);
@@ -368,6 +413,15 @@
                 viewVerify.classList.remove('hidden');
                 loadPendingOrders();
             }
+        }
+
+        function setupExpenseHelper() {
+            const dateInput = document.getElementById('expense-date');
+            if (dateInput && !dateInput.value) {
+                const today = new Date();
+                dateInput.value = today.getFullYear() + "-" + String(today.getMonth() + 1).padStart(2, '0') + "-" + String(today.getDate()).padStart(2, '0');
+            }
+            buildExpenseNote();
         }
 
         function setFinanceMode(mode) {
@@ -759,6 +813,20 @@
 
         function copyPriceGuide() {
             copyTextWithStatus(latestPriceGuideText, 'copy-price-status', "ยังไม่มีข้อมูลราคาที่แนะนำครับ");
+        }
+
+        function buildExpenseNote() {
+            const category = document.getElementById('expense-category').value;
+            const amount = parseFloat(document.getElementById('expense-amount').value) || 0;
+            const extra = document.getElementById('expense-extra').value.trim();
+            const note = `${category} ${amount.toLocaleString()}${extra ? " " + extra : ""}`;
+            latestExpenseNoteText = note;
+            document.getElementById('expense-note-preview').innerText = note;
+        }
+
+        function copyExpenseNote() {
+            buildExpenseNote();
+            copyTextWithStatus(latestExpenseNoteText, 'copy-expense-status', "ยังไม่มีข้อความค่าใช้จ่ายครับ");
         }
 
         function copyTextWithStatus(text, statusId, emptyMessage) {
