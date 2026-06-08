@@ -95,6 +95,7 @@ function askManagementAI_(body) {
     'ห้ามแต่งข้อมูล ห้ามเปิดเผยข้อมูลส่วนตัวลูกค้า หากข้อมูลไม่พอให้บอกตรงๆ',
     'เมื่อวิเคราะห์ค่าไฟที่บิลยังไม่มา ให้ใช้ electricityEstimate และระบุว่าเป็นประมาณการจากค่าไฟต่อคืนห้องพักของเดือนก่อน ไม่ใช่ยอดบิลจริง',
     'เมื่อวิเคราะห์ค่าใช้จ่าย ให้แยกดู electricity, labor, tips, otherExpenses และ controlExpenseTotal ก่อนสรุปภาพรวม',
+    'เมื่อวิเคราะห์แนวโน้มเดือนนี้เทียบเดือนก่อน ให้ใช้ latestMonthComparison เป็นหลัก',
     'คำแนะนำราคาต้องระบุว่าเป็นข้อเสนอเพื่อให้ผู้บริหารอนุมัติ ไม่ใช่การเปลี่ยนราคาอัตโนมัติ',
     'วันนี้: ' + Utilities.formatDate(new Date(), 'Asia/Bangkok', 'yyyy-MM-dd'),
     'ข้อมูลสรุปธุรกิจ JSON: ' + JSON.stringify(context),
@@ -166,10 +167,48 @@ function buildBusinessContext_() {
     roomCount: 10,
     roomBaseRates: { Standard: 1900, Family: 2900, DeluxeTwinBed: 2900, Jacuzzi: 3500 },
     monthly: monthly,
+    latestMonthComparison: buildLatestMonthComparison_(monthly, now),
     electricityEstimate: buildElectricityEstimate_(monthly, now),
     roomNightPopularityLast365Days: recentRooms,
     nextMonthPlanning: nextMonthPlanning_(now),
     note: 'ข้อมูลนี้ไม่มีชื่อ เบอร์โทร LINE หรือข้อมูลส่วนตัวลูกค้า'
+  };
+}
+
+function buildLatestMonthComparison_(monthly, now) {
+  const currentMonth = Utilities.formatDate(now, 'Asia/Bangkok', 'yyyy-MM');
+  const previousDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+  const previousMonth = Utilities.formatDate(previousDate, 'Asia/Bangkok', 'yyyy-MM');
+  const current = monthly[currentMonth] || {};
+  const previous = monthly[previousMonth] || {};
+  return {
+    currentMonth: currentMonth,
+    previousMonth: previousMonth,
+    income: compareMetric_(current.income, previous.income, 'up'),
+    electricity: compareMetric_(current.electricity, previous.electricity, 'down'),
+    laborAndTips: compareMetric_(current.laborAndTips, previous.laborAndTips, 'down'),
+    otherExpenses: compareMetric_(current.otherExpenses, previous.otherExpenses, 'down'),
+    roomNights: compareMetric_(current.roomNights, previous.roomNights, 'up')
+  };
+}
+
+function compareMetric_(currentValue, previousValue, goodWhen) {
+  const current = Number(currentValue || 0);
+  const previous = Number(previousValue || 0);
+  const change = current - previous;
+  const percentChange = previous ? (change / previous) * 100 : null;
+  let status = 'no_previous_data';
+  if (previous || current) {
+    if (!previous) status = 'new_data';
+    else if (change === 0) status = 'flat';
+    else status = (goodWhen === 'up' ? change > 0 : change < 0) ? 'better' : 'watch';
+  }
+  return {
+    current: current,
+    previous: previous,
+    change: Math.round(change * 100) / 100,
+    percentChange: percentChange === null ? null : Math.round(percentChange * 100) / 100,
+    status: status
   };
 }
 

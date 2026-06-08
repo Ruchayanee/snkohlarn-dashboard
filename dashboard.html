@@ -140,6 +140,25 @@
                 <p id="summary-note" class="mt-5 text-sm text-slate-300 leading-relaxed">เมื่อเลือกเดือน ระบบจะสรุปภาพรวมให้ทันที</p>
                 <p id="copy-summary-status" class="mt-3 text-xs text-blue-300 font-bold hidden">คัดลอกสรุปแล้ว</p>
                 <div class="mt-4 bg-white/10 border border-white/10 rounded-3xl p-5">
+                    <p id="month-comparison-title" class="font-bold text-sm mb-4 text-slate-100">เทียบเดือนก่อน</p>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse text-sm">
+                            <thead>
+                                <tr class="text-slate-300 border-b border-white/10">
+                                    <th class="py-3 pr-4 font-bold">หัวข้อ</th>
+                                    <th class="py-3 px-4 font-bold">เดือนนี้</th>
+                                    <th class="py-3 px-4 font-bold">เดือนก่อน</th>
+                                    <th class="py-3 pl-4 font-bold">เปลี่ยนแปลง</th>
+                                </tr>
+                            </thead>
+                            <tbody id="month-comparison-body" class="text-slate-100">
+                                <tr><td colspan="4" class="py-4 text-slate-300">รอโหลดข้อมูล</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <p id="month-comparison-note" class="mt-3 text-xs text-slate-400">ช่วยดูแนวโน้มรายได้ ค่าไฟ ค่าแรง และจำนวนห้อง-คืนจากเดือนก่อน</p>
+                </div>
+                <div class="mt-4 bg-white/10 border border-white/10 rounded-3xl p-5">
                     <p class="font-bold text-sm mb-4 text-slate-100">แยกค่าใช้จ่ายที่บันทึกไว้</p>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse text-sm">
@@ -696,7 +715,7 @@
         function updateExecutiveSummary(monthKey, data, netProfit, ownerShare, businessShare) {
             const [year, month] = monthKey.split('-').map(Number);
             const daysInMonth = new Date(year, month, 0).getDate();
-            const roomNights = Object.values(data.dailyData).reduce((sum, day) => sum + day.rooms.length, 0);
+            const roomNights = countRoomNights(data);
             const occupancyRate = daysInMonth ? (roomNights / (daysInMonth * 10)) * 100 : 0;
             const expenseTotal = data.totalElec + data.totalExp;
             const expenseRate = data.totalIncome ? (expenseTotal / data.totalIncome) * 100 : 0;
@@ -725,6 +744,9 @@
             document.getElementById('price-weekend').innerText = formatMoney(priceGuide.weekend);
             document.getElementById('price-holiday').innerText = formatMoney(priceGuide.holiday);
             document.getElementById('price-reason').innerText = priceGuide.reason;
+            const previousMonthKey = getPreviousMonthKey(monthKey);
+            const previousMonthData = allDataByMonth[previousMonthKey];
+            renderMonthComparison(monthKey, data, previousMonthKey, previousMonthData, formatMoney);
             renderExpenseBreakdown(data, formatMoney);
             renderRoomTypePriceGuide(priceGuide, formatMoney);
             latestExecutiveSummaryText = [
@@ -733,6 +755,9 @@
                 `รายได้รวม: ${formatMoney(data.totalIncome)}`,
                 `ค่าไฟ: ${formatMoney(data.totalElec)}`,
                 `ค่าคนงาน/ทิป: ${formatMoney(data.totalExp)}`,
+                "",
+                `เทียบเดือนก่อน (${formatMonthLabel(previousMonthKey)}):`,
+                ...buildMonthComparisonItems(data, previousMonthData).map(item => `- ${item.label}: ${formatComparisonValue(item.current, item.type, formatMoney)} / เปลี่ยนแปลง ${formatComparisonChange(item, formatMoney)} (${getComparisonStatus(item)})`),
                 "",
                 "แยกค่าใช้จ่าย:",
                 ...buildExpenseBreakdownItems(data).map(item => `- ${item.label}: ${formatMoney(item.amount)} (${item.status})`),
@@ -760,6 +785,70 @@
             const [year, month] = monthKey.split('-');
             const mNames = ["","ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย.","ต.ค.","พ.ย.","ธ.ค."];
             return `${mNames[parseInt(month)]} ${year}`;
+        }
+
+        function getPreviousMonthKey(monthKey) {
+            const [year, month] = monthKey.split('-').map(Number);
+            const previous = new Date(year, month - 2, 1);
+            return `${previous.getFullYear()}-${String(previous.getMonth() + 1).padStart(2, '0')}`;
+        }
+
+        function countRoomNights(data) {
+            if (!data || !data.dailyData) return 0;
+            return Object.values(data.dailyData).reduce((sum, day) => sum + day.rooms.length, 0);
+        }
+
+        function buildMonthComparisonItems(current, previous) {
+            const previousSafe = previous || {};
+            return [
+                { label: "รายได้", current: current.totalIncome || 0, previous: previousSafe.totalIncome || 0, type: "money", goodWhen: "up" },
+                { label: "ค่าไฟ", current: current.totalElec || 0, previous: previousSafe.totalElec || 0, type: "money", goodWhen: "down" },
+                { label: "คนงาน+ทิป", current: current.totalExp || 0, previous: previousSafe.totalExp || 0, type: "money", goodWhen: "down" },
+                { label: "ห้อง-คืน", current: countRoomNights(current), previous: countRoomNights(previous), type: "number", goodWhen: "up" }
+            ];
+        }
+
+        function formatComparisonValue(value, type, formatMoney) {
+            if (type === "money") return formatMoney(value || 0);
+            return (value || 0).toLocaleString();
+        }
+
+        function formatComparisonChange(item, formatMoney) {
+            const diff = (item.current || 0) - (item.previous || 0);
+            if (!item.previous) {
+                if (!item.current) return "-";
+                return `+${formatComparisonValue(diff, item.type, formatMoney)} (ไม่มีฐานเดือนก่อน)`;
+            }
+            const percent = (diff / item.previous) * 100;
+            const sign = diff > 0 ? "+" : "";
+            return `${sign}${formatComparisonValue(diff, item.type, formatMoney)} (${sign}${percent.toFixed(1)}%)`;
+        }
+
+        function getComparisonStatus(item) {
+            const diff = (item.current || 0) - (item.previous || 0);
+            if (!item.previous && !item.current) return "ยังไม่มีข้อมูล";
+            if (!item.previous) return "เริ่มมีข้อมูล";
+            if (diff === 0) return "ทรงตัว";
+            const isGood = item.goodWhen === "up" ? diff > 0 : diff < 0;
+            return isGood ? "ดีขึ้น" : "ควรดู";
+        }
+
+        function renderMonthComparison(monthKey, current, previousMonthKey, previous, formatMoney) {
+            document.getElementById('month-comparison-title').innerText = `เทียบเดือนก่อน: ${formatMonthLabel(monthKey)} vs ${formatMonthLabel(previousMonthKey)}`;
+            const rows = buildMonthComparisonItems(current, previous).map(item => {
+                const status = getComparisonStatus(item);
+                const tone = status === "ดีขึ้น" ? "text-emerald-300" : status === "ควรดู" ? "text-rose-300" : "text-slate-300";
+                return `<tr class="border-b border-white/10">
+                    <td class="py-3 pr-4 font-bold">${item.label}</td>
+                    <td class="py-3 px-4 font-bold">${formatComparisonValue(item.current, item.type, formatMoney)}</td>
+                    <td class="py-3 px-4 text-slate-300">${formatComparisonValue(item.previous, item.type, formatMoney)}</td>
+                    <td class="py-3 pl-4 ${tone}">${formatComparisonChange(item, formatMoney)} / ${status}</td>
+                </tr>`;
+            });
+            document.getElementById('month-comparison-body').innerHTML = rows.join('');
+            document.getElementById('month-comparison-note').innerText = previous
+                ? "รายได้และห้อง-คืนเพิ่มถือว่าดีขึ้น ส่วนค่าไฟและคนงาน+ทิปเพิ่มจะถูกตั้งเป็นควรดู"
+                : "ยังไม่มีข้อมูลเดือนก่อนในระบบ จึงใช้ตารางนี้เป็นฐานเริ่มต้นของเดือนนี้";
         }
 
         function buildExpenseBreakdownItems(data) {
