@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ผู้ช่วยบริหาร SN Koh Larn</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root { --purple:#6d28d9; --slate:#334155; --muted:#64748b; --bg:#f8f5f2; --white:#fff; }
+        * { box-sizing:border-box; }
+        body { margin:0; padding:16px; background:var(--bg); color:var(--slate); font-family:'Kanit',sans-serif; }
+        .app { width:min(760px,100%); margin:0 auto; min-height:calc(100vh - 32px); background:var(--white); border-radius:24px; box-shadow:0 16px 40px rgba(71,45,33,.12); overflow:hidden; display:flex; flex-direction:column; }
+        header { padding:20px; color:#fff; background:linear-gradient(135deg,#4c1d95,#7e22ce); }
+        .top { display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; }
+        .back,.logout { color:#fff; text-decoration:none; background:rgba(255,255,255,.16); padding:8px 12px; border:0; border-radius:10px; font:inherit; font-size:13px; cursor:pointer; }
+        h1 { margin:16px 0 2px; font-size:25px; }
+        header p { margin:0; color:#e9d5ff; font-size:13px; }
+        .status { margin-top:14px; display:flex; gap:8px; flex-wrap:wrap; font-size:11px; }
+        .pill { padding:5px 9px; border-radius:999px; background:rgba(255,255,255,.16); }
+        .quick { display:flex; gap:8px; padding:14px 14px 4px; overflow:auto; }
+        .quick button { flex:none; border:1px solid #ddd6fe; background:#faf5ff; color:#6b21a8; padding:9px 11px; border-radius:999px; font-family:inherit; font-size:12px; cursor:pointer; }
+        #chat { flex:1; padding:14px; overflow:auto; min-height:420px; max-height:62vh; }
+        .message { max-width:88%; margin:0 0 12px; padding:12px 14px; border-radius:16px; white-space:pre-line; line-height:1.65; font-size:14px; }
+        .bot { background:#f8fafc; border:1px solid #e2e8f0; border-top-left-radius:4px; }
+        .user { background:var(--purple); color:#fff; margin-left:auto; border-top-right-radius:4px; }
+        .source { margin-top:8px; color:var(--muted); font-size:11px; }
+        form { display:flex; gap:8px; padding:14px; border-top:1px solid #e2e8f0; background:#fff; }
+        input { flex:1; min-width:0; padding:13px; border:1px solid #cbd5e1; border-radius:12px; font:inherit; }
+        .send { border:0; border-radius:12px; padding:0 17px; background:var(--purple); color:#fff; font:inherit; font-weight:600; cursor:pointer; }
+        .send:disabled { opacity:.55; cursor:wait; }
+        .notice { padding:8px 14px 14px; color:#92400e; background:#fffbeb; font-size:11px; border-top:1px solid #fde68a; }
+        @media (max-width:520px) { body{padding:0}.app{min-height:100vh;border-radius:0}#chat{max-height:none}.message{max-width:94%} }
+    </style>
+</head>
+<body>
+<main class="app">
+    <header>
+        <div class="top">
+            <a class="back" href="index.html">← กลับหน้าแรก</a>
+            <button class="logout" type="button" onclick="clearPin()">ออกจากระบบ</button>
+        </div>
+        <h1>✨ ผู้ช่วยบริหาร SN Koh Larn</h1>
+        <p>ถาม AI เพื่อวิเคราะห์รายได้ ค่าใช้จ่าย แนวโน้ม และข้อเสนอราคาห้อง</p>
+        <div class="status">
+            <span class="pill" id="dataStatus">พร้อมเชื่อมต่อ AI</span>
+            <span class="pill">สำหรับ Admin / ผู้บริหาร</span>
+            <span class="pill">ส่งเฉพาะข้อมูลสรุป</span>
+        </div>
+    </header>
+
+    <div class="quick">
+        <button type="button" onclick="askQuick('สรุปรายได้ ค่าใช้จ่าย และส่วนแบ่ง 30% ของเดือนนี้')">💰 สรุปเดือนนี้</button>
+        <button type="button" onclick="askQuick('ประมาณการค่าไฟเดือนนี้ที่บิลยังไม่มา โดยเทียบค่าไฟเดือนก่อนกับจำนวนคืนห้องพักที่จองล่าสุดของเดือนนี้ แสดงสูตร ตัวเลขที่ใช้ และข้อจำกัดของประมาณการ')">⚡ ประมาณการค่าไฟ</button>
+        <button type="button" onclick="askQuick('วิเคราะห์แนวโน้มจากข้อมูลย้อนหลังและสรุปสิ่งที่ผู้บริหารควรจับตา')">📊 วิเคราะห์แนวโน้ม</button>
+        <button type="button" onclick="askQuick('ดูวันหยุดเดือนหน้า และแนะนำราคาห้องสำหรับวันธรรมดา ศุกร์-เสาร์ และวันหยุดยาว พร้อมอธิบายเหตุผล')">📈 แนะนำราคาเดือนหน้า</button>
+        <button type="button" onclick="askQuick('เดือนหน้ามีวันหยุดอะไรบ้าง และควรวางแผนราคาอย่างไร')">📅 วันหยุดเดือนหน้า</button>
+    </div>
+
+    <section id="chat" aria-live="polite"></section>
+    <form id="chatForm">
+        <input id="question" autocomplete="off" placeholder="เช่น เดือนนี้มีค่าไฟ 18,500 บาท รายได้ 30% คือเท่าไหร่">
+        <button class="send" id="sendButton" type="submit">ส่ง</button>
+    </form>
+    <div class="notice">AI อ่านเฉพาะข้อมูลสรุป ไม่มีชื่อ เบอร์โทร หรือ LINE ลูกค้า และจะไม่แก้ไขราคา Booking หรือข้อมูลใดอัตโนมัติ</div>
+</main>
+
+<script>
+const MANAGEMENT_AI_URL = 'https://script.google.com/macros/s/AKfycbxgQ_XsyiuSUO5VnVDBV4iWmB29g0rmpMZmZhpb5hBS7ZrE3G9lJ0_p0zbMxPkLbKqK/exec';
+let adminPin = sessionStorage.getItem('snManagementAdminPin') || '';
+let busy = false;
+let bridgeReady = false;
+let bridgeWindow = null;
+let requestSequence = 0;
+const pendingRequests = new Map();
+const bridge = document.createElement('iframe');
+bridge.hidden = true;
+bridge.src = `${MANAGEMENT_AI_URL}?bridge=1`;
+bridge.title = 'SN Koh Larn Management AI Bridge';
+document.body.appendChild(bridge);
+
+window.addEventListener('message', event => {
+    const message = event.data || {};
+    if(message.type === 'SN_MANAGEMENT_AI_READY') {
+        bridgeWindow = event.source;
+        bridgeReady = true;
+        document.getElementById('dataStatus').textContent = 'พร้อมถาม AI';
+        return;
+    }
+    if(message.type !== 'SN_MANAGEMENT_AI_RESPONSE') return;
+    const pending = pendingRequests.get(message.requestId);
+    if(!pending) return;
+    clearTimeout(pending.timer);
+    pendingRequests.delete(message.requestId);
+    pending.resolve(message.data);
+});
+function askBackend(payload) {
+    return new Promise((resolve, reject) => {
+        const requestId = `sn-${Date.now()}-${++requestSequence}`;
+        const timer = setTimeout(() => {
+            pendingRequests.delete(requestId);
+            reject(new Error('บริการ AI ไม่ตอบกลับ กรุณาลองใหม่'));
+        }, 45000);
+        pendingRequests.set(requestId, { resolve, timer });
+        (bridgeWindow || bridge.contentWindow).postMessage({ type:'SN_MANAGEMENT_AI_REQUEST', requestId, payload }, '*');
+    });
+}
+bridge.addEventListener('load', () => {
+    bridge.contentWindow.postMessage({ type:'SN_MANAGEMENT_AI_PING' }, '*');
+});
+
+function addMessage(text, type='bot', sourceText='') {
+    const box = document.createElement('div');
+    box.className = `message ${type}`;
+    box.textContent = text;
+    if(type === 'bot' && sourceText) {
+        const source = document.createElement('div');
+        source.className = 'source';
+        source.textContent = sourceText;
+        box.appendChild(source);
+    }
+    const chat = document.getElementById('chat');
+    chat.appendChild(box);
+    chat.scrollTop = chat.scrollHeight;
+    return box;
+}
+function ensurePin() {
+    if(adminPin) return adminPin;
+    const value = prompt('กรอก PIN สำหรับ Admin / ผู้บริหาร');
+    if(!value) return '';
+    adminPin = value.trim();
+    sessionStorage.setItem('snManagementAdminPin', adminPin);
+    return adminPin;
+}
+function clearPin() {
+    adminPin = '';
+    sessionStorage.removeItem('snManagementAdminPin');
+    document.getElementById('dataStatus').textContent = 'ออกจากระบบแล้ว';
+    addMessage('ออกจากระบบเรียบร้อย กรุณากรอก PIN อีกครั้งเมื่อถามคำถามถัดไป');
+}
+function setBusy(value) {
+    busy = value;
+    document.getElementById('sendButton').disabled = value;
+    document.getElementById('dataStatus').textContent = value ? 'AI กำลังวิเคราะห์...' : 'พร้อมถาม AI';
+}
+async function ask(question) {
+    const text = question.trim();
+    if(!text || busy) return;
+    const pin = ensurePin();
+    if(!pin) return;
+    addMessage(text, 'user');
+    setBusy(true);
+    const pending = addMessage('กำลังอ่านข้อมูลสรุปและวิเคราะห์ กรุณารอสักครู่...');
+    try {
+        if(!bridgeReady) throw new Error('สะพานเชื่อมต่อ AI ยังไม่พร้อม กรุณารอสักครู่แล้วลองใหม่');
+        const data = await askBackend({ action:'askManagementAI', pin, question:text });
+        pending.remove();
+        if(data.status === 'unauthorized') {
+            clearPin();
+            addMessage('PIN ไม่ถูกต้อง กรุณาลองใหม่อีกครั้ง');
+            return;
+        }
+        if(data.status !== 'success') throw new Error(data.message || 'AI ตอบกลับไม่สำเร็จ');
+        addMessage(data.answer, 'bot', data.updatedAt ? `อ้างอิงข้อมูลสรุปล่าสุด ${data.updatedAt}` : '');
+    } catch(error) {
+        pending.remove();
+        addMessage(`เชื่อมต่อ AI ไม่สำเร็จ: ${error.message}`);
+    } finally {
+        setBusy(false);
+    }
+}
+function askQuick(question) { ask(question); }
+document.getElementById('chatForm').addEventListener('submit', event => {
+    event.preventDefault();
+    const input = document.getElementById('question');
+    ask(input.value);
+    input.value = '';
+});
+addMessage('สวัสดีครับ ฉันคือผู้ช่วยบริหาร AI\nถามสรุปรายได้ วิเคราะห์แนวโน้ม ดูวันหยุดเดือนหน้า หรือขอคำแนะนำราคาห้องได้เลย');
+</script>
+</body>
+</html>
