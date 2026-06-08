@@ -139,6 +139,24 @@
                 </div>
                 <p id="summary-note" class="mt-5 text-sm text-slate-300 leading-relaxed">เมื่อเลือกเดือน ระบบจะสรุปภาพรวมให้ทันที</p>
                 <p id="copy-summary-status" class="mt-3 text-xs text-blue-300 font-bold hidden">คัดลอกสรุปแล้ว</p>
+                <div class="mt-4 bg-white/10 border border-white/10 rounded-3xl p-5">
+                    <p class="font-bold text-sm mb-4 text-slate-100">แยกค่าใช้จ่ายที่บันทึกไว้</p>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse text-sm">
+                            <thead>
+                                <tr class="text-slate-300 border-b border-white/10">
+                                    <th class="py-3 pr-4 font-bold">หมวด</th>
+                                    <th class="py-3 px-4 font-bold">ยอดเดือนนี้</th>
+                                    <th class="py-3 pl-4 font-bold">สถานะ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="expense-breakdown-body" class="text-slate-100">
+                                <tr><td colspan="3" class="py-4 text-slate-300">รอโหลดข้อมูล</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <p id="expense-breakdown-note" class="mt-3 text-xs text-slate-400">ค่าอื่น ๆ แสดงเพื่อให้ผู้บริหารตรวจควบคุมก่อน โดยยังไม่เปลี่ยนสูตรส่วนแบ่งเดิม</p>
+                </div>
                 <div class="mt-5 grid grid-cols-1 lg:grid-cols-2 gap-4">
                     <div class="bg-white/10 border border-white/10 rounded-3xl p-5">
                         <p class="font-bold text-sm mb-3 text-slate-100">สัญญาณเตือนผู้บริหาร</p>
@@ -609,13 +627,29 @@
                     if(parts.length === 3) { formattedDate = `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`; monthStr = `${parts[2]}-${parts[1].padStart(2, '0')}`; }
                 } else if (dateStr.includes('-')) { monthStr = dateStr.substring(0, 7); }
                 if(!monthStr) return; 
-                if (!allDataByMonth[monthStr]) allDataByMonth[monthStr] = { totalIncome: 0, totalElec: 0, totalExp: 0, dailyData: {} };
+                if (!allDataByMonth[monthStr]) {
+                    allDataByMonth[monthStr] = {
+                        totalIncome: 0,
+                        totalElec: 0,
+                        totalExp: 0,
+                        expenseBreakdown: { electricity: 0, labor: 0, tips: 0, other: 0 },
+                        dailyData: {}
+                    };
+                }
                 if (!allDataByMonth[monthStr].dailyData[formattedDate]) allDataByMonth[monthStr].dailyData[formattedDate] = { income: 0, rooms: [] };
                 let price = parseFloat(priceStr?.toString().replace(/,/g, '')) || 0;
+                const electricity = extractAmount(noteStr, ["ค่าไฟ"]);
+                const labor = extractAmount(noteStr, ["คนงาน"]);
+                const tips = extractAmount(noteStr, ["ทิป"]);
+                const otherExpense = extractAmount(noteStr, ["ค่าน้ำ", "ซักผ้า", "ซ่อมบำรุง", "ของใช้"]);
                 allDataByMonth[monthStr].totalIncome += price;
                 allDataByMonth[monthStr].dailyData[formattedDate].income += price;
-                allDataByMonth[monthStr].totalElec += extractAmount(noteStr, ["ค่าไฟ"]);
-                allDataByMonth[monthStr].totalExp += extractAmount(noteStr, ["คนงาน", "ทิป"]);
+                allDataByMonth[monthStr].totalElec += electricity;
+                allDataByMonth[monthStr].totalExp += labor + tips;
+                allDataByMonth[monthStr].expenseBreakdown.electricity += electricity;
+                allDataByMonth[monthStr].expenseBreakdown.labor += labor;
+                allDataByMonth[monthStr].expenseBreakdown.tips += tips;
+                allDataByMonth[monthStr].expenseBreakdown.other += otherExpense;
                 let room = parseInt(roomStr);
                 if (!isNaN(room) && !allDataByMonth[monthStr].dailyData[formattedDate].rooms.includes(room)) allDataByMonth[monthStr].dailyData[formattedDate].rooms.push(room);
             });
@@ -691,6 +725,7 @@
             document.getElementById('price-weekend').innerText = formatMoney(priceGuide.weekend);
             document.getElementById('price-holiday').innerText = formatMoney(priceGuide.holiday);
             document.getElementById('price-reason').innerText = priceGuide.reason;
+            renderExpenseBreakdown(data, formatMoney);
             renderRoomTypePriceGuide(priceGuide, formatMoney);
             latestExecutiveSummaryText = [
                 `สรุปผู้บริหาร SN Koh Larn (${monthLabel})`,
@@ -698,6 +733,10 @@
                 `รายได้รวม: ${formatMoney(data.totalIncome)}`,
                 `ค่าไฟ: ${formatMoney(data.totalElec)}`,
                 `ค่าคนงาน/ทิป: ${formatMoney(data.totalExp)}`,
+                "",
+                "แยกค่าใช้จ่าย:",
+                ...buildExpenseBreakdownItems(data).map(item => `- ${item.label}: ${formatMoney(item.amount)} (${item.status})`),
+                "",
                 `กำไรหลังหักค่าใช้จ่าย: ${formatMoney(netProfit)}`,
                 `ส่วนแบ่ง 30%: ${formatMoney(ownerShare)}`,
                 `ยอดคงเหลือ 70%: ${formatMoney(businessShare)}`,
@@ -721,6 +760,37 @@
             const [year, month] = monthKey.split('-');
             const mNames = ["","ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย.","ต.ค.","พ.ย.","ธ.ค."];
             return `${mNames[parseInt(month)]} ${year}`;
+        }
+
+        function buildExpenseBreakdownItems(data) {
+            const breakdown = data.expenseBreakdown || {};
+            const laborTips = (breakdown.labor || 0) + (breakdown.tips || 0);
+            const other = breakdown.other || 0;
+            const income = data.totalIncome || 0;
+            const expenseRate = amount => income ? (amount / income) * 100 : 0;
+            const rateStatus = (amount, highRate, okText) => {
+                if (!amount) return "ยังไม่มีรายการ";
+                return expenseRate(amount) >= highRate ? "ควรตรวจ" : okText;
+            };
+            return [
+                { label: "ค่าไฟ", amount: breakdown.electricity || 0, status: rateStatus(breakdown.electricity || 0, 18, "ปกติ") },
+                { label: "คนงาน", amount: breakdown.labor || 0, status: rateStatus(breakdown.labor || 0, 15, "ปกติ") },
+                { label: "ทิป", amount: breakdown.tips || 0, status: (breakdown.tips || 0) ? "บันทึกแล้ว" : "ยังไม่มีรายการ" },
+                { label: "ค่าอื่น ๆ", amount: other, status: other ? "ดูประกอบ" : "ยังไม่มีรายการ" },
+                { label: "คนงาน+ทิป", amount: laborTips, status: rateStatus(laborTips, 18, "ปกติ") }
+            ];
+        }
+
+        function renderExpenseBreakdown(data, formatMoney) {
+            const rows = buildExpenseBreakdownItems(data).map(item => {
+                const tone = item.status === "ควรตรวจ" ? "text-rose-300" : item.status === "ยังไม่มีรายการ" ? "text-slate-400" : "text-emerald-300";
+                return `<tr class="border-b border-white/10">
+                    <td class="py-3 pr-4 font-bold">${item.label}</td>
+                    <td class="py-3 px-4 font-bold ${tone}">${formatMoney(item.amount)}</td>
+                    <td class="py-3 pl-4 ${tone}">${item.status}</td>
+                </tr>`;
+            });
+            document.getElementById('expense-breakdown-body').innerHTML = rows.join('');
         }
 
         function buildExecutiveAlerts(data, netProfit, occupancyRate, expenseRate, roomNights, electricPerRoomNight, incomePerRoomNight) {

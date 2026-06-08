@@ -94,6 +94,7 @@ function askManagementAI_(body) {
     'คุณคือผู้ช่วยบริหารของรีสอร์ต SN Koh Larn ตอบภาษาไทย กระชับ และใช้ตัวเลขจากข้อมูลที่ได้รับเท่านั้น',
     'ห้ามแต่งข้อมูล ห้ามเปิดเผยข้อมูลส่วนตัวลูกค้า หากข้อมูลไม่พอให้บอกตรงๆ',
     'เมื่อวิเคราะห์ค่าไฟที่บิลยังไม่มา ให้ใช้ electricityEstimate และระบุว่าเป็นประมาณการจากค่าไฟต่อคืนห้องพักของเดือนก่อน ไม่ใช่ยอดบิลจริง',
+    'เมื่อวิเคราะห์ค่าใช้จ่าย ให้แยกดู electricity, labor, tips, otherExpenses และ controlExpenseTotal ก่อนสรุปภาพรวม',
     'คำแนะนำราคาต้องระบุว่าเป็นข้อเสนอเพื่อให้ผู้บริหารอนุมัติ ไม่ใช่การเปลี่ยนราคาอัตโนมัติ',
     'วันนี้: ' + Utilities.formatDate(new Date(), 'Asia/Bangkok', 'yyyy-MM-dd'),
     'ข้อมูลสรุปธุรกิจ JSON: ' + JSON.stringify(context),
@@ -132,11 +133,17 @@ function buildBusinessContext_() {
     if (!date || date < from) return;
     const key = Utilities.formatDate(date, 'Asia/Bangkok', 'yyyy-MM');
     const item = monthly[key] || (monthly[key] = {
-      income: 0, electricity: 0, laborAndTips: 0, roomNights: 0, occupiedDates: {}
+      income: 0, electricity: 0, labor: 0, tips: 0, laborAndTips: 0, otherExpenses: 0, roomNights: 0, occupiedDates: {}
     });
+    const note = row[idx['หมายเหตุ']];
+    const labor = extractAmount_(note, ['คนงาน']);
+    const tips = extractAmount_(note, ['ทิป']);
     item.income += number_(row[idx['ราคาขายจริง']]);
-    item.electricity += extractAmount_(row[idx['หมายเหตุ']], ['ค่าไฟ']);
-    item.laborAndTips += extractAmount_(row[idx['หมายเหตุ']], ['คนงาน', 'ทิป']);
+    item.electricity += extractAmount_(note, ['ค่าไฟ']);
+    item.labor += labor;
+    item.tips += tips;
+    item.laborAndTips += labor + tips;
+    item.otherExpenses += extractAmount_(note, ['ค่าน้ำ', 'ซักผ้า', 'ซ่อมบำรุง', 'ของใช้']);
     const room = String(row[idx['เลขห้อง']] || '').trim();
     const day = Utilities.formatDate(date, 'Asia/Bangkok', 'yyyy-MM-dd');
     if (room) {
@@ -149,6 +156,7 @@ function buildBusinessContext_() {
   Object.keys(monthly).forEach(function(key) {
     const item = monthly[key];
     item.netBeforeShare = item.income - item.electricity - item.laborAndTips;
+    item.controlExpenseTotal = item.electricity + item.laborAndTips + item.otherExpenses;
     item.share30Percent = Math.round(item.netBeforeShare * 0.3 * 100) / 100;
     item.occupiedDayCount = Object.keys(item.occupiedDates).length;
     delete item.occupiedDates;
