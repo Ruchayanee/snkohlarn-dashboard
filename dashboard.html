@@ -241,8 +241,9 @@
                     </div>
                 </div>
                 <div class="mt-5 bg-slate-50 border border-slate-200 rounded-2xl p-4">
-                    <p class="text-xs font-bold text-slate-500 mb-2">ข้อความสำหรับช่องหมายเหตุ</p>
-                    <p id="expense-note-preview" class="text-lg font-bold text-indigo-700">ค่าไฟ 0</p>
+                    <p class="text-xs font-bold text-slate-500 mb-2">ข้อมูลสำหรับใส่ Google Sheet</p>
+                    <p class="text-sm text-slate-500">วันที่เข้าพัก: <span id="expense-date-preview" class="font-bold text-slate-700">-</span></p>
+                    <p class="text-sm text-slate-500 mt-1">หมายเหตุ: <span id="expense-note-preview" class="font-bold text-indigo-700">ค่าไฟ 0</span></p>
                     <p id="copy-expense-status" class="mt-2 text-xs text-emerald-600 font-bold hidden">คัดลอกแล้ว</p>
                 </div>
             </div>
@@ -819,9 +820,19 @@
             const category = document.getElementById('expense-category').value;
             const amount = parseFloat(document.getElementById('expense-amount').value) || 0;
             const extra = document.getElementById('expense-extra').value.trim();
+            const dateValue = document.getElementById('expense-date').value;
+            const sheetDate = formatExpenseDateForSheet(dateValue);
             const note = `${category} ${amount.toLocaleString()}${extra ? " " + extra : ""}`;
-            latestExpenseNoteText = note;
+            latestExpenseNoteText = `วันที่เข้าพัก: ${sheetDate}\nหมายเหตุ: ${note}`;
+            document.getElementById('expense-date-preview').innerText = sheetDate;
             document.getElementById('expense-note-preview').innerText = note;
+        }
+
+        function formatExpenseDateForSheet(dateValue) {
+            if (!dateValue) return "-";
+            const parts = dateValue.split('-');
+            if (parts.length !== 3) return dateValue;
+            return `${parseInt(parts[2])}/${parseInt(parts[1])}/${parts[0]}`;
         }
 
         function copyExpenseNote() {
