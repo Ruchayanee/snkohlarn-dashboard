@@ -213,6 +213,9 @@
                         <h2 class="text-xl font-bold text-slate-700">ตัวช่วยสร้างข้อความค่าใช้จ่าย</h2>
                     </div>
                     <div class="flex flex-col sm:flex-row gap-2">
+                        <button onclick="checkExpenseConnection()" class="bg-slate-700 hover:bg-slate-800 text-white px-4 py-2 rounded-2xl text-xs font-bold shadow-md transition-all">
+                            ทดสอบการเชื่อมต่อ
+                        </button>
                         <button onclick="saveExpenseToSheet()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-2xl text-xs font-bold shadow-md transition-all">
                             บันทึกเข้า Google Sheet
                         </button>
@@ -853,11 +856,26 @@
             copyTextWithStatus(latestExpenseNoteText, 'copy-expense-status', "ยังไม่มีข้อความค่าใช้จ่ายครับ");
         }
 
+        async function checkExpenseConnection() {
+            const pin = document.getElementById('expense-pin').value.trim();
+            if (!pin) {
+                showExpenseSaveStatus('กรุณาใส่ PIN แอดมินก่อนทดสอบ', false);
+                return;
+            }
+
+            showExpenseSaveStatus('กำลังทดสอบการเชื่อมต่อ Google Sheet...', null);
+            try {
+                const result = await postManagementAction('checkExpenseConnection', { pin });
+                showExpenseSaveStatus(`${result.message}: ${result.sheetName} พร้อมใช้งาน`, true);
+            } catch (error) {
+                showExpenseSaveStatus(`ทดสอบไม่สำเร็จ: ${error.message}`, false);
+            }
+        }
+
         async function saveExpenseToSheet() {
             buildExpenseNote();
             const pin = document.getElementById('expense-pin').value.trim();
             const amount = parseFloat(document.getElementById('expense-amount').value) || 0;
-            const status = document.getElementById('expense-save-status');
             const dateValue = document.getElementById('expense-date').value;
             const note = document.getElementById('expense-note-preview').innerText.trim();
 
@@ -874,35 +892,39 @@
                 return;
             }
 
-            status.className = 'mt-2 text-xs font-bold text-slate-500';
-            status.innerText = 'กำลังบันทึกเข้า Google Sheet...';
+            showExpenseSaveStatus('กำลังบันทึกเข้า Google Sheet...', null);
 
             try {
-                const response = await fetch(MANAGEMENT_AI_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify({
-                        action: 'addExpense',
-                        pin,
-                        data: {
-                            date: dateValue,
-                            note
-                        }
-                    })
+                const result = await postManagementAction('addExpense', {
+                    pin,
+                    data: {
+                        date: dateValue,
+                        note
+                    }
                 });
-                const result = await response.json();
-                if (result.status !== 'success') {
-                    throw new Error(result.message || 'บันทึกไม่สำเร็จ');
-                }
                 showExpenseSaveStatus(`บันทึกแล้ว: ${result.date} / ${result.note} (ข้อมูลสรุปอาจอัปเดตช้าตาม Google Sheet)`, true);
             } catch (error) {
                 showExpenseSaveStatus(`บันทึกไม่สำเร็จ: ${error.message}`, false);
             }
         }
 
+        async function postManagementAction(action, payload) {
+            const response = await fetch(MANAGEMENT_AI_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ action, ...payload })
+            });
+            const result = await response.json();
+            if (result.status !== 'success') {
+                throw new Error(result.message || 'เชื่อมต่อไม่สำเร็จ');
+            }
+            return result;
+        }
+
         function showExpenseSaveStatus(message, success) {
             const status = document.getElementById('expense-save-status');
-            status.className = `mt-2 text-xs font-bold ${success ? 'text-emerald-600' : 'text-rose-600'}`;
+            const color = success === null ? 'text-slate-500' : (success ? 'text-emerald-600' : 'text-rose-600');
+            status.className = `mt-2 text-xs font-bold ${color}`;
             status.innerText = message;
         }
 

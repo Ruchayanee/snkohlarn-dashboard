@@ -16,6 +16,7 @@ function doPost(e) {
   try {
     const body = JSON.parse((e && e.postData && e.postData.contents) || '{}');
     if (body.action === 'askManagementAI') return json_(askManagementAI_(body));
+    if (body.action === 'checkExpenseConnection') return json_(checkExpenseConnection_(body));
     if (body.action === 'addExpense') return json_(addExpense_(body));
     return json_({ status: 'error', message: 'Unknown action' });
   } catch (error) {
@@ -25,6 +26,28 @@ function doPost(e) {
 
 function askManagementAI(body) {
   return askManagementAI_(body || {});
+}
+
+function checkExpenseConnection_(body) {
+  const props = PropertiesService.getScriptProperties();
+  const adminPin = props.getProperty('ADMIN_PIN');
+  if (!adminPin) return { status: 'setup_required', message: 'กรุณาตั้งค่า ADMIN_PIN ใน Script Properties' };
+  if (String(body.pin || '') !== adminPin) return { status: 'unauthorized', message: 'PIN ไม่ถูกต้อง' };
+
+  const sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName(FINANCE_SHEET);
+  if (!sheet) return { status: 'error', message: 'ไม่พบชีท ' + FINANCE_SHEET };
+
+  const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getDisplayValues()[0];
+  const required = ['วันที่เข้าพัก', 'ราคาขายจริง', 'หมายเหตุ'];
+  const missing = required.filter(function(header) { return headers.indexOf(header) === -1; });
+  if (missing.length) return { status: 'error', message: 'ชีทขาดคอลัมน์: ' + missing.join(', ') };
+
+  return {
+    status: 'success',
+    message: 'เชื่อมต่อ Google Sheet สำเร็จ',
+    sheetName: FINANCE_SHEET,
+    headerCount: headers.length
+  };
 }
 
 function addExpense_(body) {
