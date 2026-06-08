@@ -210,11 +210,16 @@
                         <p class="text-slate-400 text-xs font-bold uppercase">Expense Helper</p>
                         <h2 class="text-xl font-bold text-slate-700">ตัวช่วยสร้างข้อความค่าใช้จ่าย</h2>
                     </div>
-                    <button onclick="copyExpenseNote()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-2xl text-xs font-bold shadow-md transition-all">
-                        คัดลอกไปใส่ Google Sheet
-                    </button>
+                    <div class="flex flex-col sm:flex-row gap-2">
+                        <button onclick="saveExpenseToSheet()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-2xl text-xs font-bold shadow-md transition-all">
+                            บันทึกเข้า Google Sheet
+                        </button>
+                        <button onclick="copyExpenseNote()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-2xl text-xs font-bold shadow-md transition-all">
+                            คัดลอกสำรอง
+                        </button>
+                    </div>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
                     <div>
                         <label class="block text-xs font-bold text-slate-500 mb-2">วันที่ใช้บันทึก</label>
                         <input type="date" id="expense-date" class="w-full p-3 border border-slate-200 rounded-2xl bg-slate-50 text-slate-700" onchange="buildExpenseNote()">
@@ -239,12 +244,17 @@
                         <label class="block text-xs font-bold text-slate-500 mb-2">รายละเอียดเพิ่ม</label>
                         <input type="text" id="expense-extra" class="w-full p-3 border border-slate-200 rounded-2xl bg-slate-50 text-slate-700" placeholder="ไม่บังคับ" oninput="buildExpenseNote()">
                     </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 mb-2">PIN แอดมิน</label>
+                        <input type="password" id="expense-pin" class="w-full p-3 border border-slate-200 rounded-2xl bg-slate-50 text-slate-700" placeholder="PIN เดียวกับ AI">
+                    </div>
                 </div>
                 <div class="mt-5 bg-slate-50 border border-slate-200 rounded-2xl p-4">
                     <p class="text-xs font-bold text-slate-500 mb-2">ข้อมูลสำหรับใส่ Google Sheet</p>
                     <p class="text-sm text-slate-500">วันที่เข้าพัก: <span id="expense-date-preview" class="font-bold text-slate-700">-</span></p>
                     <p class="text-sm text-slate-500 mt-1">หมายเหตุ: <span id="expense-note-preview" class="font-bold text-indigo-700">ค่าไฟ 0</span></p>
                     <p id="copy-expense-status" class="mt-2 text-xs text-emerald-600 font-bold hidden">คัดลอกแล้ว</p>
+                    <p id="expense-save-status" class="mt-2 text-xs font-bold hidden"></p>
                 </div>
             </div>
 
@@ -364,6 +374,7 @@
 
     <script>
         const BACKEND_URL = "https://script.google.com/macros/s/AKfycbyLFO7dgjgdeDY5ETh7B_mV-bJG8T_tHnw-a41sOTfw9EKCoknUv2MJ2CP9yVJtL9CbfA/exec";
+        const MANAGEMENT_AI_URL = "https://script.google.com/macros/s/AKfycbxgQ_XsyiuSUO5VnVDBV4iWmB29g0rmpMZmZhpb5hBS7ZrE3G9lJ0_p0zbMxPkLbKqK/exec";
         const FINANCE_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSFeS1r3x0m5TlzHS8O19Qy0uuY9aGXJlEogF1lZkEdlgPewwdCLefvSNmch6MBm83CvUYTEOBMvK2T/pub?gid=109167594&single=true&output=csv';
         const STOCK_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQk1DLhmM8DEn1BEc8DWFUWjHAxYvGBXNKuEPZQKZw_pMBA3eQc_w1pS8QIea9fyOKGOCYUQygjyLzf/pub?gid=0&single=true&output=csv';
 
@@ -838,6 +849,59 @@
         function copyExpenseNote() {
             buildExpenseNote();
             copyTextWithStatus(latestExpenseNoteText, 'copy-expense-status', "ยังไม่มีข้อความค่าใช้จ่ายครับ");
+        }
+
+        async function saveExpenseToSheet() {
+            buildExpenseNote();
+            const pin = document.getElementById('expense-pin').value.trim();
+            const amount = parseFloat(document.getElementById('expense-amount').value) || 0;
+            const status = document.getElementById('expense-save-status');
+            const dateValue = document.getElementById('expense-date').value;
+            const note = document.getElementById('expense-note-preview').innerText.trim();
+
+            if (!pin) {
+                showExpenseSaveStatus('กรุณาใส่ PIN แอดมินก่อนบันทึก', false);
+                return;
+            }
+            if (!dateValue) {
+                showExpenseSaveStatus('กรุณาเลือกวันที่ก่อนบันทึก', false);
+                return;
+            }
+            if (!amount || amount <= 0) {
+                showExpenseSaveStatus('กรุณาใส่ยอดเงินมากกว่า 0', false);
+                return;
+            }
+
+            status.className = 'mt-2 text-xs font-bold text-slate-500';
+            status.innerText = 'กำลังบันทึกเข้า Google Sheet...';
+
+            try {
+                const response = await fetch(MANAGEMENT_AI_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({
+                        action: 'addExpense',
+                        pin,
+                        data: {
+                            date: dateValue,
+                            note
+                        }
+                    })
+                });
+                const result = await response.json();
+                if (result.status !== 'success') {
+                    throw new Error(result.message || 'บันทึกไม่สำเร็จ');
+                }
+                showExpenseSaveStatus(`บันทึกแล้ว: ${result.date} / ${result.note} (ข้อมูลสรุปอาจอัปเดตช้าตาม Google Sheet)`, true);
+            } catch (error) {
+                showExpenseSaveStatus(`บันทึกไม่สำเร็จ: ${error.message}`, false);
+            }
+        }
+
+        function showExpenseSaveStatus(message, success) {
+            const status = document.getElementById('expense-save-status');
+            status.className = `mt-2 text-xs font-bold ${success ? 'text-emerald-600' : 'text-rose-600'}`;
+            status.innerText = message;
         }
 
         function copyTextWithStatus(text, statusId, emptyMessage) {
