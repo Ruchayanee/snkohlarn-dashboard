@@ -426,6 +426,7 @@
         let latestPriceGuideText = "";
         let latestExpenseNoteText = "";
         let expenseSaveBusy = false;
+        const expenseSaveButtonDefaultText = "บันทึกเข้า Google Sheet";
         let lastSavedExpenseSignature = "";
 
         window.onload = () => {
@@ -1070,13 +1071,21 @@
                         date: dateValue,
                         note
                     }
-                });
+                }, ['success', 'duplicate']);
+                if (result.status === 'duplicate') {
+                    lastSavedExpenseSignature = signature;
+                    showExpenseSaveStatus(result.message, false);
+                    updateExpenseSaveButton();
+                    return;
+                }
                 lastSavedExpenseSignature = signature;
-                showExpenseSaveStatus(`บันทึกแล้ว: ${result.date} / ${result.note} (ข้อมูลสรุปอาจอัปเดตช้าตาม Google Sheet)`, true);
+                resetExpenseHelperAfterSave();
+                showExpenseSaveStatus(`บันทึกแล้ว: ${result.date} / ${result.note} พร้อมกรอกรายการถัดไปได้เลย`, true);
             } catch (error) {
                 showExpenseSaveStatus(`บันทึกไม่สำเร็จ: ${error.message}`, false);
             } finally {
                 setExpenseSaveBusy(false);
+                updateExpenseSaveButton();
             }
         }
 
@@ -1094,21 +1103,34 @@
 
         function updateExpenseSaveButton() {
             const saveButton = document.getElementById('save-expense-btn');
-            if (!saveButton || expenseSaveBusy) return;
+            if (!saveButton) return;
             const dateValue = document.getElementById('expense-date').value;
+            const amount = parseFloat(document.getElementById('expense-amount').value) || 0;
             const note = document.getElementById('expense-note-preview').innerText.trim();
             const isSameAsLastSaved = `${dateValue}|${note}` === lastSavedExpenseSignature;
-            saveButton.classList.toggle('opacity-70', isSameAsLastSaved);
+            const isReadyToSave = !!dateValue && amount > 0 && !expenseSaveBusy;
+            const shouldDisable = !isReadyToSave || isSameAsLastSaved;
+
+            saveButton.disabled = shouldDisable;
+            saveButton.classList.toggle('opacity-60', shouldDisable);
+            saveButton.classList.toggle('cursor-not-allowed', shouldDisable);
+            saveButton.innerText = isSameAsLastSaved ? 'บันทึกแล้ว' : expenseSaveButtonDefaultText;
         }
 
-        async function postManagementAction(action, payload) {
+        function resetExpenseHelperAfterSave() {
+            document.getElementById('expense-amount').value = '';
+            document.getElementById('expense-extra').value = '';
+            buildExpenseNote();
+        }
+
+        async function postManagementAction(action, payload, allowedStatuses = ['success']) {
             const response = await fetch(MANAGEMENT_AI_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify({ action, ...payload })
             });
             const result = await response.json();
-            if (result.status !== 'success') {
+            if (!allowedStatuses.includes(result.status)) {
                 throw new Error(result.message || 'เชื่อมต่อไม่สำเร็จ');
             }
             return result;
