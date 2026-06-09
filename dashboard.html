@@ -280,17 +280,18 @@
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-500 mb-2">ยอดเงิน</label>
-                        <input type="number" id="expense-amount" class="w-full p-3 border border-slate-200 rounded-2xl bg-slate-50 text-slate-700" placeholder="เช่น 5200" oninput="buildExpenseNote()">
+                        <input type="number" id="expense-amount" class="w-full p-3 border border-slate-200 rounded-2xl bg-slate-50 text-slate-700" placeholder="เช่น 5200" oninput="buildExpenseNote()" onkeydown="handleExpenseHelperKeydown(event, 'expense-extra')">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-500 mb-2">รายละเอียดเพิ่ม</label>
-                        <input type="text" id="expense-extra" class="w-full p-3 border border-slate-200 rounded-2xl bg-slate-50 text-slate-700" placeholder="ไม่บังคับ" oninput="buildExpenseNote()">
+                        <input type="text" id="expense-extra" class="w-full p-3 border border-slate-200 rounded-2xl bg-slate-50 text-slate-700" placeholder="ไม่บังคับ" oninput="buildExpenseNote()" onkeydown="handleExpenseHelperKeydown(event, 'expense-pin')">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-500 mb-2">PIN แอดมิน</label>
-                        <input type="password" id="expense-pin" class="w-full p-3 border border-slate-200 rounded-2xl bg-slate-50 text-slate-700" placeholder="PIN เดียวกับ AI">
+                        <input type="password" id="expense-pin" class="w-full p-3 border border-slate-200 rounded-2xl bg-slate-50 text-slate-700" placeholder="PIN เดียวกับ AI" onkeydown="handleExpenseHelperKeydown(event)">
                     </div>
                 </div>
+                <p class="mt-3 text-xs text-slate-400">กด Enter ต่อเนื่องได้เลย: ยอดเงิน > รายละเอียดเพิ่ม > PIN > บันทึก</p>
                 <div class="mt-5 bg-slate-50 border border-slate-200 rounded-2xl p-4">
                     <p class="text-xs font-bold text-slate-500 mb-2">ข้อมูลสำหรับใส่ Google Sheet</p>
                     <p class="text-sm text-slate-500">วันที่เข้าพัก: <span id="expense-date-preview" class="font-bold text-slate-700">-</span></p>
@@ -1075,6 +1076,7 @@
                 if (result.status === 'duplicate') {
                     lastSavedExpenseSignature = signature;
                     showExpenseSaveStatus(result.message, false);
+                    focusExpenseAmountInput();
                     updateExpenseSaveButton();
                     return;
                 }
@@ -1121,6 +1123,33 @@
             document.getElementById('expense-amount').value = '';
             document.getElementById('expense-extra').value = '';
             buildExpenseNote();
+            focusExpenseAmountInput();
+        }
+
+        function focusExpenseAmountInput() {
+            const amountInput = document.getElementById('expense-amount');
+            if (!amountInput) return;
+            amountInput.focus();
+            amountInput.select();
+        }
+
+        function handleExpenseHelperKeydown(event, nextFieldId = '') {
+            if (event.key !== 'Enter') return;
+            event.preventDefault();
+
+            if (nextFieldId) {
+                const nextField = document.getElementById(nextFieldId);
+                if (nextField) {
+                    nextField.focus();
+                    if (typeof nextField.select === 'function') nextField.select();
+                }
+                return;
+            }
+
+            const saveButton = document.getElementById('save-expense-btn');
+            if (saveButton && !saveButton.disabled) {
+                saveExpenseToSheet();
+            }
         }
 
         async function postManagementAction(action, payload, allowedStatuses = ['success']) {
