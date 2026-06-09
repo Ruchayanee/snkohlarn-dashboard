@@ -64,6 +64,20 @@ function addExpense_(body) {
 
   const sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName(FINANCE_SHEET);
   const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getDisplayValues()[0];
+  const dateIndex = headers.indexOf('วันที่เข้าพัก');
+  const noteIndex = headers.indexOf('หมายเหตุ');
+  if (dateIndex === -1 || noteIndex === -1) {
+    return { status: 'error', message: 'ชีทขาดคอลัมน์วันที่เข้าพักหรือหมายเหตุ' };
+  }
+
+  const rows = sheet.getDataRange().getDisplayValues();
+  const duplicate = rows.slice(1).some(function(row) {
+    return String(row[dateIndex] || '').trim() === dateText && String(row[noteIndex] || '').trim() === note;
+  });
+  if (duplicate) {
+    return { status: 'duplicate', message: 'พบรายการวันที่และหมายเหตุนี้อยู่แล้ว จึงไม่บันทึกซ้ำ' };
+  }
+
   const row = headers.map(function(header) {
     if (header === 'วันที่เข้าพัก') return dateText;
     if (header === 'ราคาขายจริง') return 0;

@@ -250,10 +250,10 @@
                         <h2 class="text-xl font-bold text-slate-700">ตัวช่วยสร้างข้อความค่าใช้จ่าย</h2>
                     </div>
                     <div class="flex flex-col sm:flex-row gap-2">
-                        <button onclick="checkExpenseConnection()" class="bg-slate-700 hover:bg-slate-800 text-white px-4 py-2 rounded-2xl text-xs font-bold shadow-md transition-all">
+                        <button id="check-expense-connection-btn" onclick="checkExpenseConnection()" class="bg-slate-700 hover:bg-slate-800 text-white px-4 py-2 rounded-2xl text-xs font-bold shadow-md transition-all">
                             ทดสอบการเชื่อมต่อ
                         </button>
-                        <button onclick="saveExpenseToSheet()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-2xl text-xs font-bold shadow-md transition-all">
+                        <button id="save-expense-btn" onclick="saveExpenseToSheet()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-2xl text-xs font-bold shadow-md transition-all">
                             บันทึกเข้า Google Sheet
                         </button>
                         <button onclick="copyExpenseNote()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-2xl text-xs font-bold shadow-md transition-all">
@@ -425,6 +425,8 @@
         let latestExecutiveSummaryText = "";
         let latestPriceGuideText = "";
         let latestExpenseNoteText = "";
+        let expenseSaveBusy = false;
+        let lastSavedExpenseSignature = "";
 
         window.onload = () => {
             // โหลดข้อมูลบัญชี
@@ -1001,6 +1003,7 @@
             latestExpenseNoteText = `วันที่เข้าพัก: ${sheetDate}\nหมายเหตุ: ${note}`;
             document.getElementById('expense-date-preview').innerText = sheetDate;
             document.getElementById('expense-note-preview').innerText = note;
+            updateExpenseSaveButton();
         }
 
         function formatExpenseDateForSheet(dateValue) {
@@ -1032,11 +1035,13 @@
         }
 
         async function saveExpenseToSheet() {
+            if (expenseSaveBusy) return;
             buildExpenseNote();
             const pin = document.getElementById('expense-pin').value.trim();
             const amount = parseFloat(document.getElementById('expense-amount').value) || 0;
             const dateValue = document.getElementById('expense-date').value;
             const note = document.getElementById('expense-note-preview').innerText.trim();
+            const signature = `${dateValue}|${note}`;
 
             if (!pin) {
                 showExpenseSaveStatus('กรุณาใส่ PIN แอดมินก่อนบันทึก', false);
@@ -1050,8 +1055,13 @@
                 showExpenseSaveStatus('กรุณาใส่ยอดเงินมากกว่า 0', false);
                 return;
             }
+            if (signature === lastSavedExpenseSignature) {
+                showExpenseSaveStatus('รายการนี้เพิ่งบันทึกแล้ว ถ้าต้องการบันทึกอีกรายการให้เปลี่ยนยอดหรือรายละเอียดก่อน', false);
+                return;
+            }
 
             showExpenseSaveStatus('กำลังบันทึกเข้า Google Sheet...', null);
+            setExpenseSaveBusy(true);
 
             try {
                 const result = await postManagementAction('addExpense', {
@@ -1061,10 +1071,34 @@
                         note
                     }
                 });
+                lastSavedExpenseSignature = signature;
                 showExpenseSaveStatus(`บันทึกแล้ว: ${result.date} / ${result.note} (ข้อมูลสรุปอาจอัปเดตช้าตาม Google Sheet)`, true);
             } catch (error) {
                 showExpenseSaveStatus(`บันทึกไม่สำเร็จ: ${error.message}`, false);
+            } finally {
+                setExpenseSaveBusy(false);
             }
+        }
+
+        function setExpenseSaveBusy(isBusy) {
+            expenseSaveBusy = isBusy;
+            const saveButton = document.getElementById('save-expense-btn');
+            const testButton = document.getElementById('check-expense-connection-btn');
+            [saveButton, testButton].forEach(button => {
+                if (!button) return;
+                button.disabled = isBusy;
+                button.classList.toggle('opacity-60', isBusy);
+                button.classList.toggle('cursor-not-allowed', isBusy);
+            });
+        }
+
+        function updateExpenseSaveButton() {
+            const saveButton = document.getElementById('save-expense-btn');
+            if (!saveButton || expenseSaveBusy) return;
+            const dateValue = document.getElementById('expense-date').value;
+            const note = document.getElementById('expense-note-preview').innerText.trim();
+            const isSameAsLastSaved = `${dateValue}|${note}` === lastSavedExpenseSignature;
+            saveButton.classList.toggle('opacity-70', isSameAsLastSaved);
         }
 
         async function postManagementAction(action, payload) {
