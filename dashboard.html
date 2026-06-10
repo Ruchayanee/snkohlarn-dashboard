@@ -432,10 +432,7 @@
 
         window.onload = () => {
             // โหลดข้อมูลบัญชี
-            Papa.parse(FINANCE_CSV_URL, {
-                download: true, header: true, skipEmptyLines: true,
-                complete: function(results) { processData(results.data); }
-            });
+            loadFinanceData();
             
             // โหลดข้อมูลสต๊อก
             loadStockData();
@@ -635,7 +632,24 @@
             }, 0);
         }
 
-        function processData(rows) {
+        function loadFinanceData(preferredMonth = '') {
+            return new Promise((resolve, reject) => {
+                Papa.parse(FINANCE_CSV_URL, {
+                    download: true,
+                    header: true,
+                    skipEmptyLines: true,
+                    complete: function(results) {
+                        processData(results.data, preferredMonth);
+                        resolve();
+                    },
+                    error: function(error) {
+                        reject(error);
+                    }
+                });
+            });
+        }
+
+        function processData(rows, preferredMonth = '') {
             allDataByMonth = {};
             rows.forEach(row => {
                 let dateStr = row["วันที่เข้าพัก"];
@@ -676,11 +690,12 @@
                 let room = parseInt(roomStr);
                 if (!isNaN(room) && !allDataByMonth[monthStr].dailyData[formattedDate].rooms.includes(room)) allDataByMonth[monthStr].dailyData[formattedDate].rooms.push(room);
             });
-            setupMonthSelector();
+            setupMonthSelector(preferredMonth);
         }
 
-        function setupMonthSelector() {
+        function setupMonthSelector(preferredMonth = '') {
             const s = document.getElementById('month-selector');
+            const currentMonth = preferredMonth || s.value;
             s.innerHTML = '';
             const sorted = Object.keys(allDataByMonth).sort();
             sorted.forEach(m => {
@@ -692,7 +707,7 @@
                 s.appendChild(opt);
             });
             if(sorted.length > 0) {
-                s.value = sorted[sorted.length - 1];
+                s.value = allDataByMonth[currentMonth] ? currentMonth : sorted[sorted.length - 1];
                 changeMonth();
             }
         }
@@ -1082,7 +1097,14 @@
                 }
                 lastSavedExpenseSignature = signature;
                 resetExpenseHelperAfterSave();
-                showExpenseSaveStatus(`บันทึกแล้ว: ${result.date} / ${result.note} พร้อมกรอกรายการถัดไปได้เลย`, true);
+                const selectedMonth = document.getElementById('month-selector').value;
+                showExpenseSaveStatus(`บันทึกแล้ว: ${result.date} / ${result.note} กำลังรีเฟรชข้อมูลสรุป...`, true);
+                try {
+                    await loadFinanceData(selectedMonth);
+                    showExpenseSaveStatus(`บันทึกแล้ว: ${result.date} / ${result.note} และอัปเดตสรุปล่าสุดแล้ว`, true);
+                } catch (refreshError) {
+                    showExpenseSaveStatus(`บันทึกแล้ว แต่รีเฟรชสรุปไม่สำเร็จ: ${refreshError.message || refreshError}`, false);
+                }
             } catch (error) {
                 showExpenseSaveStatus(`บันทึกไม่สำเร็จ: ${error.message}`, false);
             } finally {
