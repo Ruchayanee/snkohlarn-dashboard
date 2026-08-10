@@ -163,11 +163,22 @@
 
 <script>
 const BACKEND_URL = "https://script.google.com/macros/s/AKfycbyLFO7dgjgdeDY5ETh7B_mV-bJG8T_tHnw-a41sOTfw9EKCoknUv2MJ2CP9yVJtL9CbfA/exec";
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzKj6d7mAV-9SVvIKHA1SyWMJcUFMQ5241Mz5xWTLMtOaPRQgfQFfdaGOqOHRkrShd5/exec";
 const ROOM_NUMBERS = { 'std': ['1', '2', '3', '4', '5'], 'jac': ['6', '7'], 'fam': ['8', '9'], 'sea': ['10'] };
 const ROOM_DATA = { 'std': { name: 'Standard', price: 1900, short: 'Std' }, 'fam': { name: 'Family', price: 2900, short: 'Fam' }, 'sea': { name: 'Deluxe Twin Bed', price: 2900, short: 'Deluxe Twin' }, 'jac': { name: 'Jacuzzi', price: 3500, short: 'Jac' } };
 let currentMode = 'booking'; let roomMode = 'single'; let currentPayload = null; let globalBookedRooms = {};
-async function callAPI(action, payload = {}) { const response = await fetch(WEB_APP_URL, { method: "POST", body: JSON.stringify({ action, data: payload }), headers: { "Content-Type": "text/plain;charset=utf-8" } }); return await response.json(); }
+async function callAPI(action, payload = {}) {
+    const response = await fetch(BACKEND_URL, {
+        method: "POST",
+        body: JSON.stringify({ action, data: payload }),
+        headers: { "Content-Type": "text/plain;charset=utf-8" }
+    });
+    const rawText = await response.text();
+    try {
+        return JSON.parse(rawText);
+    } catch (error) {
+        throw new Error(rawText || 'หลังบ้านไม่ส่งข้อมูล JSON กลับมา');
+    }
+}
 window.onload = function() { document.querySelectorAll('.mainRoomType').forEach(sel => handleRoomTypeChange(sel)); const pendingBooking = sessionStorage.getItem('pendingBooking'); if (pendingBooking) { const data = JSON.parse(pendingBooking); if(data.name || data.custName) document.getElementById('custName').value = data.name || data.custName; if(data.phone || data.contactSource) document.getElementById('contactSource').value = data.phone || data.contactSource; if(data.line || data.lineName) document.getElementById('lineName').value = data.line || data.lineName; const slipUrl = data.slip || data.slipUrl; if (slipUrl) document.getElementById('pendingSlipArea').innerHTML = `<div class="slip-preview-container" id="slipBox"><div style="flex:1;"><p style="margin:0; font-weight:bold; color:#d35400; font-size:14px;">📢 ข้อมูลรอการจอง (โอนสลิปแล้ว)</p><p style="margin:5px 0; font-size:11px; color:#666;">ส่งมาจาก Line: <b>${data.line || data.lineName || '-'}</b></p><button onclick="clearPendingData()" style="background:#e74c3c; color:white; border:none; padding:4px 8px; border-radius:5px; font-size:10px; cursor:pointer; margin-top:5px;">ล้างข้อมูลที่ค้างไว้</button></div><div><a href="${slipUrl}" target="_blank" style="background:#fff; border:2px solid #3498db; color:#3498db; padding:10px 15px; border-radius:12px; font-size:13px; font-weight:bold; text-decoration:none; display:inline-flex;">🖼️ คลิกเพื่อดูสลิป</a></div></div>`; } if(new URLSearchParams(window.location.search).get('mode') === 'manage') switchMode('manage'); };
 function clearPendingData(){ sessionStorage.removeItem('pendingBooking'); const box=document.getElementById('pendingSlipArea'); if(box) box.innerHTML=''; }
 function fetchBookedRooms(){ const cin=document.getElementById('checkIn').value; const cout=document.getElementById('checkOut').value; if(!cin) return; document.getElementById('loadingRooms').style.display='inline'; callAPI('getBookedRoomsDict',{cin,cout:cout||cin}).then(res=>{ globalBookedRooms=res; applyRoomLocks(); document.getElementById('loadingRooms').style.display='none'; }).catch(()=>{ document.getElementById('loadingRooms').style.display='none'; }); }
