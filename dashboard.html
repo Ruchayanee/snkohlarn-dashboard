@@ -301,6 +301,56 @@
                 </div>
             </div>
 
+            <div class="mb-10 bg-white border border-slate-200 rounded-3xl p-6 shadow-sm">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-5">
+                    <div>
+                        <p class="text-slate-400 text-xs font-bold uppercase">Expense History</p>
+                        <h2 class="text-xl font-bold text-slate-700">ประวัติค่าใช้จ่ายล่าสุด</h2>
+                    </div>
+                    <p id="expense-history-summary" class="text-xs font-bold text-slate-400">กำลังเตรียมข้อมูล...</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-5">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 mb-2">กรองตามวันที่</label>
+                        <input type="date" id="expense-history-date" class="w-full p-3 border border-slate-200 rounded-2xl bg-slate-50 text-slate-700">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 mb-2">กรองตามหมวด</label>
+                        <select id="expense-history-category" class="w-full p-3 border border-slate-200 rounded-2xl bg-slate-50 text-slate-700">
+                            <option value="">ทุกหมวด</option>
+                            <option value="ค่าไฟ">ค่าไฟ</option>
+                            <option value="คนงาน">คนงาน</option>
+                            <option value="ทิป">ทิป</option>
+                            <option value="ค่าน้ำ">ค่าน้ำ</option>
+                            <option value="ซักผ้า">ซักผ้า</option>
+                            <option value="ซ่อมบำรุง">ซ่อมบำรุง</option>
+                            <option value="ของใช้">ของใช้</option>
+                        </select>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-xs font-bold text-slate-500 mb-2">ค้นหาจากรายละเอียด/หมายเหตุ</label>
+                        <input type="text" id="expense-history-search" class="w-full p-3 border border-slate-200 rounded-2xl bg-slate-50 text-slate-700" placeholder="เช่น ค่าไฟ มิเตอร์ ช่าง ซักผ้า">
+                    </div>
+                </div>
+                <div class="overflow-x-auto border border-slate-100 rounded-2xl">
+                    <table class="w-full text-sm">
+                        <thead class="bg-slate-50 text-slate-500 text-xs uppercase tracking-wide">
+                            <tr>
+                                <th class="p-3 text-left">วันที่</th>
+                                <th class="p-3 text-left">หมวด</th>
+                                <th class="p-3 text-right">ยอดเงิน</th>
+                                <th class="p-3 text-left">รายละเอียด</th>
+                                <th class="p-3 text-left">หมายเหตุในชีต</th>
+                            </tr>
+                        </thead>
+                        <tbody id="expense-history-body" class="text-slate-700">
+                            <tr><td colspan="5" class="p-6 text-center text-slate-400">กำลังโหลดข้อมูลค่าใช้จ่าย...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p class="mt-3 text-xs text-slate-400">จะแสดงล่าสุด 20 รายการก่อน ถ้ากรองหรือค้นหาแล้วระบบจะขยายผลลัพธ์ให้มากขึ้นอัตโนมัติ</p>
+            </div>
+
             <div class="mb-12 bg-slate-50 p-6 rounded-3xl border border-slate-200">
                 <h2 class="text-lg font-bold mb-4 text-slate-700">📈 ผลประกอบการรายวัน</h2>
                 <canvas id="monthlyChart" height="100"></canvas>
@@ -426,9 +476,39 @@
         let latestExecutiveSummaryText = "";
         let latestPriceGuideText = "";
         let latestExpenseNoteText = "";
+        let expenseHistoryEntries = [];
         let expenseSaveBusy = false;
         const expenseSaveButtonDefaultText = "บันทึกเข้า Google Sheet";
         let lastSavedExpenseSignature = "";
+        const expenseCategoryKeywords = ["ค่าไฟ", "คนงาน", "ทิป", "ค่าน้ำ", "ซักผ้า", "ซ่อมบำรุง", "ของใช้"];
+        let managementBridgeReady = false;
+        let managementBridgeWindow = null;
+        let managementBridgeSequence = 0;
+        const pendingManagementRequests = new Map();
+        const managementBridge = document.createElement('iframe');
+        managementBridge.hidden = true;
+        managementBridge.src = `${MANAGEMENT_AI_URL}?bridge=1`;
+        managementBridge.title = 'SN Koh Larn Management Bridge';
+        document.body.appendChild(managementBridge);
+
+        window.addEventListener('message', event => {
+            const message = event.data || {};
+            if (message.type === 'SN_MANAGEMENT_AI_READY') {
+                managementBridgeWindow = event.source;
+                managementBridgeReady = true;
+                return;
+            }
+            if (message.type !== 'SN_MANAGEMENT_AI_RESPONSE') return;
+            const pending = pendingManagementRequests.get(message.requestId);
+            if (!pending) return;
+            clearTimeout(pending.timer);
+            pendingManagementRequests.delete(message.requestId);
+            pending.resolve(message.data);
+        });
+
+        managementBridge.addEventListener('load', () => {
+            managementBridge.contentWindow.postMessage({ type: 'SN_MANAGEMENT_AI_PING' }, '*');
+        });
 
         window.onload = () => {
             // โหลดข้อมูลบัญชี
@@ -476,7 +556,15 @@
                 const today = new Date();
                 dateInput.value = today.getFullYear() + "-" + String(today.getMonth() + 1).padStart(2, '0') + "-" + String(today.getDate()).padStart(2, '0');
             }
+            ['expense-history-date', 'expense-history-category', 'expense-history-search'].forEach(id => {
+                const element = document.getElementById(id);
+                if (!element || element.dataset.bound === '1') return;
+                element.addEventListener('input', renderExpenseHistory);
+                element.addEventListener('change', renderExpenseHistory);
+                element.dataset.bound = '1';
+            });
             buildExpenseNote();
+            renderExpenseHistory();
         }
 
         function setFinanceMode(mode) {
@@ -651,6 +739,7 @@
 
         function processData(rows, preferredMonth = '') {
             allDataByMonth = {};
+            expenseHistoryEntries = [];
             rows.forEach(row => {
                 let dateStr = row["วันที่เข้าพัก"];
                 let roomStr = row["เลขห้อง"];
@@ -687,10 +776,95 @@
                 allDataByMonth[monthStr].expenseBreakdown.labor += labor;
                 allDataByMonth[monthStr].expenseBreakdown.tips += tips;
                 allDataByMonth[monthStr].expenseBreakdown.other += otherExpense;
+                expenseHistoryEntries.push(...extractExpenseHistoryEntries(noteStr, formattedDate, row));
                 let room = parseInt(roomStr);
                 if (!isNaN(room) && !allDataByMonth[monthStr].dailyData[formattedDate].rooms.includes(room)) allDataByMonth[monthStr].dailyData[formattedDate].rooms.push(room);
             });
             setupMonthSelector(preferredMonth);
+            renderExpenseHistory();
+        }
+
+        function extractExpenseHistoryEntries(noteStr, formattedDate, row) {
+            if (!noteStr) return [];
+            const note = noteStr.toString().trim();
+            if (!note) return [];
+            const entries = [];
+            expenseCategoryKeywords.forEach(category => {
+                const escapedCategory = category.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                const regex = new RegExp(`${escapedCategory}\\s*[:=]?\\s*(\\d[\\d,.]*)`, 'g');
+                let match;
+                while ((match = regex.exec(note)) !== null) {
+                    const amount = parseFloat(String(match[1] || '').replace(/,/g, '')) || 0;
+                    if (!amount) continue;
+                    const detail = note.replace(match[0], '').trim();
+                    entries.push({
+                        dateKey: formattedDate,
+                        category,
+                        amount,
+                        detail: detail || '-',
+                        note,
+                        sortKey: `${formattedDate}|${entries.length}`,
+                        sourceRoom: row["เลขห้อง"] || '',
+                        sourceIncome: parseFloat(String(row["ราคาขายจริง"] || '').replace(/,/g, '')) || 0
+                    });
+                }
+            });
+            return entries;
+        }
+
+        function formatExpenseHistoryDate(dateKey) {
+            if (!dateKey) return '-';
+            const date = new Date(dateKey);
+            if (Number.isNaN(date.getTime())) return dateKey;
+            return date.toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' });
+        }
+
+        function renderExpenseHistory() {
+            const tbody = document.getElementById('expense-history-body');
+            const summary = document.getElementById('expense-history-summary');
+            if (!tbody || !summary) return;
+
+            const selectedDate = document.getElementById('expense-history-date')?.value || '';
+            const selectedCategory = document.getElementById('expense-history-category')?.value || '';
+            const searchText = (document.getElementById('expense-history-search')?.value || '').trim().toLowerCase();
+            const hasFilter = !!selectedDate || !!selectedCategory || !!searchText;
+            const maxItems = hasFilter ? 100 : 20;
+
+            const filtered = expenseHistoryEntries
+                .filter(item => !selectedDate || item.dateKey === selectedDate)
+                .filter(item => !selectedCategory || item.category === selectedCategory)
+                .filter(item => {
+                    if (!searchText) return true;
+                    return [item.detail, item.note, item.category]
+                        .join(' ')
+                        .toLowerCase()
+                        .includes(searchText);
+                })
+                .sort((a, b) => {
+                    if (a.dateKey !== b.dateKey) return a.dateKey < b.dateKey ? 1 : -1;
+                    return a.sortKey < b.sortKey ? 1 : -1;
+                });
+
+            const visible = filtered.slice(0, maxItems);
+            const totalAmount = filtered.reduce((sum, item) => sum + item.amount, 0);
+            summary.innerText = filtered.length
+                ? `พบ ${filtered.length.toLocaleString()} รายการ รวม ${totalAmount.toLocaleString()} บาท`
+                : 'ยังไม่พบรายการที่ตรงกับตัวกรอง';
+
+            if (!visible.length) {
+                tbody.innerHTML = '<tr><td colspan="5" class="p-6 text-center text-slate-400">ยังไม่มีรายการค่าใช้จ่ายที่ตรงกับเงื่อนไข</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = visible.map(item => `
+                <tr class="border-t border-slate-100 hover:bg-slate-50">
+                    <td class="p-3 whitespace-nowrap">${formatExpenseHistoryDate(item.dateKey)}</td>
+                    <td class="p-3"><span class="inline-flex px-3 py-1 rounded-full bg-indigo-50 text-indigo-700 text-xs font-bold">${item.category}</span></td>
+                    <td class="p-3 text-right font-bold text-rose-600">${item.amount.toLocaleString()} ฿</td>
+                    <td class="p-3 text-slate-600">${item.detail}</td>
+                    <td class="p-3 text-xs text-slate-500">${item.note}</td>
+                </tr>
+            `).join('');
         }
 
         function setupMonthSelector(preferredMonth = '') {
@@ -1175,16 +1349,40 @@
         }
 
         async function postManagementAction(action, payload, allowedStatuses = ['success']) {
-            const response = await fetch(MANAGEMENT_AI_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify({ action, ...payload })
-            });
-            const result = await response.json();
+            const requestPayload = { action, ...payload };
+            let result;
+
+            if (managementBridgeReady) {
+                result = await postManagementActionViaBridge(requestPayload);
+            } else {
+                const response = await fetch(MANAGEMENT_AI_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify(requestPayload)
+                });
+                result = await response.json();
+            }
+
             if (!allowedStatuses.includes(result.status)) {
                 throw new Error(result.message || 'เชื่อมต่อไม่สำเร็จ');
             }
             return result;
+        }
+
+        function postManagementActionViaBridge(payload) {
+            return new Promise((resolve, reject) => {
+                const requestId = `expense-${Date.now()}-${++managementBridgeSequence}`;
+                const timer = setTimeout(() => {
+                    pendingManagementRequests.delete(requestId);
+                    reject(new Error('Apps Script ไม่ตอบกลับ กรุณาลองใหม่'));
+                }, 45000);
+                pendingManagementRequests.set(requestId, { resolve, timer });
+                (managementBridgeWindow || managementBridge.contentWindow).postMessage({
+                    type: 'SN_MANAGEMENT_AI_REQUEST',
+                    requestId,
+                    payload
+                }, '*');
+            });
         }
 
         function showExpenseSaveStatus(message, success) {
