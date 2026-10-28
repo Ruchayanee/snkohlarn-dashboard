@@ -47,6 +47,35 @@
         .btn-qty { width: 40px; height: 40px; border-radius: 50%; border: 1.5px solid var(--navy); background: white; cursor: pointer; font-size: 20px; }
         .btn-qty:disabled { opacity: 0.4; cursor: not-allowed; }
         .btn-submit { width: 100%; padding: 22px; border-radius: 18px; border: none; background: var(--navy); color: white; font-size: 20px; cursor: pointer; margin-top: 20px; box-shadow: 0 10px 20px rgba(26,54,93,0.3); }
+        .price-tag { font-size: 13px; color: #536174; margin-top: 4px; }
+        .map-wrap { max-width: 440px; margin: 0 auto 22px; background: #efe6d2; border: 2px solid var(--gold); border-radius: 24px; padding: 8px; box-shadow: 0 10px 24px rgba(26,54,93,0.15); }
+        .map-wrap svg { width: 100%; height: auto; display: block; border-radius: 18px; }
+        .map-wrap.loading .room-g { opacity: 0.6; }
+        .map-legend { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 14px; font-size: 12px; margin-top: 8px; }
+        .map-legend i { display: inline-block; width: 11px; height: 11px; border-radius: 50%; margin-right: 5px; vertical-align: -1px; }
+        .map-summary { text-align: center; font-size: 14px; font-weight: 600; margin: 8px 0 20px; min-height: 20px; }
+        .room-g { cursor: pointer; outline: none; transform-box: fill-box; transform-origin: center; transition: filter 0.2s; }
+        .room-g:hover, .room-g:focus-visible { filter: brightness(1.1) drop-shadow(0 4px 6px rgba(0,0,0,0.25)); }
+        .room-g.sel { animation: roomBob 1.6s ease-in-out infinite; }
+        .room-g.sel .roof-base { stroke: #C5A059; stroke-width: 7; }
+        .room-g.locked { cursor: not-allowed; filter: grayscale(1) opacity(0.45); }
+        .room-g .chk, .room-g .lock, .room-g .spark { display: none; }
+        .room-g .chk { transform-box: fill-box; transform-origin: center; }
+        .room-g.sel .chk { display: block; animation: chkPop 0.35s ease-out; }
+        .room-g.sel .spark { display: block; animation: twinkle 1.4s ease-in-out infinite; }
+        .room-g.locked .lock { display: block; }
+        .room-g .room-sub { paint-order: stroke; stroke: rgba(0,0,0,0.35); stroke-width: 3px; }
+        .room-g.locked .bubble { display: none; }
+        .bubble { animation: bubbleRise 2.4s ease-in infinite; }
+        .tree { transform-box: fill-box; transform-origin: 50% 90%; animation: treeSway 4s ease-in-out infinite; }
+        .cloud { animation: cloudDrift 45s linear infinite; pointer-events: none; }
+        @keyframes roomBob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+        @keyframes chkPop { 0% { transform: scale(0); } 70% { transform: scale(1.3); } 100% { transform: scale(1); } }
+        @keyframes twinkle { 0%, 100% { opacity: 0.2; } 50% { opacity: 1; } }
+        @keyframes bubbleRise { 0% { transform: translateY(0); opacity: 0; } 20% { opacity: 0.9; } 100% { transform: translateY(-40px); opacity: 0; } }
+        @keyframes treeSway { 0%, 100% { transform: rotate(-4deg); } 50% { transform: rotate(4deg); } }
+        @keyframes cloudDrift { from { transform: translateX(-220px); } to { transform: translateX(950px); } }
+        @media (prefers-reduced-motion: reduce) { .room-g.sel, .room-g.sel .spark, .bubble, .tree, .cloud { animation: none; } }
         #capWarning, #dateWarning { color: var(--danger); font-size: 15px; font-weight: bold; margin-top: 15px; text-align: center; display: none; background: #fee2e2; padding: 12px; border-radius: 12px; border: 1px solid var(--danger); }
     </style>
 </head>
@@ -71,7 +100,7 @@
                             <div class="availability-chip"><strong id="previewStd">-</strong><span>Standard</span></div>
                             <div class="availability-chip"><strong id="previewJac">-</strong><span>Jacuzzi</span></div>
                             <div class="availability-chip"><strong id="previewFam">-</strong><span>Family</span></div>
-                            <div class="availability-chip"><strong id="previewSea">-</strong><span>Sea View</span></div>
+                            <div class="availability-chip"><strong id="previewSea">-</strong><span>Deluxe Twin Bed</span></div>
                         </div>
                     </div>
                     <div class="date-actions">
@@ -102,25 +131,62 @@
 
         <div class="card">
             <div class="section-title">🛏️ 2. เลือกห้องพัก</div>
+            <div class="map-wrap" id="mapWrap">
+                <svg viewBox="0 0 729 1024" role="group" aria-label="แผนที่ห้องพัก SN Kohlarn มุมสูง แตะเพื่อเลือกห้อง">
+                    <rect width="729" height="1024" fill="#efe6d2"/>
+                    <rect x="300" y="40" width="88" height="730" rx="10" fill="#e3d7bd"/>
+                    <rect x="225" y="470" width="165" height="260" rx="10" fill="#e3d7bd"/>
+                    <rect x="150" y="820" width="215" height="200" rx="10" fill="#e3d7bd"/>
+                    <rect x="90" y="848" width="58" height="52" rx="8" fill="#7ec27e"/>
+                    <rect x="634" y="0" width="95" height="215" rx="8" fill="#b8bec6" opacity="0.7"/>
+                    <rect x="630" y="237" width="99" height="123" rx="8" fill="#f4f6f8" opacity="0.8"/>
+                    <rect x="672" y="360" width="57" height="320" rx="8" fill="#e8806b" opacity="0.7"/>
+                    <rect x="625" y="725" width="104" height="270" rx="8" fill="#5fc4d8" opacity="0.7"/>
+                    <rect x="0" y="592" width="55" height="50" rx="6" fill="#7b8491" opacity="0.7"/>
+                    <rect x="0" y="815" width="28" height="209" rx="6" fill="#7b8491" opacity="0.7"/>
+                    <rect x="222" y="344" width="82" height="271" rx="8" fill="#9aa3b0" stroke="#6f7886" stroke-width="3"/>
+                    <rect x="368" y="765" width="258" height="245" rx="16" fill="#8f99a8" stroke="#6f7886" stroke-width="4"/>
+                    <path d="M368 765 L426 823 M626 765 L568 823 M368 1010 L426 952 M626 1010 L568 952 M426 823 H568 V952 H426 Z" stroke="#6f7886" stroke-width="3" fill="none" opacity="0.8"/>
+                    <circle cx="660" cy="462" r="13" fill="#4aa3e0"/><circle cx="680" cy="527" r="11" fill="#4aa3e0"/>
+                    <circle cx="683" cy="567" r="12" fill="#4aa3e0"/><circle cx="684" cy="602" r="13" fill="#4aa3e0"/>
+                    <g id="mapRooms"></g>
+                    <circle class="tree" cx="170" cy="865" r="24" fill="#4caf6a"/>
+                    <circle class="tree" cx="172" cy="995" r="21" fill="#3e9e5c" style="animation-delay:-1s"/>
+                    <circle class="tree" cx="14" cy="385" r="22" fill="#4caf6a" style="animation-delay:-2s"/>
+                    <circle class="tree" cx="28" cy="522" r="15" fill="#3e9e5c" style="animation-delay:-3s"/>
+                    <circle class="tree" cx="652" cy="652" r="24" fill="#4caf6a" style="animation-delay:-1.5s"/>
+                    <circle class="tree" cx="120" cy="12" r="26" fill="#3e9e5c" style="animation-delay:-0.5s"/>
+                    <circle class="tree" cx="300" cy="10" r="24" fill="#4caf6a" style="animation-delay:-2.5s"/>
+                    <g class="cloud" opacity="0.55"><ellipse cx="0" cy="200" rx="60" ry="22" fill="#fff"/><ellipse cx="40" cy="186" rx="40" ry="20" fill="#fff"/></g>
+                    <g class="cloud" opacity="0.5" style="animation-delay:-22s"><ellipse cx="0" cy="720" rx="70" ry="24" fill="#fff"/><ellipse cx="44" cy="704" rx="42" ry="22" fill="#fff"/></g>
+                </svg>
+                <div class="map-legend">
+                    <span><i style="background:#6FC3AE"></i>Standard (1-5) 1,900฿</span>
+                    <span><i style="background:#F29CC0"></i>Jacuzzi (6-7) 3,500฿</span>
+                    <span><i style="background:#F6C760"></i>Family (8-9) 2,900฿</span>
+                    <span><i style="background:#7DADF0"></i>Deluxe Twin Bed (10) 2,900฿</span>
+                </div>
+            </div>
+            <div class="map-summary" id="selectedSummary" aria-live="polite"></div>
             <div class="room-grid">
                 <div class="room-item" id="roomCardStd">
                     <div class="video-box"><video autoplay muted loop playsinline poster="images/images/std-1.jpg"><source src="images/images/std-1.mp4" type="video/mp4"></video></div>
-                    <div class="room-info"><span class="avail-tag" id="stdAvail">โปรดเลือกวันที่...</span><div class="room-name">Standard (พักได้ 2)</div>
+                    <div class="room-info"><span class="avail-tag" id="stdAvail">โปรดเลือกวันที่...</span><div class="room-name">Standard (พักได้ 2)</div><div class="price-tag">เริ่มต้น 1,900 บาท/คืน · 5 ห้อง</div>
                     <div class="qty-wrap"><button class="btn-qty" id="stdMinus" onclick="changeQty('std', -1)">-</button><span id="stdQty" style="font-weight:bold; font-size:18px;">0</span><button class="btn-qty" id="stdPlus" onclick="changeQty('std', 1)">+</button></div></div>
                 </div>
                 <div class="room-item" id="roomCardJac">
                     <div class="video-box"><video autoplay muted loop playsinline poster="images/images/jac-1.jpg"><source src="images/images/jac-1.mp4" type="video/mp4"></video></div>
-                    <div class="room-info"><span class="avail-tag" id="jacAvail">โปรดเลือกวันที่...</span><div class="room-name">Jacuzzi (พักได้ 2)</div>
+                    <div class="room-info"><span class="avail-tag" id="jacAvail">โปรดเลือกวันที่...</span><div class="room-name">Jacuzzi (พักได้ 2)</div><div class="price-tag">เริ่มต้น 3,500 บาท/คืน · 2 ห้อง</div>
                     <div class="qty-wrap"><button class="btn-qty" id="jacMinus" onclick="changeQty('jac', -1)">-</button><span id="jacQty" style="font-weight:bold; font-size:18px;">0</span><button class="btn-qty" id="jacPlus" onclick="changeQty('jac', 1)">+</button></div></div>
                 </div>
                 <div class="room-item" id="roomCardFam">
                     <div class="video-box"><video autoplay muted loop playsinline poster="images/images/fam-1.jpg"><source src="images/images/fam-1.mp4" type="video/mp4"></video></div>
-                    <div class="room-info"><span class="avail-tag" id="famAvail">โปรดเลือกวันที่...</span><div class="room-name">Family (พักได้ 3)</div>
+                    <div class="room-info"><span class="avail-tag" id="famAvail">โปรดเลือกวันที่...</span><div class="room-name">Family (พักได้ 3)</div><div class="price-tag">เริ่มต้น 2,900 บาท/คืน · 2 ห้อง</div>
                     <div class="qty-wrap"><button class="btn-qty" id="famMinus" onclick="changeQty('fam', -1)">-</button><span id="famQty" style="font-weight:bold; font-size:18px;">0</span><button class="btn-qty" id="famPlus" onclick="changeQty('fam', 1)">+</button></div></div>
                 </div>
                 <div class="room-item" id="roomCardSea">
                     <div class="video-box"><video autoplay muted loop playsinline poster="images/images/sea-1.jpg"><source src="images/images/sea-1.mp4" type="video/mp4"></video></div>
-                    <div class="room-info"><span class="avail-tag" id="seaAvail">โปรดเลือกวันที่...</span><div class="room-name">Sea View (พักได้ 2)</div>
+                    <div class="room-info"><span class="avail-tag" id="seaAvail">โปรดเลือกวันที่...</span><div class="room-name">Deluxe Twin Bed (พักได้ 2)</div><div class="price-tag">เริ่มต้น 2,900 บาท/คืน · 1 ห้อง</div>
                     <div class="qty-wrap"><button class="btn-qty" id="seaMinus" onclick="changeQty('sea', -1)">-</button><span id="seaQty" style="font-weight:bold; font-size:18px;">0</span><button class="btn-qty" id="seaPlus" onclick="changeQty('sea', 1)">+</button></div></div>
                 </div>
             </div>
@@ -130,7 +196,7 @@
         <div class="card">
             <div class="section-title">👤 3. ข้อมูลผู้ติดต่อ</div>
             <div class="form-grid">
-                <div><label>ชื่อผู้ติดต่อ</label><input type="text" id="name" placeholder="กำลังดึงชื่อ..."></div>
+                <div><label>ชื่อผู้ติดต่อ</label><input type="text" id="name" placeholder="กรอกชื่อ-นามสกุล" autocomplete="name"></div>
                 <div><label>เบอร์โทรศัพท์</label><input type="tel" id="phone" placeholder="08x-xxx-xxxx"></div>
             </div>
         </div>
@@ -142,28 +208,81 @@
 <script>
     const APP_URL = 'https://script.google.com/macros/s/AKfycbzKj6d7mAV-9SVvIKHA1SyWMJcUFMQ5241Mz5xWTLMtOaPRQgfQFfdaGOqOHRkrShd5/exec';
     const ROOM_NUMBERS = { std: ['1', '2', '3', '4', '5'], jac: ['6', '7'], fam: ['8', '9'], sea: ['10'] };
+    const ROOM_INFO = {
+        std: { name: 'Standard', cap: 2, price: 1900, emoji: '🛏️' },
+        jac: { name: 'Jacuzzi', cap: 2, price: 3500, emoji: '🛁' },
+        fam: { name: 'Family', cap: 3, price: 2900, emoji: '👨‍👩‍👧' },
+        sea: { name: 'Deluxe Twin Bed', cap: 2, price: 2900, emoji: '🌊' }
+    };
+    const ROOM_COLORS = {
+        std: { f: '#6FC3AE', d: '#2F8F7A' },
+        jac: { f: '#F29CC0', d: '#C2578A' },
+        fam: { f: '#F6C760', d: '#C48F1B' },
+        sea: { f: '#7DADF0', d: '#3E6FBF' }
+    };
+    const ROOM_TYPE_BY_NO = {};
+    Object.keys(ROOM_NUMBERS).forEach(type => ROOM_NUMBERS[type].forEach(no => { ROOM_TYPE_BY_NO[no] = type; }));
+
+    // ตำแหน่งห้องบนแผนที่ (อ้างอิงภาพมุมสูงของรีสอร์ต)
+    const MAP_ROOMS = [
+        { no: '4', x: 395, y: 27, w: 225, h: 168 },
+        { no: '3', x: 392, y: 205, w: 228, h: 180 },
+        { no: '2', x: 392, y: 404, w: 228, h: 168 },
+        { no: '1', x: 395, y: 592, w: 228, h: 168 },
+        { no: '5', x: 60, y: 645, w: 225, h: 170 },
+        { no: '7', x: 52, y: 344, w: 166, h: 130 },
+        { no: '6', x: 52, y: 480, w: 166, h: 133 },
+        { no: '10', x: 36, y: 48, w: 325, h: 134 },
+        { no: '9', x: 36, y: 188, w: 160, h: 142 },
+        { no: '8', x: 202, y: 188, w: 159, h: 142 }
+    ];
+
     let selections = { std: 0, jac: 0, fam: 0, sea: 0 };
     let inv = { std: 0, jac: 0, fam: 0, sea: 0 };
+    let lockedRooms = new Set();
+    let selectedRooms = new Set();
+    let availabilityOk = false;
+    let availabilitySeq = 0;
+    let isSubmitting = false;
+
+    function getPsid() {
+        return new URLSearchParams(window.location.search).get('psid');
+    }
 
     async function initPage() {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
         const tomorrow = new Date(today);
         tomorrow.setDate(tomorrow.getDate() + 1);
-        const minToday = today.toISOString().split('T')[0];
-        const minTomorrow = tomorrow.toISOString().split('T')[0];
+        const minToday = formatDateLocal(today);
+        const minTomorrow = formatDateLocal(tomorrow);
         ['welcomeCin', 'cin'].forEach(id => document.getElementById(id).min = minToday);
         ['welcomeCout', 'cout'].forEach(id => document.getElementById(id).min = minTomorrow);
 
-        const psid = new URLSearchParams(window.location.search).get('psid');
-        if(psid) {
-            const r = await fetch(`${APP_URL}?action=getFBProfile&psid=${psid}`);
-            const d = await r.json(); if(d.name) document.getElementById('name').value = d.name;
+        buildRoomMap();
+        renderAvailability();
+
+        const nameInput = document.getElementById('name');
+        const psid = getPsid();
+        if (!psid) return;
+        nameInput.placeholder = 'กำลังดึงชื่อ...';
+        try {
+            const r = await fetch(`${APP_URL}?action=getFBProfile&psid=${encodeURIComponent(psid)}`);
+            const d = await r.json();
+            if (d && d.name && !nameInput.value) nameInput.value = d.name;
+        } catch (err) {
+            // ดึงชื่อไม่สำเร็จ ให้ลูกค้ากรอกเอง (ไม่บันทึก psid ลง log)
+        } finally {
+            nameInput.placeholder = 'กรอกชื่อ-นามสกุล';
         }
     }
 
+    function parseLocalDate(dateString) {
+        return new Date(dateString + 'T00:00:00');
+    }
+
     function isValidDateRange(cin, cout) {
-        return cin && cout && new Date(cout) > new Date(cin);
+        return cin && cout && parseLocalDate(cout) > parseLocalDate(cin);
     }
 
     function syncDatesFromWelcome(shouldCheck = false) {
@@ -184,9 +303,9 @@
     }
 
     function nextDate(dateString) {
-        const d = new Date(dateString);
+        const d = parseLocalDate(dateString);
         d.setDate(d.getDate() + 1);
-        return d.toISOString().split('T')[0];
+        return formatDateLocal(d);
     }
 
     function formatDateLocal(date) {
@@ -194,33 +313,43 @@
     }
 
     function countNights(cin, cout) {
-        return Math.max(1, Math.ceil((new Date(cout) - new Date(cin)) / 86400000));
+        return Math.max(1, Math.round((parseLocalDate(cout) - parseLocalDate(cin)) / 86400000));
     }
 
-    function calculateAvailabilityFromBookedRooms(bookedRoomsByDate, cin, cout) {
+    // ห้องที่ถูกจองอย่างน้อย 1 คืนในช่วงที่เลือก ถือว่าไม่ว่างทั้งการเข้าพัก
+    function getLockedRoomsForStay(bookedRoomsByDate, cin, cout) {
         const nights = countNights(cin, cout);
-        const checkInDate = new Date(cin);
-        const lockedRoomsForStay = new Set();
-
+        const checkInDate = parseLocalDate(cin);
+        const locked = new Set();
         for (let n = 0; n < nights; n++) {
             const currentNight = new Date(checkInDate);
             currentNight.setDate(currentNight.getDate() + n);
-            const dateStr = formatDateLocal(currentNight);
-            const bookedTonight = bookedRoomsByDate[dateStr] || [];
-            bookedTonight.forEach(roomNo => lockedRoomsForStay.add(String(roomNo)));
+            const bookedTonight = bookedRoomsByDate[formatDateLocal(currentNight)] || [];
+            bookedTonight.forEach(roomNo => locked.add(String(roomNo)));
         }
+        return locked;
+    }
 
-        return {
-            std: ROOM_NUMBERS.std.filter(room => !lockedRoomsForStay.has(room)).length,
-            jac: ROOM_NUMBERS.jac.filter(room => !lockedRoomsForStay.has(room)).length,
-            fam: ROOM_NUMBERS.fam.filter(room => !lockedRoomsForStay.has(room)).length,
-            sea: ROOM_NUMBERS.sea.filter(room => !lockedRoomsForStay.has(room)).length
-        };
+    function computeInventory(locked) {
+        const result = {};
+        Object.keys(ROOM_NUMBERS).forEach(type => {
+            result[type] = ROOM_NUMBERS[type].filter(room => !locked.has(room)).length;
+        });
+        return result;
+    }
+
+    function syncSelectionCounts() {
+        selections = { std: 0, jac: 0, fam: 0, sea: 0 };
+        selectedRooms.forEach(no => { selections[ROOM_TYPE_BY_NO[no]]++; });
     }
 
     function resetWelcomeDates() {
         ['welcomeCin', 'welcomeCout', 'cin', 'cout'].forEach(id => document.getElementById(id).value = '');
-        selections = { std: 0, jac: 0, fam: 0, sea: 0 };
+        availabilitySeq++;
+        selectedRooms = new Set();
+        lockedRooms = new Set();
+        availabilityOk = false;
+        syncSelectionCounts();
         inv = { std: 0, jac: 0, fam: 0, sea: 0 };
         renderAvailability();
         document.getElementById('availabilityPreview').classList.remove('show');
@@ -247,8 +376,11 @@
         const preview = document.getElementById('availabilityPreview');
         const status = document.getElementById('availabilityStatus');
 
-        if(!cin || !cout) return;
+        if (!cin || !cout) return;
         if (!isValidDateRange(cin, cout)) {
+            availabilitySeq++;
+            availabilityOk = false;
+            renderAvailability();
             document.getElementById('dateWarning').style.display = 'block';
             return;
         }
@@ -257,6 +389,10 @@
         if (status) status.innerText = 'กำลังเช็กห้องว่าง...';
         document.querySelectorAll('.avail-tag').forEach(el => el.innerText = "กำลังเช็ค...");
 
+        const seq = ++availabilitySeq;
+        availabilityOk = false;
+        document.getElementById('mapWrap').classList.add('loading');
+
         try {
             const response = await fetch(APP_URL, {
                 method: "POST",
@@ -264,17 +400,95 @@
                 headers: { "Content-Type": "text/plain;charset=utf-8" }
             });
             const bookedRoomsByDate = await response.json();
-            inv = calculateAvailabilityFromBookedRooms(bookedRoomsByDate || {}, cin, cout);
-            Object.keys(selections).forEach(key => {
-                if (selections[key] > inv[key]) selections[key] = inv[key];
-            });
+            if (seq !== availabilitySeq) return; // มีการเลือกวันที่ใหม่แล้ว ใช้ผลล่าสุดเท่านั้น
+            lockedRooms = getLockedRoomsForStay(bookedRoomsByDate || {}, cin, cout);
+            // ยกเลิกห้องที่เลือกไว้แต่ไม่ว่างในช่วงวันที่ใหม่
+            selectedRooms.forEach(no => { if (lockedRooms.has(no)) selectedRooms.delete(no); });
+            syncSelectionCounts();
+            inv = computeInventory(lockedRooms);
+            availabilityOk = true;
             renderAvailability();
             if (status) status.innerText = `ห้องว่างสำหรับ ${countNights(cin, cout)} คืนที่เลือก`;
         } catch (err) {
-            console.log(err);
+            if (seq !== availabilitySeq) return;
+            availabilityOk = false;
+            renderAvailability();
             if (status) status.innerText = 'ไม่สามารถเช็กห้องว่างได้ กรุณาลองใหม่อีกครั้ง';
             document.querySelectorAll('.avail-tag').forEach(el => el.innerText = "เช็กห้องว่างไม่สำเร็จ");
+        } finally {
+            if (seq === availabilitySeq) document.getElementById('mapWrap').classList.remove('loading');
         }
+    }
+
+    // ---------- แผนที่ห้องพักแบบการ์ตูน (SVG) ----------
+    const SVG_NS = 'http://www.w3.org/2000/svg';
+    function svgEl(tag, attrs, parent) {
+        const el = document.createElementNS(SVG_NS, tag);
+        Object.keys(attrs || {}).forEach(k => el.setAttribute(k, attrs[k]));
+        if (parent) parent.appendChild(el);
+        return el;
+    }
+
+    function buildRoomMap() {
+        const layer = document.getElementById('mapRooms');
+        layer.textContent = '';
+        MAP_ROOMS.forEach(r => {
+            const type = ROOM_TYPE_BY_NO[r.no];
+            const c = ROOM_COLORS[type];
+            const g = svgEl('g', { class: 'room-g', role: 'button', 'data-room': r.no }, layer);
+            const roof = svgEl('g', { class: 'roof' }, g);
+            const x2 = r.x + r.w, y2 = r.y + r.h;
+            const cx = r.x + r.w / 2, cy = r.y + r.h / 2;
+            const inset = Math.min(r.w, r.h) * 0.3;
+
+            svgEl('rect', { x: r.x, y: r.y, width: r.w, height: r.h, rx: 16, fill: c.f, stroke: c.d, 'stroke-width': 4, class: 'roof-base' }, roof);
+            [[r.x, r.y, r.x + inset, r.y + inset], [x2, r.y, x2 - inset, r.y + inset],
+             [r.x, y2, r.x + inset, y2 - inset], [x2, y2, x2 - inset, y2 - inset]].forEach(l => {
+                svgEl('line', { x1: l[0], y1: l[1], x2: l[2], y2: l[3], stroke: c.d, 'stroke-width': 3, 'stroke-linecap': 'round', opacity: 0.7 }, roof);
+            });
+            svgEl('rect', { x: r.x + inset, y: r.y + inset, width: r.w - 2 * inset, height: r.h - 2 * inset, rx: 8, fill: 'none', stroke: c.d, 'stroke-width': 3, opacity: 0.5 }, roof);
+            for (let y = r.y + 14; y < y2 - 8; y += 16) {
+                svgEl('line', { x1: r.x + 12, y1: y, x2: x2 - 12, y2: y, stroke: '#fff', 'stroke-width': 3, 'stroke-dasharray': '12 10', 'stroke-linecap': 'round', opacity: 0.28 }, roof);
+            }
+
+            if (type === 'jac') {
+                [-34, 0, 34].forEach((dx, i) => {
+                    svgEl('circle', { class: 'bubble', cx: cx + dx, cy: cy + 18, r: 5 + i, fill: '#fff', opacity: 0, style: `animation-delay:${i * 0.7}s` }, g);
+                });
+            }
+
+            svgEl('text', { x: cx, y: cy - 32, 'text-anchor': 'middle', 'font-size': 20 }, g).textContent = ROOM_INFO[type].emoji;
+            svgEl('circle', { cx: cx, cy: cy + 2, r: 26, fill: '#fff', stroke: c.d, 'stroke-width': 3 }, g);
+            const num = svgEl('text', { x: cx, y: cy + 12, 'text-anchor': 'middle', 'font-size': 28, 'font-weight': 700, fill: '#1A365D' }, g);
+            num.textContent = r.no;
+            svgEl('text', { x: cx, y: cy + 52, 'text-anchor': 'middle', 'font-size': 14, 'font-weight': 700, fill: '#fff', class: 'room-sub' }, g).textContent = ROOM_INFO[type].name === 'Deluxe Twin Bed' ? 'Deluxe' : ROOM_INFO[type].name;
+
+            const chk = svgEl('g', { class: 'chk' }, g);
+            svgEl('circle', { cx: x2 - 20, cy: r.y + 20, r: 15, fill: '#16a34a', stroke: '#fff', 'stroke-width': 3 }, chk);
+            svgEl('text', { x: x2 - 20, y: r.y + 27, 'text-anchor': 'middle', 'font-size': 20, 'font-weight': 700, fill: '#fff' }, chk).textContent = '✓';
+            svgEl('text', { class: 'lock', x: x2 - 20, y: r.y + 28, 'text-anchor': 'middle', 'font-size': 22 }, g).textContent = '🔒';
+            [[r.x + 18, r.y + 22], [x2 - 48, y2 - 14], [r.x + 28, y2 - 18]].forEach((p, i) => {
+                svgEl('text', { class: 'spark', x: p[0], y: p[1], 'font-size': 18, style: `animation-delay:${i * 0.4}s` }, g).textContent = '✨';
+            });
+
+            g.addEventListener('click', () => toggleRoom(r.no));
+            g.addEventListener('keydown', e => {
+                if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleRoom(r.no); }
+            });
+        });
+    }
+
+    function hasValidDates() {
+        return isValidDateRange(document.getElementById('cin').value, document.getElementById('cout').value);
+    }
+
+    function toggleRoom(no) {
+        if (!hasValidDates()) { alert("กรุณาเลือกวันที่เข้าพักก่อนค่ะ"); return; }
+        if (!availabilityOk) { alert("ระบบกำลังตรวจสอบห้องว่าง กรุณารอสักครู่ หรือเลือกวันที่ใหม่อีกครั้งค่ะ"); return; }
+        if (lockedRooms.has(no)) { alert(`ขออภัยค่ะ ห้อง ${no} ไม่ว่างในช่วงวันที่เลือก`); return; }
+        if (selectedRooms.has(no)) selectedRooms.delete(no); else selectedRooms.add(no);
+        syncSelectionCounts();
+        renderAvailability();
     }
 
     function renderAvailability() {
@@ -288,27 +502,62 @@
         Object.keys(roomMap).forEach(key => {
             const room = roomMap[key];
             const available = Number(inv[key] || 0);
-            document.getElementById(room.avail).innerText = available > 0 ? `ว่าง ${available} ห้อง` : 'เต็มแล้ว';
+            if (availabilityOk) {
+                document.getElementById(room.avail).innerText = available > 0 ? `ว่าง ${available} ห้อง` : 'เต็มแล้ว';
+            }
             document.getElementById(room.qty).innerText = selections[key];
-            document.getElementById(room.preview).innerText = available;
-            document.getElementById(room.card).classList.toggle('unavailable', available <= 0);
-            document.getElementById(room.plus).disabled = available <= 0 || selections[key] >= available;
+            document.getElementById(room.preview).innerText = availabilityOk ? available : '-';
+            document.getElementById(room.card).classList.toggle('unavailable', availabilityOk && available <= 0);
+            document.getElementById(room.plus).disabled = !availabilityOk || available <= 0 || selections[key] >= available;
         });
+
+        document.querySelectorAll('.room-g').forEach(g => {
+            const no = g.getAttribute('data-room');
+            const type = ROOM_TYPE_BY_NO[no];
+            const isLocked = availabilityOk && lockedRooms.has(no);
+            const isSelected = selectedRooms.has(no);
+            g.classList.toggle('locked', isLocked);
+            g.classList.toggle('sel', isSelected);
+            g.setAttribute('aria-pressed', isSelected ? 'true' : 'false');
+            g.setAttribute('aria-disabled', isLocked ? 'true' : 'false');
+            g.setAttribute('tabindex', isLocked ? '-1' : '0');
+            g.setAttribute('aria-label', `ห้อง ${no} ${ROOM_INFO[type].name} ${isLocked ? 'ไม่ว่าง' : (isSelected ? 'เลือกแล้ว' : 'ว่าง')}`);
+        });
+
+        const summary = document.getElementById('selectedSummary');
+        if (summary) {
+            const list = Array.from(selectedRooms).sort((a, b) => Number(a) - Number(b));
+            summary.innerText = list.length
+                ? `ห้องที่เลือก: ${list.join(', ')} (เลขห้องเป็นความต้องการเบื้องต้น ทีมงานจะยืนยันเลขห้องให้อีกครั้งค่ะ)`
+                : 'แตะที่ห้องบนแผนที่ หรือกด + เพื่อเลือกห้อง';
+        }
         validateCapacity();
     }
 
     function changeQty(id, v) {
-        if(!document.getElementById('cin').value || !document.getElementById('cout').value) { alert("กรุณาเลือกวันที่เข้าพักก่อนค่ะ"); return; }
-        if(v > 0 && selections[id] >= inv[id]) { alert("ขออภัยค่ะ ห้องเต็มแล้ว"); return; }
-        selections[id] = Math.max(0, selections[id] + v);
+        if (!hasValidDates()) { alert("กรุณาเลือกวันที่เข้าพักก่อนค่ะ"); return; }
+        if (!availabilityOk) { alert("ระบบกำลังตรวจสอบห้องว่าง กรุณารอสักครู่ค่ะ"); return; }
+        if (v > 0) {
+            const free = ROOM_NUMBERS[id].find(no => !lockedRooms.has(no) && !selectedRooms.has(no));
+            if (!free) { alert("ขออภัยค่ะ ห้องเต็มแล้ว"); return; }
+            selectedRooms.add(free);
+        } else {
+            const chosen = ROOM_NUMBERS[id].filter(no => selectedRooms.has(no));
+            if (chosen.length) selectedRooms.delete(chosen[chosen.length - 1]);
+        }
+        syncSelectionCounts();
         renderAvailability();
+    }
+
+    function getTotalCapacity() {
+        return Object.keys(selections).reduce((sum, key) => sum + selections[key] * ROOM_INFO[key].cap, 0);
     }
 
     function validateCapacity() {
         const adults = parseInt(document.getElementById('adults').value) || 0;
         const kids = parseInt(document.getElementById('kidsOver4').value) || 0;
         const totalGuests = adults + kids;
-        const totalCap = (selections.std * 2) + (selections.jac * 2) + (selections.fam * 3) + (selections.sea * 2);
+        const totalCap = getTotalCapacity();
         const warning = document.getElementById('capWarning');
         if (totalGuests > totalCap && totalCap > 0) {
             warning.style.display = 'block';
@@ -318,27 +567,69 @@
     }
 
     async function submitBooking() {
-        if (!document.getElementById('cin').value) { alert("กรุณาเลือกวันเช็คอินค่ะ"); return; }
-        if (!isValidDateRange(document.getElementById('cin').value, document.getElementById('cout').value)) { alert("กรุณาเลือกวันเช็คเอาท์ให้มากกว่าวันเช็คอินค่ะ"); return; }
-        const totalCap = (selections.std * 2) + (selections.jac * 2) + (selections.fam * 3) + (selections.sea * 2);
-        if (totalCap === 0) { alert("⚠️ กรุณาเลือกห้องพักอย่างน้อย 1 ห้องค่ะ"); return; }
+        if (isSubmitting) return;
+        const cin = document.getElementById('cin').value;
+        const cout = document.getElementById('cout').value;
+        if (!cin) { alert("กรุณาเลือกวันเช็คอินค่ะ"); return; }
+        if (!isValidDateRange(cin, cout)) { alert("กรุณาเลือกวันเช็คเอาท์ให้มากกว่าวันเช็คอินค่ะ"); return; }
+        if (!availabilityOk) { alert("ยังตรวจสอบห้องว่างไม่สำเร็จ กรุณาเลือกวันที่ใหม่หรือลองอีกครั้งค่ะ"); return; }
+        if (getTotalCapacity() === 0) { alert("⚠️ กรุณาเลือกห้องพักอย่างน้อย 1 ห้องค่ะ"); return; }
 
-        document.getElementById('btnSubmit').innerText = "⌛ กำลังบันทึก...";
-        document.getElementById('btnSubmit').disabled = true;
+        const adults = parseInt(document.getElementById('adults').value) || 0;
+        const kidsOver4 = parseInt(document.getElementById('kidsOver4').value) || 0;
+        const kidsUnder4 = parseInt(document.getElementById('kidsUnder4').value) || 0;
+        if (adults < 1) { alert("กรุณาระบุจำนวนผู้ใหญ่อย่างน้อย 1 ท่านค่ะ"); return; }
+        if (kidsOver4 < 0 || kidsUnder4 < 0) { alert("กรุณาระบุจำนวนเด็กให้ถูกต้องค่ะ"); return; }
+
+        const name = document.getElementById('name').value.trim();
+        const phone = document.getElementById('phone').value.trim();
+        if (!name) { alert("กรุณากรอกชื่อผู้ติดต่อค่ะ"); return; }
+        const phoneDigits = phone.replace(/\D/g, '');
+        if (phoneDigits.length < 9 || phoneDigits.length > 15) { alert("กรุณากรอกเบอร์โทรศัพท์ให้ถูกต้องค่ะ"); return; }
+
+        if (adults + kidsOver4 > getTotalCapacity()) {
+            if (!confirm("จำนวนผู้เข้าพักเกินความจุของห้องที่เลือก อาจมีค่าใช้จ่ายเพิ่มเติมและไม่มีเตียงเสริม ต้องการดำเนินการจองต่อหรือไม่คะ?")) return;
+        }
+
+        const btn = document.getElementById('btnSubmit');
+        const psid = getPsid();
+        isSubmitting = true;
+        btn.innerText = "⌛ กำลังบันทึก...";
+        btn.disabled = true;
 
         const payload = {
-            action: "advancedBooking", psid: new URLSearchParams(window.location.search).get('psid'),
-            customerName: document.getElementById('name').value, phone: document.getElementById('phone').value,
-            facebook: document.getElementById('name').value, checkinDate: document.getElementById('cin').value,
-            checkoutDate: document.getElementById('cout').value, adults: document.getElementById('adults').value,
+            action: "advancedBooking", psid: psid,
+            customerName: name, phone: phone,
+            facebook: name, checkinDate: cin,
+            checkoutDate: cout, adults: document.getElementById('adults').value,
             kidsOver4: document.getElementById('kidsOver4').value, kidsUnder4: document.getElementById('kidsUnder4').value,
             pets: document.getElementById('pets').value, arrivalTime: "",
             standardRoom: selections.std, jacuzziRoom: selections.jac, familyRoom: selections.fam, seaRoom: selections.sea,
             motorbike: false, bookingStatus: 'Pending'
         };
 
-        await fetch(APP_URL, { method: 'POST', body: JSON.stringify(payload) });
-        alert("✅ แจ้งจองเรียบร้อย! ระบบส่งสรุปให้ในแชทแล้วค่ะ"); location.reload();
+        try {
+            const res = await fetch(APP_URL, {
+                method: 'POST',
+                body: JSON.stringify(payload),
+                headers: { "Content-Type": "text/plain;charset=utf-8" }
+            });
+            if (!res.ok) throw new Error('http');
+            let result = null;
+            try { result = await res.json(); } catch (e) { /* backend อาจไม่ตอบเป็น JSON */ }
+            if (result && (result.success === false || result.error || result.status === 'error')) throw new Error('backend');
+        } catch (err) {
+            alert("❌ ส่งข้อมูลไม่สำเร็จ กรุณาตรวจสอบอินเทอร์เน็ตแล้วลองใหม่อีกครั้ง หรือติดต่อทางเพจค่ะ");
+            btn.innerText = "ยืนยันการแจ้งจอง";
+            btn.disabled = false;
+            isSubmitting = false;
+            return;
+        }
+
+        alert(psid
+            ? "✅ แจ้งจองเรียบร้อย! ระบบส่งสรุปให้ในแชทแล้วค่ะ"
+            : "✅ แจ้งจองเรียบร้อย! เจ้าหน้าที่จะติดต่อกลับทางเบอร์โทรศัพท์ที่ระบุไว้ค่ะ");
+        location.reload();
     }
 </script>
 </body>
