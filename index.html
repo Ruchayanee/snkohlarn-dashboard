@@ -9,9 +9,12 @@
     <link rel="icon" type="image/jpeg" href="https://i.postimg.cc/K8NJswRQ/SN-LOGOAPP.jpg">
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
+        :root { --ink: #17283d; --muted: #64748b; --cream: #f8f5f2; --gold: #b68a4a; --line: #e8e1d7; }
+        * { box-sizing: border-box; }
         body {
-            font-family: 'Kanit', sans-serif; 
-            background-color: #f8f5f2; 
+            font-family: 'Kanit', sans-serif;
+            background: radial-gradient(circle at 10% 0%, rgba(182,138,74,.16), transparent 30%), linear-gradient(180deg, #fbf9f6, var(--cream));
+            color: var(--ink);
             display: flex; 
             flex-direction: column; 
             justify-content: center; 
@@ -19,26 +22,36 @@
             min-height: 100vh; 
             margin: 0; 
             text-align: center;
-            padding: 20px;
+            padding: 24px 16px 42px;
             position: relative;
         }
+        .app-shell { width: 100%; max-width: 520px; background: rgba(255,255,255,.8); border: 1px solid var(--line); border-radius: 32px; padding: 24px 20px 22px; box-shadow: 0 24px 60px rgba(23,40,61,.12); backdrop-filter: blur(8px); }
+        .welcome-panel { display: grid; grid-template-columns: 1fr 130px; align-items: end; gap: 10px; margin-bottom: 18px; text-align: left; }
+        .welcome-kicker { color: var(--gold); letter-spacing: .12em; text-transform: uppercase; font-size: 12px; font-weight: 600; margin: 0 0 6px; }
+        .welcome-title { color: var(--ink); font-size: clamp(25px, 6vw, 34px); line-height: 1.2; margin: 0; }
+        .welcome-note { color: var(--muted); font-size: 14px; line-height: 1.65; margin: 8px 0 0; }
+        .host-illustration { width: 130px; height: 145px; justify-self: end; filter: drop-shadow(0 12px 12px rgba(23,40,61,.12)); }
+        .host-illustration .wave { transform-box: fill-box; transform-origin: 15% 90%; animation: wave 2.8s ease-in-out infinite; }
+        @keyframes wave { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(12deg); } }
+        @media (prefers-reduced-motion: reduce) { .host-illustration .wave { animation: none; } }
         .subtitle { 
-            color: #777; 
-            font-size: 22px; 
-            margin-top: -55px; /* ชิดโลโก้ขึ้นไป */
+            color: #777;
+            font-size: 18px;
+            margin: -42px 0 16px;
             margin-bottom: 12px; 
             letter-spacing: 0.5px;
-            font-weight: 600; 
+            font-weight: 600;
         }
         .btn-app {
             display: flex; align-items: center; justify-content: center; gap: 12px;
-            width: 100%; max-width: 380px; padding: 24px; margin-bottom: 14px; 
-            font-size: 22px; 
-            font-weight: bold; color: white; text-decoration: none;
-            border-radius: 22px; box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-            transition: 0.3s;
+            width: 100%; max-width: 380px; padding: 18px 20px; margin: 0 auto 12px;
+            font-size: 18px; font-weight: 600; color: white; text-decoration: none;
+            border-radius: 16px; box-shadow: 0 8px 18px rgba(0,0,0,0.1);
+            transition: transform .2s, box-shadow .2s, filter .2s;
         }
-        .btn-app:active { transform: scale(0.95); }
+        .btn-app:hover { transform: translateY(-2px); box-shadow: 0 12px 24px rgba(0,0,0,.14); filter: brightness(1.03); }
+        .btn-app:focus-visible, .bell-container:focus-visible { outline: 3px solid rgba(182,138,74,.55); outline-offset: 3px; }
+        .btn-app:active { transform: scale(0.98); }
         .btn-book { background-color: #059669; }
         .btn-verify { background-color: #f39c12; } 
         .btn-dash { background-color: #1e293b; }
@@ -46,13 +59,14 @@
 
         .bell-container {
             position: absolute;
-            top: 25px;
-            right: 25px;
-            font-size: 32px;
+            top: 18px;
+            right: 18px;
+            font-size: 28px;
             cursor: pointer;
             text-decoration: none;
             transition: transform 0.2s;
         }
+        .bell-container:hover { transform: translateY(-2px); }
         .bell-badge {
             position: absolute;
             top: -5px;
@@ -70,13 +84,39 @@
 </head>
 <body>
 
+<div class="app-shell">
+
     <!-- ปุ่มกระดิ่ง (ทางลัดตรวจสอบการโอน) -->
     <a href="dashboard.html?tab=verify" class="bell-container">
         🔔<span class="bell-badge" id="slipBadge">0</span>
     </a>
 
+    <div class="welcome-panel">
+        <div>
+            <p class="welcome-kicker">SN Koh Larn · Admin</p>
+            <h1 class="welcome-title">ยินดีต้อนรับครับ</h1>
+            <p class="welcome-note">จัดการการจอง รายได้ และงานประจำวันของที่พักได้จากหน้านี้</p>
+        </div>
+        <svg class="host-illustration" viewBox="0 0 150 165" role="img" aria-label="ผู้ช่วยผู้ชายสวมเสื้อโปโลสีกรมท่ายืนโบกมือทักทาย">
+            <ellipse cx="77" cy="154" rx="45" ry="7" fill="#d9d0c3" opacity=".7"/>
+            <path d="M45 151c2-27 8-49 18-59h29c10 10 16 32 18 59z" fill="#1b334c"/>
+            <path d="M62 94c5 7 11 11 17 11s12-4 17-11l7 8c-7 11-15 16-24 16s-17-5-24-16z" fill="#f5c6a8"/>
+            <path d="M61 97c5 9 11 13 18 13s13-4 18-13l-6-6H68z" fill="#f8f0e6"/>
+            <path d="M69 91h20v10H69z" fill="#b68a4a"/>
+            <path d="M64 97c-2-16-1-27 5-35 4-6 10-9 17-9 11 0 20 8 21 20 1 12-4 24-14 29-8 4-20 1-29-5z" fill="#f5c6a8"/>
+            <path d="M63 63c0-13 10-25 25-25 14 0 23 9 23 23-7-4-14-7-23-6-9 1-16 5-25 8z" fill="#3d2923"/>
+            <path d="M65 58c4-14 13-20 24-20 10 0 18 5 22 14-10-4-20-5-30-1-5 2-10 5-16 7z" fill="#4b3027"/>
+            <circle cx="77" cy="67" r="2" fill="#17283d"/><circle cx="95" cy="67" r="2" fill="#17283d"/>
+            <path d="M82 78c4 3 8 3 12 0" fill="none" stroke="#a85f59" stroke-width="2" stroke-linecap="round"/>
+            <path d="M66 110l-18 21" stroke="#f5c6a8" stroke-width="9" stroke-linecap="round"/>
+            <g class="wave"><path d="M101 111l24-23" stroke="#f5c6a8" stroke-width="9" stroke-linecap="round"/><path d="M123 88l6-13M123 88l12-7M123 88l14 1M123 88l8 10" stroke="#f5c6a8" stroke-width="6" stroke-linecap="round"/></g>
+            <path d="M58 150l-8 8M97 150l8 8" stroke="#17283d" stroke-width="7" stroke-linecap="round"/>
+            <path d="M59 121h34" stroke="#31536f" stroke-width="2" opacity=".8"/><circle cx="82" cy="122" r="3" fill="#b68a4a"/>
+        </svg>
+    </div>
+
     <!-- โลโก้ SN Kohlarn -->
-    <img src="https://i.postimg.cc/zDw9HWXS/IMG-5036.jpg" alt="SN Kohlarn Logo" style="width: 320px; max-width: 95vw; margin: 0 auto 0 auto; display: block; mix-blend-mode: multiply;">
+    <img src="https://i.postimg.cc/zDw9HWXS/IMG-5036.jpg" alt="SN Koh Larn Logo" style="width: 260px; max-width: 80vw; margin: 0 auto; display: block; mix-blend-mode: multiply;">
     
     <div class="subtitle">Super App Management System</div>
 
@@ -87,6 +127,8 @@
     
     <!-- ปุ่มตรวจสอบการโอน (ต้องส่งค่า ?tab=verify ไปด้วย) -->
     <a href="dashboard.html?tab=verify" class="btn-app btn-verify">🔔 ตรวจสอบการโอนเงิน</a>
+
+</div>
 
     <script>
         const PENDING_API_URL = "https://script.google.com/macros/s/AKfycbyLFO7dgjgdeDY5ETh7B_mV-bJG8T_tHnw-a41sOTfw9EKCoknUv2MJ2CP9yVJtL9CbfA/exec"; 
