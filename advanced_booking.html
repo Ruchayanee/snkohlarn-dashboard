@@ -3,55 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Luxury Booking - SN Kohlarn</title>
-    <link href="https://fonts.googleapis.com/css2?family=Prata&family=Sarabun:wght@300;400;600&display=swap" rel="stylesheet">
+    <title>จองห้องพัก | SN Koh Larn</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Noto+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        :root { --navy: #1A365D; --cream: #FAF0E6; --gold: #C5A059; --soft: #fffaf3; --danger: #dc2626; }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Sarabun', sans-serif; }
-        body { background: linear-gradient(180deg, var(--cream), #fff 45%, var(--cream)); color: var(--navy); padding: 15px; min-height: 100vh; }
-        h1, .room-name, .btn-submit, .brand-title { font-family: 'Prata', serif; }
-        .container { max-width: 880px; margin: 0 auto; }
+        :root { --navy: #17283d; --navy-soft: #2b4059; --cream: #f5efe6; --gold: #8c642a; --gold-soft: #ead9b8; --soft: #fcfaf6; --ink: #263344; --muted: #566171; --danger: #b84444; --line: #e7e0d6; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Noto Sans Thai', sans-serif; }
+        body { background: radial-gradient(circle at 85% -10%, rgba(182,138,74,.18), transparent 32%), linear-gradient(180deg, #f6f1e9 0%, #fff 42%, #f6f1e9 100%); color: var(--ink); padding: 18px 14px 46px; min-height: 100vh; }
+        h1, .room-name, .btn-submit, .brand-title, .header h1 { font-family: 'Cormorant Garamond', serif; }
+        .container { max-width: 920px; margin: 0 auto; }
         .hidden { display: none !important; }
         .welcome-screen { min-height: calc(100vh - 30px); display: flex; align-items: center; justify-content: center; }
-        .welcome-card { width: 100%; background: rgba(255,255,255,0.94); border: 2px solid var(--gold); border-radius: 32px; padding: 32px 24px; box-shadow: 0 24px 60px rgba(26,54,93,0.18); overflow: hidden; position: relative; }
-        .welcome-card:before { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at top right, rgba(197,160,89,0.2), transparent 32%), radial-gradient(circle at bottom left, rgba(26,54,93,0.12), transparent 30%); pointer-events: none; }
+        .welcome-card { width: 100%; background: rgba(255,255,255,.88); border: 1px solid rgba(182,138,74,.55); border-radius: 28px; padding: clamp(28px, 6vw, 58px); box-shadow: 0 28px 70px rgba(0,0,0,.12); overflow: hidden; position: relative; backdrop-filter: blur(10px); }
+        .welcome-card:before { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at top right, rgba(182,138,74,.16), transparent 32%), radial-gradient(circle at bottom left, rgba(23,40,61,.08), transparent 30%); pointer-events: none; }
         .welcome-inner { position: relative; z-index: 1; }
-        .brand-pill { display: inline-flex; align-items: center; gap: 8px; background: var(--navy); color: white; padding: 8px 14px; border-radius: 999px; font-size: 13px; letter-spacing: 1px; margin-bottom: 16px; }
-        .brand-title { font-size: clamp(34px, 8vw, 62px); color: var(--navy); line-height: 1; margin-bottom: 10px; }
-        .welcome-copy { color: #5f6b7a; line-height: 1.8; margin-bottom: 24px; font-size: 16px; }
-        .quick-date-card { background: var(--soft); border: 1.5px solid rgba(197,160,89,0.65); border-radius: 24px; padding: 20px; }
+        .brand-pill { display: inline-flex; align-items: center; gap: 8px; color: var(--gold); font-size: 12px; letter-spacing: .12em; font-weight: 600; margin-bottom: 14px; }
+        .brand-title { font-size: clamp(44px, 10vw, 78px); color: var(--navy); line-height: .88; letter-spacing: .02em; margin-bottom: 16px; }
+        .welcome-copy { max-width: 660px; color: var(--muted); line-height: 1.9; margin-bottom: 28px; font-size: 15px; }
+        .quick-date-card { max-width: 720px; background: var(--soft); border: 1px solid var(--line); border-radius: 18px; padding: clamp(16px, 3vw, 24px); box-shadow: 0 8px 26px rgba(0,0,0,.05); }
         .date-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 14px; }
-        .btn-primary, .btn-secondary { width: 100%; padding: 16px; border-radius: 16px; border: none; font-weight: 700; cursor: pointer; font-size: 16px; }
-        .btn-primary { background: var(--navy); color: white; box-shadow: 0 10px 20px rgba(26,54,93,0.22); }
-        .btn-secondary { background: white; color: var(--navy); border: 1.5px solid var(--navy); }
+        .btn-primary, .btn-secondary { width: 100%; padding: 14px 16px; border-radius: 11px; border: none; font-weight: 600; cursor: pointer; font-size: 15px; transition: transform .2s, box-shadow .2s, background .2s; }
+        .btn-primary { background: var(--navy); color: white; box-shadow: 0 9px 20px rgba(0,0,0,.14); }
+        .btn-secondary { background: white; color: var(--navy); border: 1px solid #c9d0d8; }
+        .btn-primary:hover, .btn-secondary:hover, .btn-submit:hover { transform: translateY(-1px); }
         .availability-preview { margin-top: 18px; display: none; }
         .availability-preview.show { display: block; }
         .availability-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 12px; }
-        .availability-chip { background: white; border: 1.5px solid #ead9b8; border-radius: 16px; padding: 12px 8px; text-align: center; }
+        .availability-chip { background: white; border: 1px solid var(--line); border-radius: 12px; padding: 12px 8px; text-align: center; }
         .availability-chip strong { display: block; font-size: 20px; color: var(--gold); }
-        .availability-chip span { font-size: 12px; color: #536174; }
-        .header { background: var(--navy); color: white; padding: 45px 20px; border-radius: 25px; text-align: center; margin-bottom: 25px; border: 2px solid var(--gold); }
-        .card { background: white; border-radius: 20px; padding: 25px; margin-bottom: 20px; border: 1.5px solid var(--navy); }
-        .section-title { font-size: 19px; font-weight: 600; margin-bottom: 20px; border-bottom: 1.5px solid var(--gold); padding-bottom: 8px; }
+        .availability-chip span { font-size: 12px; color: var(--muted); }
+        .header { background: var(--navy); color: white; padding: 34px 20px; border-radius: 22px; text-align: center; margin-bottom: 20px; box-shadow: 0 16px 34px rgba(0,0,0,.12); }
+        .header h1 { font-size: clamp(42px, 8vw, 64px); line-height: .9; letter-spacing: .04em; }
+        .header p { color: #d8c39d; letter-spacing: .18em; font-size: 11px; margin-top: 10px; }
+        .card { background: rgba(255,255,255,.92); border-radius: 18px; padding: clamp(18px, 3vw, 26px); margin-bottom: 18px; border: 1px solid var(--line); box-shadow: 0 8px 26px rgba(0,0,0,.05); }
+        .section-title { font-size: 18px; font-weight: 600; color: var(--navy); margin-bottom: 18px; padding-bottom: 10px; border-bottom: 1px solid var(--gold-soft); }
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         @media (max-width: 640px) { .form-grid, .date-actions { grid-template-columns: 1fr; } .availability-grid { grid-template-columns: repeat(2, 1fr); } }
-        input, select { width: 100%; padding: 13px; border: 1.5px solid var(--navy); border-radius: 12px; margin-top: 5px; background: #fff; }
+        input, select { width: 100%; padding: 12px 13px; border: 1px solid #d7dce2; border-radius: 10px; margin-top: 5px; background: #fff; color: var(--ink); transition: border-color .2s, box-shadow .2s; }
+        input:focus, select:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px rgba(182,138,74,.16); }
         .room-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
-        .room-item { border: 2px solid var(--navy); border-radius: 18px; overflow: hidden; background: white; transition: 0.2s; }
+        .room-item { border: 1px solid var(--line); border-radius: 16px; overflow: hidden; background: white; transition: transform .2s, box-shadow .2s, border-color .2s; }
+        .room-item:hover { transform: translateY(-2px); box-shadow: 0 12px 24px rgba(0,0,0,.09); border-color: var(--gold-soft); }
         .room-item.unavailable { opacity: 0.48; filter: grayscale(0.35); }
         .video-box { width: 100%; height: 160px; background: #000; }
         .video-box video { width: 100%; height: 100%; object-fit: cover; }
         .room-info { padding: 18px; text-align: center; }
-        .avail-tag { font-size: 13px; font-weight: bold; color: var(--gold); margin-bottom: 8px; display: block; }
+        .room-name { font-size: 22px; color: var(--navy); }
+        .avail-tag { font-size: 13px; font-weight: 600; color: #8c642a; margin-bottom: 8px; display: block; }
         .qty-wrap { display: flex; align-items: center; justify-content: center; gap: 18px; margin-top: 12px; }
-        .btn-qty { width: 40px; height: 40px; border-radius: 50%; border: 1.5px solid var(--navy); background: white; cursor: pointer; font-size: 20px; }
+        .btn-qty { width: 40px; height: 40px; border-radius: 50%; border: 1px solid #c8d0da; background: white; color: var(--navy); cursor: pointer; font-size: 20px; }
         .btn-qty:disabled { opacity: 0.4; cursor: not-allowed; }
-        .btn-submit { width: 100%; padding: 22px; border-radius: 18px; border: none; background: var(--navy); color: white; font-size: 20px; cursor: pointer; margin-top: 20px; box-shadow: 0 10px 20px rgba(26,54,93,0.3); }
-        .price-tag { font-size: 13px; color: #536174; margin-top: 4px; }
-        .map-wrap { max-width: 440px; margin: 0 auto 22px; background: #efe6d2; border: 2px solid var(--gold); border-radius: 24px; padding: 8px; box-shadow: 0 10px 24px rgba(26,54,93,0.15); }
+        .btn-submit { width: 100%; padding: 17px; border-radius: 12px; border: none; background: var(--navy); color: white; font-size: 18px; cursor: pointer; margin-top: 14px; box-shadow: 0 10px 20px rgba(0,0,0,.16); transition: transform .2s, box-shadow .2s; }
+        .price-tag { font-size: 13px; color: var(--muted); margin-top: 5px; }
+        .map-wrap { max-width: 440px; margin: 0 auto 22px; background: #f2eadc; border: 1px solid var(--gold-soft); border-radius: 20px; padding: 8px; box-shadow: 0 10px 24px rgba(0,0,0,.09); }
         .map-wrap svg { width: 100%; height: auto; display: block; border-radius: 18px; }
         .map-wrap.loading .room-g { opacity: 0.6; }
-        .map-legend { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 14px; font-size: 12px; margin-top: 8px; }
+        .map-legend { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 14px; font-size: 12px; color: var(--muted); margin-top: 10px; }
         .map-legend i { display: inline-block; width: 11px; height: 11px; border-radius: 50%; margin-right: 5px; vertical-align: -1px; }
         .map-summary { text-align: center; font-size: 14px; font-weight: 600; margin: 8px 0 20px; min-height: 20px; }
         .room-g { cursor: pointer; outline: none; transform-box: fill-box; transform-origin: center; transition: filter 0.2s; }
@@ -76,7 +82,8 @@
         @keyframes treeSway { 0%, 100% { transform: rotate(-4deg); } 50% { transform: rotate(4deg); } }
         @keyframes cloudDrift { from { transform: translateX(-220px); } to { transform: translateX(950px); } }
         @media (prefers-reduced-motion: reduce) { .room-g.sel, .room-g.sel .spark, .bubble, .tree, .cloud { animation: none; } }
-        #capWarning, #dateWarning { color: var(--danger); font-size: 15px; font-weight: bold; margin-top: 15px; text-align: center; display: none; background: #fee2e2; padding: 12px; border-radius: 12px; border: 1px solid var(--danger); }
+        #capWarning, #dateWarning { color: #8f2e32; font-size: 14px; font-weight: 600; margin-top: 15px; text-align: center; display: none; background: #fff1f0; padding: 12px; border-radius: 10px; border: 1px solid #e8b7b4; }
+        @media (max-width: 640px) { body { padding: 10px 8px 32px; } .welcome-screen { min-height: calc(100vh - 42px); } .card { padding: 17px 14px; } .header { padding: 28px 16px; } .map-wrap { max-width: 100%; } }
     </style>
 </head>
 <body onload="initPage()">
@@ -84,9 +91,9 @@
     <section id="welcomeScreen" class="welcome-screen">
         <div class="welcome-card">
             <div class="welcome-inner">
-                <div class="brand-pill">🏝️ SN KOHLARN RESERVATION</div>
-                <h1 class="brand-title">Welcome</h1>
-                <p class="welcome-copy">ยินดีต้อนรับสู่ SN Kohlarn ค่ะ กรุณาเลือกวันที่ต้องการเข้าพัก เพื่อให้ระบบตรวจสอบห้องว่างให้ก่อน จากนั้นท่านสามารถเลือกประเภทห้องพักที่ต้องการและดำเนินการจองต่อได้อย่างสะดวกค่ะ</p>
+                <h1 class="brand-title">SN KOHLARN</h1>
+                <p style="color:var(--gold); letter-spacing:.12em; font-size:12px; margin-bottom:14px;">RESERVATION</p>
+                <p class="welcome-copy">เลือกวันเข้าพักเพื่อดูห้องว่างก่อน จากนั้นเลือกห้องที่ต้องการและกรอกข้อมูลติดต่อให้ครบ ใช้เวลาเพียงไม่กี่ขั้นตอนค่ะ</p>
                 <div class="quick-date-card">
                     <div class="section-title">📅 เลือกวันที่เข้าพัก</div>
                     <div class="form-grid">
@@ -104,7 +111,7 @@
                         </div>
                     </div>
                     <div class="date-actions">
-                        <button class="btn-primary" onclick="enterBookingForm()">ดูห้องว่างและเลือกห้องพัก</button>
+                        <button class="btn-primary" onclick="enterBookingForm()">ดูห้องว่าง</button>
                         <button class="btn-secondary" onclick="resetWelcomeDates()">ล้างวันที่</button>
                     </div>
                 </div>
@@ -201,7 +208,7 @@
             </div>
         </div>
 
-        <button class="btn-submit" id="btnSubmit" onclick="submitBooking()">ยืนยันการแจ้งจอง</button>
+        <button class="btn-submit" id="btnSubmit" onclick="submitBooking()">ส่งคำขอจอง</button>
     </main>
 </div>
 
@@ -620,7 +627,7 @@
             if (result && (result.success === false || result.error || result.status === 'error')) throw new Error('backend');
         } catch (err) {
             alert("❌ ส่งข้อมูลไม่สำเร็จ กรุณาตรวจสอบอินเทอร์เน็ตแล้วลองใหม่อีกครั้ง หรือติดต่อทางเพจค่ะ");
-            btn.innerText = "ยืนยันการแจ้งจอง";
+            btn.innerText = "ส่งคำขอจอง";
             btn.disabled = false;
             isSubmitting = false;
             return;
