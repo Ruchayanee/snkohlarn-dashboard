@@ -6,35 +6,40 @@
     <title>ระบบการจอง SN Koh Larn</title>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
-        :root { --primary-brown: #a68b6d; --light-brown: #d7ccc8; --bg-color: #f8f5f2; --text-dark: #4e443f; --white: #ffffff; --accent-green: #6d8a7a; --orange: #e67e22; }
-        body { font-family: 'Kanit', sans-serif; background-color: var(--bg-color); color: var(--text-dark); margin: 0; padding: 15px; }
-        .container { max-width: 650px; margin: 10px auto; background: var(--white); padding: 25px; border-radius: 20px; box-shadow: 0 10px 30px rgba(166, 139, 109, 0.15); }
-        .btn-back-home { display: block; text-align: center; background-color: #e74c3c; color: white; text-decoration: none; padding: 10px; border-radius: 10px; font-weight: bold; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .header { text-align: center; border-bottom: 2px solid var(--bg-color); padding-bottom: 15px; margin-bottom: 20px; }
-        .header h1 { margin: 0; color: var(--primary-brown); font-size: 26px; letter-spacing: 2px; }
-        .mode-selector { display: flex; flex-wrap: wrap; background: #eee; padding: 5px; border-radius: 12px; margin-bottom: 20px; gap: 5px; }
-        .mode-btn { flex: 1; min-width: 80px; padding: 10px 5px; border-radius: 8px; border: none; cursor: pointer; font-family: 'Kanit'; transition: 0.3s; font-size: 13px; font-weight: 500; }
-        .mode-btn.active { background: var(--primary-brown); color: white; }
-        .admin-section { background: #eef2f7; padding: 15px; border-radius: 12px; border: 1px solid #d1d9e6; margin-bottom: 20px; }
-        h3 { color: var(--primary-brown); font-size: 18px; border-left: 4px solid var(--primary-brown); padding-left: 10px; margin: 25px 0 10px; }
+        :root { --primary-brown: #8b6f52; --light-brown: #e6ddd3; --bg-color: #f4f1ed; --text-dark: #2f3540; --muted: #697386; --white: #ffffff; --accent-green: #2e8066; --orange: #c87528; --navy: #253448; --danger: #b94a48; }
+        * { box-sizing: border-box; }
+        body { font-family: 'Kanit', sans-serif; background: radial-gradient(circle at top right, #fffaf3 0, transparent 34%), var(--bg-color); color: var(--text-dark); margin: 0; padding: 24px 14px 48px; }
+        .container { max-width: 760px; margin: 0 auto; background: rgba(255,255,255,.94); padding: clamp(18px, 4vw, 34px); border: 1px solid rgba(139,111,82,.16); border-radius: 24px; box-shadow: 0 18px 48px rgba(53,44,35,.10); }
+        .btn-back-home { display: inline-flex; align-items: center; gap: 7px; background: #fff; color: var(--navy); text-decoration: none; padding: 9px 13px; border: 1px solid #dfe3e8; border-radius: 10px; font-weight: 500; margin-bottom: 24px; }
+        .btn-back-home:hover { border-color: var(--primary-brown); color: var(--primary-brown); }
+        .header { text-align: left; border-bottom: 1px solid #ebe7e2; padding: 0 2px 22px; margin-bottom: 22px; }
+        .header h1 { margin: 0; color: var(--navy); font-size: clamp(24px, 5vw, 32px); letter-spacing: .02em; }
+        .header p { color: var(--muted) !important; font-size: 14px !important; margin-top: 4px !important; }
+        .mode-selector { display: flex; flex-wrap: wrap; background: #f1f3f5; padding: 4px; border-radius: 13px; margin-bottom: 24px; gap: 4px; }
+        .mode-btn { flex: 1; min-width: 120px; padding: 11px 8px; border-radius: 10px; border: none; cursor: pointer; font-family: 'Kanit'; transition: .2s ease; font-size: 14px; font-weight: 500; color: var(--muted); }
+        .mode-btn.active { background: var(--navy); color: white; box-shadow: 0 4px 10px rgba(37,52,72,.18); }
+        .admin-section { background: #faf8f5; padding: 18px; border-radius: 15px; border: 1px solid #e9e1d8; margin-bottom: 22px; }
+        h2, h3 { color: var(--navy) !important; font-size: 19px; border: 0 !important; padding: 0 !important; margin: 26px 0 12px; letter-spacing: -.01em; }
+        h4 { color: var(--navy); }
         .form-group { margin-bottom: 12px; }
-        label { display: block; margin-bottom: 5px; font-size: 14px; font-weight: 500; }
+        label { display: block; margin-bottom: 6px; font-size: 13px; font-weight: 500; color: #4b5563; }
         .flex-row { display: flex; flex-direction: column; gap: 10px; }
         @media (min-width: 480px) { .flex-row { flex-direction: row; } .flex-row div { flex: 1; } }
-        input, select { width: 100%; padding: 12px; border: 1px solid #e0d9d5; border-radius: 10px; font-family: 'Kanit'; box-sizing: border-box; }
-        .type-btn { flex: 1; padding: 10px; border: 1px solid var(--light-brown); border-radius: 10px; text-align: center; cursor: pointer; background: #fff; font-size: 14px; }
-        .type-btn.active { background: var(--primary-brown); color: #fff; }
-        .nightly-container { background: #faf8f6; padding: 15px; border-radius: 12px; border: 1px dashed var(--light-brown); }
-        .room-row { display: flex; gap: 10px; margin-bottom: 10px; align-items: flex-start; flex-wrap: wrap; background: #ffffff; padding: 15px; border-radius: 12px; border: 1px solid #e0d9d5; position: relative;}
-        .btn-add { background: var(--accent-green); color: white; border: none; padding: 5px 10px; border-radius: 8px; cursor: pointer; font-size: 12px; }
+        input, select { width: 100%; padding: 12px 13px; border: 1px solid #d8dde5; border-radius: 10px; font-family: 'Kanit'; box-sizing: border-box; background: #fff; color: var(--text-dark); transition: border-color .2s, box-shadow .2s; }
+        input:focus, select:focus { outline: none; border-color: var(--primary-brown); box-shadow: 0 0 0 3px rgba(139,111,82,.13); }
+        .type-btn { flex: 1; padding: 11px 10px; border: 1px solid #ddd6ce; border-radius: 10px; text-align: center; cursor: pointer; background: #fff; font-size: 14px; color: var(--muted); }
+        .type-btn.active { background: #f0e9e1; color: var(--primary-brown); border-color: var(--primary-brown); font-weight: 600; }
+        .nightly-container { background: #fbfaf8; padding: 18px; border-radius: 15px; border: 1px solid #e9e1d8; }
+        .room-row { display: flex; gap: 10px; margin-bottom: 12px; align-items: flex-start; flex-wrap: wrap; background: #ffffff; padding: 16px; border-radius: 13px; border: 1px solid #e4e7eb; position: relative;}
+        .btn-add { background: #edf5f1; color: #246b56; border: 1px solid #b9d9ca; padding: 8px 11px; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: 500; }
         .btn-remove { position: absolute; top: 10px; right: 10px; background: #ffeaa7; color: #d63031; border: none; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 11px; font-weight: bold; }
         .grid-3 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
         @media (min-width: 480px) { .grid-3 { grid-template-columns: repeat(3, 1fr); } }
-        button.main-btn { background-color: var(--primary-brown); color: white; padding: 16px; border: none; border-radius: 12px; cursor: pointer; width: 100%; font-size: 16px; font-weight: 500; margin-top: 20px; }
-        button.action-btn { background-color: #27ae60; color: white; padding: 16px; border: none; border-radius: 12px; cursor: pointer; width: 100%; font-size: 16px; font-weight: 500; margin-top: 10px; }
+        button.main-btn { background-color: var(--navy); color: white; padding: 14px 16px; border: none; border-radius: 11px; cursor: pointer; width: 100%; font-size: 16px; font-weight: 500; margin-top: 24px; box-shadow: 0 7px 16px rgba(37,52,72,.18); }
+        button.action-btn { background-color: var(--accent-green); color: white; padding: 14px 16px; border: none; border-radius: 11px; cursor: pointer; width: 100%; font-size: 16px; font-weight: 500; margin-top: 10px; box-shadow: 0 7px 16px rgba(46,128,102,.14); }
         button.action-btn:disabled { background-color: #95a5a6; cursor: not-allowed; }
-        #summaryResult { margin-top: 25px; padding: 20px; border: 1px solid var(--light-brown); background: #fffdfb; border-radius: 15px; display: none; white-space: pre-line; font-size: 14px; line-height: 1.8; }
-        .sub-panel { display: none; padding: 15px; background: #fdfaf5; border-radius: 15px; border: 1px solid var(--light-brown); }
+        #summaryResult { margin-top: 25px; padding: 20px; border: 1px solid #d7e2dc; background: #f4faf7; color: #25483d; border-radius: 15px; display: none; white-space: pre-line; font-size: 14px; line-height: 1.8; }
+        .sub-panel { display: none; padding: 18px; background: #fbfaf8; border-radius: 15px; border: 1px solid #e9e1d8; }
         .room-cb-label { display: inline-block; padding: 6px 12px; background: #f1f3f5; border-radius: 20px; font-size: 13px; cursor: pointer; margin: 4px 4px 0 0; border: 1px solid #dee2e6; color: #495057; transition: all 0.2s; user-select: none; }
         .room-cb-label input { display: none; }
         .room-cb-label.checked { background: #1DB446; color: white; border-color: #1DB446; font-weight: bold; }
@@ -44,9 +49,12 @@
         .booking-card { background: #fff; border: 1px solid #e0d9d5; border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
         .booking-card h4 { margin: 0 0 10px 0; color: #2c3e50; font-size: 16px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
         .booking-card p { margin: 5px 0; font-size: 13px; color: #555; }
-        .btn-delete-card { background: #e74c3c; color: white; border: none; padding: 10px; width: 100%; border-radius: 8px; cursor: pointer; font-family: 'Kanit'; transition: 0.3s;}
-        .btn-edit-card { background: #f39c12; color: white; border: none; padding: 10px; width: 100%; border-radius: 8px; cursor: pointer; font-family: 'Kanit'; transition: 0.3s;}
-        .slip-preview-container { background: #fff8e1; border: 2px solid #f39c12; padding: 15px; border-radius: 15px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .btn-delete-card { background: #b83f3d; color: white; border: none; padding: 10px; width: 100%; border-radius: 8px; cursor: pointer; font-family: 'Kanit'; transition: 0.3s;}
+        .btn-edit-card { background: #a96013; color: white; border: none; padding: 10px; width: 100%; border-radius: 8px; cursor: pointer; font-family: 'Kanit'; transition: 0.3s;}
+        .booking-card .btn-add { color: #246b56; }
+        .form-group input[type="number"] { font-variant-numeric: tabular-nums; }
+        .slip-preview-container { background: #fff9ed; border: 1px solid #efc778; padding: 15px; border-radius: 15px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; gap: 14px; }
+        @media (max-width: 480px) { body { padding: 10px 8px 32px; } .container { padding: 16px 13px; border-radius: 18px; } .admin-section { padding: 14px; } .room-row { padding: 13px; } .slip-preview-container { align-items: flex-start; flex-direction: column; } }
     </style>
 </head>
 <body>
@@ -62,13 +70,13 @@
     <div id="pendingSlipArea"></div>
 
     <div class="mode-selector">
-        <button class="mode-btn active" id="modeBooking" onclick="switchMode('booking')">📝 ยืนยันจอง</button>
-        <button class="mode-btn" id="modeManage" onclick="switchMode('manage')">📋 ระบบจัดการการจอง</button>
+        <button class="mode-btn active" id="modeBooking" onclick="switchMode('booking')">📝 สร้างการจอง</button>
+        <button class="mode-btn" id="modeManage" onclick="switchMode('manage')">📋 รายการจอง</button>
     </div>
 
     <div id="bookingFields">
         <div class="admin-section" id="bookingChannelSection">
-            <h3 style="margin-top:0; color: #d35400; border-left-color: #d35400;">🏷️ ประเภทการจอง</h3>
+            <h2 style="margin-top:0; color: #d35400; border-left-color: #d35400;">🏷️ ช่องทางการจอง</h2>
             <select id="bookingChannel" onchange="toggleWalkinMode()" style="font-size: 16px; font-weight: bold; color: #2c3e50;">
                 <option value="online">📱 จองออนไลน์ (ส่งข้อมูลเข้า LINE ลูกค้า)</option>
                 <option value="walkin">🚶‍♂️ ลูกค้า Walk-in หน้ารีสอร์ต (บันทึกบัญชีอย่างเดียว)</option>
@@ -76,7 +84,7 @@
         </div>
 
         <div id="customerInfoGroup">
-            <h3>👤 ข้อมูลลูกค้า</h3>
+            <h2>👤 ข้อมูลลูกค้า</h2>
             <div class="flex-row">
                 <div class="form-group"><label>ชื่อลูกค้า</label><input type="text" id="custName" placeholder="เช่น คุณสมชาย"></div>
                 <div class="form-group"><label>เบอร์โทรศัพท์</label><input type="text" id="contactSource" placeholder="เช่น 0812345678"></div>
@@ -92,13 +100,13 @@
             <input type="number" id="totalGuests" value="2" min="1">
         </div>
 
-        <h3>📅 วันที่เข้าพัก <span id="loadingRooms">⏳ กำลังเชื่อมต่อ...</span></h3>
+        <h2>📅 วันที่เข้าพัก <span id="loadingRooms">⏳ กำลังเชื่อมต่อ...</span></h2>
         <div class="flex-row">
             <div class="form-group"><label>เช็คอิน</label><input type="date" id="checkIn" onchange="updateNightCount(); fetchBookedRooms();"></div>
             <div class="form-group"><label>เช็คเอ้าท์</label><input type="date" id="checkOut" onchange="updateNightCount(); fetchBookedRooms();"></div>
         </div>
 
-        <h3>🏠 ห้องพัก</h3>
+        <h2>🏠 ห้องพัก</h2>
         <div style="display: flex; gap: 10px; margin-bottom: 20px;">
             <div class="type-btn active" id="btnSingle" onclick="switchType('single')">ห้องประเภทเดิมตลอด</div>
             <div class="type-btn" id="btnMixed" onclick="switchType('mixed')">ย้ายห้องรายคืน</div>
@@ -128,7 +136,7 @@
         <div id="mixedRoomArea" class="nightly-container" style="display:none;"><div id="mixedList"></div></div>
 
         <div class="admin-section" style="margin-top:15px; background-color: #e8f5e9; border-color: #c8e6c9;">
-            <h4 style="margin:0 0 10px 0; color:#2e7d32; font-size:15px;">🎁 สิทธิประโยชน์ฟรี</h4>
+            <h3 style="margin:0 0 10px 0; color:#2e7d32; font-size:15px;">🎁 สิทธิ์ที่รวมในราคา</h3>
             <div class="flex-row">
                 <div class="form-group" style="flex:1;"><label>🛵 มอเตอร์ไซค์</label><select id="benefitMotor"><option value="free">✅ ฟรี (ห้องละ 1 คัน)</option><option value="none">❌ ไม่มี</option></select></div>
                 <div class="form-group" style="flex:1;"><label>🍳 อาหารเช้า</label><select id="benefitBreakfast"><option value="free">✅ ฟรีอาหารเช้า</option><option value="none" selected>❌ ไม่มี</option></select></div>
@@ -146,7 +154,7 @@
         </div>
 
         <div class="admin-section" style="margin-top:15px; background-color: #fff8e1; border-color: #ffe082;">
-            <h4 style="margin:0 0 10px 0; color:#f39c12; font-size:15px;">📝 รายการค่าใช้จ่ายอื่นๆ</h4>
+            <h3 style="margin:0 0 10px 0; color:#a96013; font-size:15px;">📝 รายการค่าใช้จ่ายอื่นๆ</h3>
             <div class="flex-row">
                 <div class="form-group" style="flex:2;"><label>รายละเอียด</label><input type="text" id="customExtraName" placeholder="เช่น ค่าเรือ"></div>
                 <div class="form-group" style="flex:1;"><label>จำนวนเงิน (บาท)</label><input type="number" id="customExtraPrice" value="0"></div>
@@ -157,7 +165,7 @@
         <button id="sendLineBtn" class="action-btn" onclick="submitToBackend()" style="display:none;">🚀 2. ยืนยันบันทึกบัญชี & ส่งการ์ด LINE</button>
     </div>
 
-    <div id="manageSection" class="sub-panel"><h3 style="margin-top:0; color: #2980b9; border-left-color: #2980b9;">📋 ระบบจัดการการจอง</h3><button class="action-btn" onclick="loadBookings()" style="background-color: #3498db; margin-bottom: 15px;">🔄 ดึงข้อมูลบิลล่าสุด</button><div id="loadingManage">⏳ กำลังเชื่อมต่อ...</div><div id="bookingListContainer"></div></div>
+    <div id="manageSection" class="sub-panel"><h2 style="margin-top:0; color: #2980b9; border-left-color: #2980b9;">📋 รายการจองปัจจุบัน</h2><button class="action-btn" onclick="loadBookings()" style="background-color: #3498db; margin-bottom: 15px;">🔄 โหลดรายการล่าสุด</button><div id="loadingManage">⏳ กำลังโหลดรายการจอง...</div><div id="bookingListContainer"></div></div>
     <div id="summaryResult"></div>
 </div>
 
