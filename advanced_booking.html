@@ -6,20 +6,22 @@
     <title>จองห้องพัก | SN Koh Larn</title>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Noto+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        :root { --navy: #17283d; --navy-soft: #2b4059; --cream: #f5efe6; --gold: #8c642a; --gold-soft: #ead9b8; --soft: #fcfaf6; --ink: #263344; --muted: #566171; --danger: #b84444; --line: #e7e0d6; }
+        :root { --navy: #14253a; --navy-soft: #30465f; --cream: #f7f2ea; --gold: #a4793d; --gold-soft: #ead9b8; --soft: #fcfaf6; --ink: #253346; --muted: #657181; --danger: #b84444; --line: #e5ded3; --teal: #5b9b8f; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Noto Sans Thai', sans-serif; }
         body { background: radial-gradient(circle at 85% -10%, rgba(182,138,74,.18), transparent 32%), linear-gradient(180deg, #f6f1e9 0%, #fff 42%, #f6f1e9 100%); color: var(--ink); padding: 18px 14px 46px; min-height: 100vh; }
         h1, .room-name, .btn-submit, .brand-title, .header h1 { font-family: 'Cormorant Garamond', serif; }
         .container { max-width: 920px; margin: 0 auto; }
         .hidden { display: none !important; }
         .welcome-screen { min-height: calc(100vh - 30px); display: flex; align-items: center; justify-content: center; }
-        .welcome-card { width: 100%; background: rgba(255,255,255,.88); border: 1px solid rgba(182,138,74,.55); border-radius: 28px; padding: clamp(28px, 6vw, 58px); box-shadow: 0 28px 70px rgba(0,0,0,.12); overflow: hidden; position: relative; backdrop-filter: blur(10px); }
+        .welcome-card { width: 100%; background: rgba(255,255,255,.9); border: 1px solid rgba(182,138,74,.55); border-radius: 30px; padding: clamp(28px, 6vw, 58px); box-shadow: 0 28px 70px rgba(20,37,58,.14); overflow: hidden; position: relative; backdrop-filter: blur(10px); }
         .welcome-card:before { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at top right, rgba(182,138,74,.16), transparent 32%), radial-gradient(circle at bottom left, rgba(23,40,61,.08), transparent 30%); pointer-events: none; }
         .welcome-inner { position: relative; z-index: 1; }
         .brand-pill { display: inline-flex; align-items: center; gap: 8px; color: var(--gold); font-size: 12px; letter-spacing: .12em; font-weight: 600; margin-bottom: 14px; }
+        .brand-pill:before { content: ''; width: 28px; height: 1px; background: var(--gold); }
         .brand-title { font-size: clamp(44px, 10vw, 78px); color: var(--navy); line-height: .88; letter-spacing: .02em; margin-bottom: 16px; }
         .welcome-copy { max-width: 660px; color: var(--muted); line-height: 1.9; margin-bottom: 28px; font-size: 15px; }
-        .quick-date-card { max-width: 720px; background: var(--soft); border: 1px solid var(--line); border-radius: 18px; padding: clamp(16px, 3vw, 24px); box-shadow: 0 8px 26px rgba(0,0,0,.05); }
+        .eyebrow { color: var(--gold); letter-spacing: .16em; font-size: 11px; font-weight: 700; margin-bottom: 12px; }
+        .quick-date-card { max-width: 720px; background: var(--soft); border: 1px solid var(--line); border-radius: 20px; padding: clamp(16px, 3vw, 24px); box-shadow: 0 8px 26px rgba(0,0,0,.05); }
         .date-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 14px; }
         .btn-primary, .btn-secondary { width: 100%; padding: 14px 16px; border-radius: 11px; border: none; font-weight: 600; cursor: pointer; font-size: 15px; transition: transform .2s, box-shadow .2s, background .2s; }
         .btn-primary { background: var(--navy); color: white; box-shadow: 0 9px 20px rgba(0,0,0,.14); }
@@ -31,28 +33,35 @@
         .availability-chip { background: white; border: 1px solid var(--line); border-radius: 12px; padding: 12px 8px; text-align: center; }
         .availability-chip strong { display: block; font-size: 20px; color: var(--gold); }
         .availability-chip span { font-size: 12px; color: var(--muted); }
-        .header { background: var(--navy); color: white; padding: 34px 20px; border-radius: 22px; text-align: center; margin-bottom: 20px; box-shadow: 0 16px 34px rgba(0,0,0,.12); }
+        .header { background: linear-gradient(135deg, #14253a, #2f4a65); color: white; padding: 28px 20px 24px; border-radius: 22px; text-align: center; margin-bottom: 14px; box-shadow: 0 16px 34px rgba(0,0,0,.12); }
         .header h1 { font-size: clamp(42px, 8vw, 64px); line-height: .9; letter-spacing: .04em; }
         .header p { color: #d8c39d; letter-spacing: .18em; font-size: 11px; margin-top: 10px; }
-        .card { background: rgba(255,255,255,.92); border-radius: 18px; padding: clamp(18px, 3vw, 26px); margin-bottom: 18px; border: 1px solid var(--line); box-shadow: 0 8px 26px rgba(0,0,0,.05); }
+        .progress { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 0 0 20px; }
+        .progress-step { display: flex; align-items: center; justify-content: center; gap: 6px; color: var(--muted); font-size: 12px; padding: 9px 6px; background: rgba(255,255,255,.72); border: 1px solid var(--line); border-radius: 999px; }
+        .progress-step strong { display: grid; place-items: center; width: 21px; height: 21px; border-radius: 50%; background: var(--gold-soft); color: var(--navy); font-size: 11px; }
+        .progress-step.active { color: var(--navy); border-color: var(--gold); font-weight: 700; }
+        .progress-step.active strong { background: var(--gold); color: white; }
+        .card { background: rgba(255,255,255,.94); border-radius: 20px; padding: clamp(18px, 3vw, 26px); margin-bottom: 18px; border: 1px solid var(--line); box-shadow: 0 8px 26px rgba(0,0,0,.05); }
         .section-title { font-size: 18px; font-weight: 600; color: var(--navy); margin-bottom: 18px; padding-bottom: 10px; border-bottom: 1px solid var(--gold-soft); }
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         @media (max-width: 640px) { .form-grid, .date-actions { grid-template-columns: 1fr; } .availability-grid { grid-template-columns: repeat(2, 1fr); } }
         input, select { width: 100%; padding: 12px 13px; border: 1px solid #d7dce2; border-radius: 10px; margin-top: 5px; background: #fff; color: var(--ink); transition: border-color .2s, box-shadow .2s; }
         input:focus, select:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px rgba(182,138,74,.16); }
-        .room-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
-        .room-item { border: 1px solid var(--line); border-radius: 16px; overflow: hidden; background: white; transition: transform .2s, box-shadow .2s, border-color .2s; }
+        .room-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+        .room-item { border: 1px solid var(--line); border-radius: 18px; overflow: hidden; background: white; transition: transform .2s, box-shadow .2s, border-color .2s; }
         .room-item:hover { transform: translateY(-2px); box-shadow: 0 12px 24px rgba(0,0,0,.09); border-color: var(--gold-soft); }
         .room-item.unavailable { opacity: 0.48; filter: grayscale(0.35); }
-        .video-box { width: 100%; height: 160px; background: #000; }
+        .video-box { width: 100%; height: 160px; background: #000; position: relative; }
+        .video-box:after { content: 'ดูบรรยากาศห้อง'; position: absolute; left: 12px; bottom: 10px; color: white; font-size: 11px; background: rgba(20,37,58,.68); padding: 4px 8px; border-radius: 999px; }
         .video-box video { width: 100%; height: 100%; object-fit: cover; }
-        .room-info { padding: 18px; text-align: center; }
+        .room-info { padding: 17px; text-align: center; }
         .room-name { font-size: 22px; color: var(--navy); }
         .avail-tag { font-size: 13px; font-weight: 600; color: #8c642a; margin-bottom: 8px; display: block; }
-        .qty-wrap { display: flex; align-items: center; justify-content: center; gap: 18px; margin-top: 12px; }
+        .qty-wrap { display: flex; align-items: center; justify-content: center; gap: 18px; margin-top: 14px; padding-top: 13px; border-top: 1px solid #f0ebe4; }
         .btn-qty { width: 40px; height: 40px; border-radius: 50%; border: 1px solid #c8d0da; background: white; color: var(--navy); cursor: pointer; font-size: 20px; }
         .btn-qty:disabled { opacity: 0.4; cursor: not-allowed; }
-        .btn-submit { width: 100%; padding: 17px; border-radius: 12px; border: none; background: var(--navy); color: white; font-size: 18px; cursor: pointer; margin-top: 14px; box-shadow: 0 10px 20px rgba(0,0,0,.16); transition: transform .2s, box-shadow .2s; }
+        .btn-submit { width: 100%; padding: 17px; border-radius: 14px; border: none; background: var(--navy); color: white; font-size: 18px; cursor: pointer; margin-top: 14px; box-shadow: 0 10px 20px rgba(0,0,0,.16); transition: transform .2s, box-shadow .2s; }
+        .submit-note { text-align: center; color: var(--muted); font-size: 12px; margin: 9px 0 0; }
         .price-tag { font-size: 13px; color: var(--muted); margin-top: 5px; }
         .map-wrap { max-width: 440px; margin: 0 auto 22px; background: #f2eadc; border: 1px solid var(--gold-soft); border-radius: 20px; padding: 8px; box-shadow: 0 10px 24px rgba(0,0,0,.09); }
         .map-wrap svg { width: 100%; height: auto; display: block; border-radius: 18px; }
@@ -83,7 +92,7 @@
         @keyframes cloudDrift { from { transform: translateX(-220px); } to { transform: translateX(950px); } }
         @media (prefers-reduced-motion: reduce) { .room-g.sel, .room-g.sel .spark, .bubble, .tree, .cloud { animation: none; } }
         #capWarning, #dateWarning { color: #8f2e32; font-size: 14px; font-weight: 600; margin-top: 15px; text-align: center; display: none; background: #fff1f0; padding: 12px; border-radius: 10px; border: 1px solid #e8b7b4; }
-        @media (max-width: 640px) { body { padding: 10px 8px 32px; } .welcome-screen { min-height: calc(100vh - 42px); } .card { padding: 17px 14px; } .header { padding: 28px 16px; } .map-wrap { max-width: 100%; } }
+        @media (max-width: 640px) { body { padding: 10px 8px 32px; } .welcome-screen { min-height: calc(100vh - 42px); } .card { padding: 17px 14px; } .header { padding: 24px 16px; } .map-wrap { max-width: 100%; } .progress-step { font-size: 11px; } .progress-step strong { width: 19px; height: 19px; } .btn-submit { position: sticky; bottom: 10px; z-index: 5; } }
     </style>
 </head>
 <body onload="initPage()">
@@ -91,11 +100,13 @@
     <section id="welcomeScreen" class="welcome-screen">
         <div class="welcome-card">
             <div class="welcome-inner">
+                <div class="brand-pill">BOUTIQUE STAY · KOH LARN</div>
                 <h1 class="brand-title">SN KOHLARN</h1>
                 <p style="color:var(--gold); letter-spacing:.12em; font-size:12px; margin-bottom:14px;">RESERVATION</p>
-                <p class="welcome-copy">เลือกวันเข้าพักเพื่อดูห้องว่างก่อน จากนั้นเลือกห้องที่ต้องการและกรอกข้อมูลติดต่อให้ครบ ใช้เวลาเพียงไม่กี่ขั้นตอนค่ะ</p>
+                <p class="welcome-copy">วางแผนการพักผ่อนของคุณบนเกาะล้าน เลือกวันเข้าพักเพื่อดูห้องว่าง แล้วส่งคำขอจองให้ทีมงานดูแลต่อได้ในไม่กี่ขั้นตอนค่ะ</p>
                 <div class="quick-date-card">
-                    <div class="section-title">📅 เลือกวันที่เข้าพัก</div>
+                    <div class="eyebrow">เริ่มต้นการจอง</div>
+                    <div class="section-title">เลือกวันที่เข้าพัก</div>
                     <div class="form-grid">
                         <div><label>เช็คอิน</label><input type="date" id="welcomeCin" onchange="syncDatesFromWelcome(true)"></div>
                         <div><label>เช็คเอาท์</label><input type="date" id="welcomeCout" onchange="syncDatesFromWelcome(true)"></div>
@@ -121,9 +132,14 @@
 
     <main id="bookingApp" class="hidden">
         <div class="header"><h1>SN KOHLARN</h1><p>RESERVATION SYSTEM</p></div>
+        <div class="progress" aria-label="ขั้นตอนการจอง">
+            <div class="progress-step active"><strong>1</strong> วันเข้าพัก</div>
+            <div class="progress-step active"><strong>2</strong> เลือกห้อง</div>
+            <div class="progress-step active"><strong>3</strong> ส่งคำขอ</div>
+        </div>
 
         <div class="card">
-            <div class="section-title">📅 1. วันที่และจำนวนผู้เข้าพัก</div>
+            <div class="eyebrow">ขั้นตอนที่ 1</div><div class="section-title">วันเข้าพักและจำนวนผู้เข้าพัก</div>
             <div class="form-grid">
                 <div><label>เช็คอิน</label><input type="date" id="cin" onchange="syncDatesToWelcome(); checkAvailability()"></div>
                 <div><label>เช็คเอาท์</label><input type="date" id="cout" onchange="syncDatesToWelcome(); checkAvailability()"></div>
@@ -137,7 +153,7 @@
         </div>
 
         <div class="card">
-            <div class="section-title">🛏️ 2. เลือกห้องพัก</div>
+            <div class="eyebrow">ขั้นตอนที่ 2</div><div class="section-title">เลือกห้องพักที่เหมาะกับคุณ</div>
             <div class="map-wrap" id="mapWrap">
                 <svg viewBox="0 0 729 1024" role="group" aria-label="แผนที่ห้องพัก SN Kohlarn มุมสูง แตะเพื่อเลือกห้อง">
                     <rect width="729" height="1024" fill="#efe6d2"/>
@@ -201,7 +217,7 @@
         </div>
 
         <div class="card">
-            <div class="section-title">👤 3. ข้อมูลผู้ติดต่อ</div>
+            <div class="eyebrow">ขั้นตอนที่ 3</div><div class="section-title">ข้อมูลสำหรับติดต่อกลับ</div>
             <div class="form-grid">
                 <div><label>ชื่อผู้ติดต่อ</label><input type="text" id="name" placeholder="กรอกชื่อ-นามสกุล" autocomplete="name"></div>
                 <div><label>เบอร์โทรศัพท์</label><input type="tel" id="phone" placeholder="08x-xxx-xxxx"></div>
@@ -209,6 +225,7 @@
         </div>
 
         <button class="btn-submit" id="btnSubmit" onclick="submitBooking()">ส่งคำขอจอง</button>
+        <p class="submit-note">ทีมงานจะตรวจสอบรายละเอียดและติดต่อกลับเพื่อยืนยันการจองค่ะ</p>
     </main>
 </div>
 
