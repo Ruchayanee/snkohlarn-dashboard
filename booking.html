@@ -184,6 +184,15 @@ async function callAPI(action, payload = {}) {
     try {
         return JSON.parse(rawText);
     } catch (error) {
+        if (action === 'processBooking') {
+            const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(payload))))
+                .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+            const fallback = await fetch(`${BACKEND_URL}?action=processBooking&payload=${encodeURIComponent(encoded)}`);
+            const fallbackText = await fallback.text();
+            try { return JSON.parse(fallbackText); } catch (fallbackError) {
+                throw new Error(fallbackText || 'หลังบ้านไม่ส่งข้อมูล JSON กลับมา');
+            }
+        }
         throw new Error(rawText || 'หลังบ้านไม่ส่งข้อมูล JSON กลับมา');
     }
 }

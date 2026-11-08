@@ -636,7 +636,12 @@
             });
             if (!res.ok) throw new Error('http');
             let result = null;
-            try { result = await res.json(); } catch (e) { /* backend อาจไม่ตอบเป็น JSON */ }
+            try { result = await res.json(); } catch (e) {
+                const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(payload))))
+                    .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+                const fallback = await fetch(`${APP_URL}?action=advancedBooking&payload=${encodeURIComponent(encoded)}`);
+                result = await fallback.json();
+            }
             if (result && (result.success === false || result.error || result.status === 'error')) throw new Error('backend');
         } catch (err) {
             alert("❌ ส่งข้อมูลไม่สำเร็จ กรุณาตรวจสอบอินเทอร์เน็ตแล้วลองใหม่อีกครั้ง หรือติดต่อทางเพจค่ะ");
