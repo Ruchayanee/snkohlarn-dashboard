@@ -418,11 +418,7 @@
         document.getElementById('mapWrap').classList.add('loading');
 
         try {
-            const response = await fetch(APP_URL, {
-                method: "POST",
-                body: JSON.stringify({ action: 'getBookedRoomsDict', data: { cin: cin, cout: cout } }),
-                headers: { "Content-Type": "text/plain;charset=utf-8" }
-            });
+            const response = await fetch(`${APP_URL}?action=getBookedRoomsDict&cin=${encodeURIComponent(cin)}&cout=${encodeURIComponent(cout)}`);
             const bookedRoomsByDate = await response.json();
             if (seq !== availabilitySeq) return; // มีการเลือกวันที่ใหม่แล้ว ใช้ผลล่าสุดเท่านั้น
             lockedRooms = getLockedRoomsForStay(bookedRoomsByDate || {}, cin, cout);
